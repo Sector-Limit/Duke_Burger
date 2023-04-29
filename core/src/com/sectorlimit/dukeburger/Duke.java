@@ -9,6 +9,13 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.World;
 import com.sectorlimit.dukeburger.factory.ExplosionFactory;
 import com.sectorlimit.dukeburger.factory.PickupItemFactory;
 import com.sectorlimit.dukeburger.factory.ProjectileFactory;
@@ -23,6 +30,8 @@ public class Duke {
 	private boolean m_walking;
 	private boolean m_jumping;
 	private float m_walkDuration;
+
+	private World m_world;
 
 	private ExplosionFactory m_explosionFactory;
 	private PickupItemFactory m_pickupItemFactory;
@@ -48,8 +57,10 @@ public class Duke {
 	private static final int NUMBER_OF_WALKING_FRAMES = 4;
 	private static final float WALK_ANIMATION_SPEED = 0.07f;
 
-	public Duke() {
-		m_pickupItemFactory = new PickupItemFactory();
+	public Duke(World world) {
+		m_world = world;
+
+		m_pickupItemFactory = new PickupItemFactory(m_world);
 		m_projectileFactory = new ProjectileFactory();
 		m_explosionFactory = new ExplosionFactory();
 
@@ -103,10 +114,21 @@ public class Duke {
 	}
 
 	public void pickupItem(PickupItem pickupItem) {
+		if(m_pickupItem != null) {
+			return;
+		}
+
 		m_pickupItem = pickupItem;
+
+		m_pickupItem.pickup();
 	}
 
 	public void dropItem() {
+		if(m_pickupItem == null) {
+			return;
+		}
+
+		m_pickupItem.drop(m_velocity);
 		m_pickupItem = null;
 	}
 
@@ -185,15 +207,17 @@ public class Duke {
 		}
 
 		if(Gdx.input.isKeyPressed(Keys.E) || Gdx.input.isKeyPressed(Keys.F)) {
-			for(PickupItem pickupItem : m_pickupItems) {
-				if(getCenterPosition().dst(pickupItem.getCenterPosition()) <= getSize().x) {
-					m_pickupItem = pickupItem;
-					break;
+			if(m_pickupItem == null) {
+				for(PickupItem pickupItem : m_pickupItems) {
+					if(getCenterPosition().dst(pickupItem.getCenterPosition()) <= getSize().x) {
+						m_pickupItem = pickupItem;
+						break;
+					}
 				}
 			}
 		}
 		else if(Gdx.input.isKeyPressed(Keys.G)) {
-			m_pickupItem = null;
+			dropItem();
 		}
 
 		if(m_pickupItem != null) {

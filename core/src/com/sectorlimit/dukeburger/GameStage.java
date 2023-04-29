@@ -12,4 +12,5 @@ public class GameStage extends Stage {
     public void resize(int width, int height) {
     	getViewport().update(width, height, true);
     }
+
 }
