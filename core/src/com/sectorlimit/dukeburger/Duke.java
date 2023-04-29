@@ -9,12 +9,6 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.sectorlimit.dukeburger.factory.ExplosionFactory;
 import com.sectorlimit.dukeburger.factory.PickupItemFactory;
@@ -68,6 +62,7 @@ public class Duke {
 		m_pickupItems = new Vector<PickupItem>();
 		m_pickupItems.add(m_pickupItemFactory.createBurger(new Vector2(150, 5)));
 		m_pickupItems.add(m_pickupItemFactory.createBox(new Vector2(50, 5)));
+		m_pickupItems.add(m_pickupItemFactory.createBarrel(new Vector2(75, 5)));
 
 		m_position = new Vector2(100.0f, 0.0f);
 		m_velocity = new Vector2(0.0f, 0.0f);
@@ -76,20 +71,6 @@ public class Duke {
 		m_walking = false;
 		m_jumping = false;
 		m_walkDuration = 0.0f;
-
-		/*BodyDef bodyDefinition = new BodyDef();
-		bodyDefinition.type = BodyType.DynamicBody;
-		bodyDefinition.position.set(m_position);
-		Body body = m_world.createBody(bodyDefinition);
-		PolygonShape polygonCollisionShape = new PolygonShape();
-		polygonCollisionShape.setAsBox(DUKE_SIZE.x / 2.0f, DUKE_SIZE.y / 2.0f);
-		FixtureDef fixtureDefinition = new FixtureDef();
-		fixtureDefinition.shape = polygonCollisionShape;
-		fixtureDefinition.density = 0.5f;
-		fixtureDefinition.friction = 0.4f;
-		fixtureDefinition.restitution = 0.6f;
-		Fixture fixture = body.createFixture(fixtureDefinition);
-		polygonCollisionShape.dispose();*/
 
 		m_idleTexture = new Texture(Gdx.files.internal("sprites/duke_idle.png"));
 		m_idleHoldTexture = new Texture(Gdx.files.internal("sprites/duke_holds_idle.png"));

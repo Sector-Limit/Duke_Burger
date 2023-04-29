@@ -3,16 +3,10 @@ package com.sectorlimit.dukeburger.factory;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.sectorlimit.dukeburger.object.Barrel;
 import com.sectorlimit.dukeburger.object.Box;
 import com.sectorlimit.dukeburger.object.Burger;
-import com.sectorlimit.dukeburger.object.PickupItem;
 
 public class PickupItemFactory {
 
@@ -20,12 +14,14 @@ public class PickupItemFactory {
 
 	private Texture m_bigBurgerTexture;
 	private Texture m_woodenBoxTexture;
+	private Texture m_barrelTexture;
 
 	public PickupItemFactory(World world) {
 		m_world = world;
 
 		m_bigBurgerTexture = new Texture(Gdx.files.internal("sprites/big_burger.png"));
 		m_woodenBoxTexture = new Texture(Gdx.files.internal("sprites/wooden_box.png"));
+		m_barrelTexture = new Texture(Gdx.files.internal("sprites/barrel.png"));
 	}
 
 	public Burger createBurger(Vector2 position) {
@@ -40,9 +36,16 @@ public class PickupItemFactory {
 		return box;
 	}
 
+	public Barrel createBarrel(Vector2 position) {
+		Barrel barrel = new Barrel(position, m_barrelTexture);
+		barrel.assignPhysics(m_world, position);
+		return barrel;
+	}
+
 	public void dispose() {
 		m_bigBurgerTexture.dispose();
 		m_woodenBoxTexture.dispose();
+		m_barrelTexture.dispose();
 	}
 
 }
