@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.sectorlimit.dukeburger.factory.ExplosionFactory;
 import com.sectorlimit.dukeburger.factory.PickupItemFactory;
+import com.sectorlimit.dukeburger.factory.ProjectileFactory;
 import com.sectorlimit.dukeburger.object.PickupItem;
 
 public class Duke {
@@ -25,6 +26,7 @@ public class Duke {
 
 	private ExplosionFactory m_explosionFactory;
 	private PickupItemFactory m_pickupItemFactory;
+	private ProjectileFactory m_projectileFactory;
 
 	private PickupItem m_pickupItem;
 	private Vector<PickupItem> m_pickupItems;
@@ -48,6 +50,7 @@ public class Duke {
 
 	public Duke() {
 		m_pickupItemFactory = new PickupItemFactory();
+		m_projectileFactory = new ProjectileFactory();
 		m_explosionFactory = new ExplosionFactory();
 
 		m_pickupItems = new Vector<PickupItem>();
@@ -242,6 +245,7 @@ public class Duke {
 
 	public void dispose() {
 		m_pickupItemFactory.dispose();
+		m_projectileFactory.dispose();
 		m_explosionFactory.dispose();
 
 		m_idleTexture.dispose();
