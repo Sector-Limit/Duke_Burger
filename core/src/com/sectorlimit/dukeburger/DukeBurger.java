@@ -4,14 +4,19 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class DukeBurger extends ApplicationAdapter {
 
 	private World m_world;
-	private Box2DDebugRenderer m_debugRenderer; 
+	private Body m_groundBody;
+	private Box2DDebugRenderer m_debugRenderer;
+
 	private GameStage m_gameStage;
 	private SpriteBatch m_spriteBatch;
 	private Duke m_duke;
@@ -24,6 +29,14 @@ public class DukeBurger extends ApplicationAdapter {
 		m_gameStage = new GameStage();
 		m_spriteBatch = new SpriteBatch();
 		m_duke = new Duke(m_world);
+
+		BodyDef groundBodyDefinition = new BodyDef();
+		groundBodyDefinition.position.set(new Vector2(0, -2.0f));
+		m_groundBody = m_world.createBody(groundBodyDefinition);
+		PolygonShape groundBox = new PolygonShape();
+		groundBox.setAsBox(m_gameStage.getCamera().viewportWidth, 1.0f);
+		m_groundBody.createFixture(groundBox, 0.0f);
+		groundBox.dispose();
 	}
 
 	@Override
