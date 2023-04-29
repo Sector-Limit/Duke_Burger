@@ -14,6 +14,7 @@ public class DukeBurger extends ApplicationAdapter {
 
 	@Override
 	public void create() {
+		Gdx.graphics.setWindowedMode(1280, 720);
 		m_gameStage = new GameStage();
 		m_spriteBatch = new SpriteBatch();
 		m_duke = new Duke();
