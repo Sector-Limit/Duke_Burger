@@ -31,7 +31,7 @@ public class DukeBurger extends ApplicationAdapter {
 		m_duke = new Duke(m_world);
 
 		BodyDef groundBodyDefinition = new BodyDef();
-		groundBodyDefinition.position.set(new Vector2(0, -2.0f));
+		groundBodyDefinition.position.set(new Vector2(0.0f, -1.0f));
 		m_groundBody = m_world.createBody(groundBodyDefinition);
 		PolygonShape groundBox = new PolygonShape();
 		groundBox.setAsBox(m_gameStage.getCamera().viewportWidth, 1.0f);
