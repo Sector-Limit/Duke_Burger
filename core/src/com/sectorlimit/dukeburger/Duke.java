@@ -95,7 +95,7 @@ public class Duke {
 	}
 
 	public Vector2 getCenterPosition() {
-		return new Vector2(m_position).add(new Vector2(DUKE_SIZE).scl(0.5f));
+		return new Vector2(m_position).add(new Vector2(getSize()).scl(0.5f));
 	}
 
 	public Vector2 getSize() {
@@ -176,17 +176,17 @@ public class Duke {
 			}
 		}
 
-		if(m_position.x + DUKE_SIZE.x > SCREEN_SIZE.x) {
-			m_position.x = SCREEN_SIZE.x - DUKE_SIZE.x;
+		if(m_position.x + getSize().x > SCREEN_SIZE.x) {
+			m_position.x = SCREEN_SIZE.x - getSize().x;
 		}
 
-		if(m_position.y + DUKE_SIZE.y > SCREEN_SIZE.y) {
-			m_position.y = SCREEN_SIZE.y - DUKE_SIZE.y;
+		if(m_position.y + getSize().y > SCREEN_SIZE.y) {
+			m_position.y = SCREEN_SIZE.y - getSize().y;
 		}
 
 		if(Gdx.input.isKeyPressed(Keys.E) || Gdx.input.isKeyPressed(Keys.F)) {
 			for(PickupItem pickupItem : m_pickupItems) {
-				if(getCenterPosition().dst(pickupItem.getCenterPosition()) <= DUKE_SIZE.x) {
+				if(getCenterPosition().dst(pickupItem.getCenterPosition()) <= getSize().x) {
 					m_pickupItem = pickupItem;
 					break;
 				}
@@ -197,7 +197,7 @@ public class Duke {
 		}
 
 		if(m_pickupItem != null) {
-			m_pickupItem.setPosition(new Vector2(m_position.x, m_position.y + DUKE_SIZE.y));
+			m_pickupItem.setPosition(new Vector2(m_position.x, m_position.y + getSize().y - 1));
 		}
 
 		for(PickupItem pickupItem : m_pickupItems) {
