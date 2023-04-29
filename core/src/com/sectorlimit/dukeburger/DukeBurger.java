@@ -1,16 +1,15 @@
 package com.sectorlimit.dukeburger;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.sectorlimit.dukeburger.factory.ExplosionFactory;
 
 public class DukeBurger extends ApplicationAdapter {
 
 	private GameStage m_gameStage;
 	private SpriteBatch m_spriteBatch;
 	private Duke m_duke;
-	private ExplosionFactory m_explosionFactory;
 
 	@Override
 	public void create() {
@@ -18,7 +17,6 @@ public class DukeBurger extends ApplicationAdapter {
 		m_gameStage = new GameStage();
 		m_spriteBatch = new SpriteBatch();
 		m_duke = new Duke();
-		m_explosionFactory = new ExplosionFactory();
 	}
 
 	@Override
@@ -40,7 +38,6 @@ public class DukeBurger extends ApplicationAdapter {
 	public void dispose() {
 		m_spriteBatch.dispose();
 		m_duke.dispose();
-		m_explosionFactory.dispose();
 	}
 
 }

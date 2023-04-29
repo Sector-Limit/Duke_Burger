@@ -1,5 +1,7 @@
 package com.sectorlimit.dukeburger;
 
+import java.util.Vector;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
@@ -7,6 +9,9 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.sectorlimit.dukeburger.factory.ExplosionFactory;
+import com.sectorlimit.dukeburger.factory.PickupItemFactory;
+import com.sectorlimit.dukeburger.object.PickupItem;
 
 public class Duke {
 
@@ -16,8 +21,13 @@ public class Duke {
 	private boolean m_facingLeft;
 	private boolean m_walking;
 	private boolean m_jumping;
-	private boolean m_holdingItem;
 	private float m_walkDuration;
+
+	private ExplosionFactory m_explosionFactory;
+	private PickupItemFactory m_pickupItemFactory;
+
+	private PickupItem m_pickupItem;
+	private Vector<PickupItem> m_pickupItems;
 
 	private Texture m_idleTexture;
 	private Texture m_idleHoldTexture;
@@ -37,13 +47,19 @@ public class Duke {
 	private static final float WALK_ANIMATION_SPEED = 0.07f;
 
 	public Duke() {
+		m_pickupItemFactory = new PickupItemFactory();
+		m_explosionFactory = new ExplosionFactory();
+
+		m_pickupItems = new Vector<PickupItem>();
+		m_pickupItems.add(m_pickupItemFactory.createBurger(new Vector2(150, 5)));
+		m_pickupItems.add(m_pickupItemFactory.createBox(new Vector2(50, 5)));
+
 		m_position = new Vector2(100.0f, 0.0f);
 		m_velocity = new Vector2(0.0f, 0.0f);
 		m_acceleration = new Vector2(0.0f, 0.0f);
 		m_facingLeft = false;
 		m_walking = false;
 		m_jumping = false;
-		m_holdingItem = false;
 		m_walkDuration = 0.0f;
 
 		m_idleTexture = new Texture(Gdx.files.internal("sprites/duke_idle.png"));
@@ -69,6 +85,26 @@ public class Duke {
 		}
 
 		m_walkHoldAnimation = new Animation<TextureRegion>(WALK_ANIMATION_SPEED, walkHoldFrames);
+	}
+
+	public Vector2 getPosition() {
+		return m_position;
+	}
+
+	public Vector2 getCenterPosition() {
+		return new Vector2(m_position).add(new Vector2(DUKE_SIZE).scl(0.5f));
+	}
+
+	public Vector2 getSize() {
+		return DUKE_SIZE;
+	}
+
+	public void pickupItem(PickupItem pickupItem) {
+		m_pickupItem = pickupItem;
+	}
+
+	public void dropItem() {
+		m_pickupItem = null;
 	}
 
 	public void render(SpriteBatch spriteBatch) {
@@ -138,11 +174,31 @@ public class Duke {
 		}
 
 		if(m_position.x + DUKE_SIZE.x > SCREEN_SIZE.x) {
-			m_position.x = SCREEN_SIZE.x;
+			m_position.x = SCREEN_SIZE.x - DUKE_SIZE.x;
 		}
 
 		if(m_position.y + DUKE_SIZE.y > SCREEN_SIZE.y) {
-			m_position.y = SCREEN_SIZE.y;
+			m_position.y = SCREEN_SIZE.y - DUKE_SIZE.y;
+		}
+
+		if(Gdx.input.isKeyPressed(Keys.E) || Gdx.input.isKeyPressed(Keys.F)) {
+			for(PickupItem pickupItem : m_pickupItems) {
+				if(getCenterPosition().dst(pickupItem.getCenterPosition()) <= DUKE_SIZE.x) {
+					m_pickupItem = pickupItem;
+					break;
+				}
+			}
+		}
+		else if(Gdx.input.isKeyPressed(Keys.G)) {
+			m_pickupItem = null;
+		}
+
+		if(m_pickupItem != null) {
+			m_pickupItem.setPosition(new Vector2(m_position.x, m_position.y + DUKE_SIZE.y));
+		}
+
+		for(PickupItem pickupItem : m_pickupItems) {
+			pickupItem.render(spriteBatch);
 		}
 
 		Texture currentTexture = null;
@@ -152,7 +208,7 @@ public class Duke {
 			currentTexture = m_jumpTexture;
 		}
 		else if(m_walking) {
-			if(m_holdingItem) {
+			if(m_pickupItem != null) {
 				currentTextureRegion = m_walkHoldAnimation.getKeyFrame(m_walkDuration, true);
 			}
 			else {
@@ -160,7 +216,7 @@ public class Duke {
 			}
 		}
 		else {
-			if(m_holdingItem) {
+			if(m_pickupItem != null) {
 				currentTexture = m_idleHoldTexture;
 			}
 			else {
@@ -185,6 +241,9 @@ public class Duke {
 	}
 
 	public void dispose() {
+		m_pickupItemFactory.dispose();
+		m_explosionFactory.dispose();
+
 		m_idleTexture.dispose();
 		m_idleHoldTexture.dispose();
 		m_jumpTexture.dispose();
