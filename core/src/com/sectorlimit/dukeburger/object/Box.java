@@ -15,4 +15,8 @@ public class Box extends PickupItem {
 		return BOX_SIZE;
 	}
 
+	public boolean isRotationFixed() {
+		return true;
+	}
+
 }

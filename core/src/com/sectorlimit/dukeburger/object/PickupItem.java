@@ -4,12 +4,16 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 public abstract class PickupItem {
 
 	protected Body m_body;
-	protected Fixture m_fixture;
 
 	protected Texture m_texture;
 
@@ -29,13 +33,37 @@ public abstract class PickupItem {
 
 	public void setPhysicsProperties(Body body, Fixture fixture) {
 		m_body = body;
-		m_fixture = fixture;
 		
 		m_body.setActive(false);
 	}
 
 	public void setPosition(Vector2 position) {
 		m_body.setTransform(position, 0);
+	}
+
+	public boolean isRotationFixed() {
+		return false;
+	}
+
+	public void assignPhysics(World world, Vector2 position) {
+		BodyDef bodyDefinition = new BodyDef();
+		bodyDefinition.type = BodyType.DynamicBody;
+		bodyDefinition.position.set(position);
+
+		if(isRotationFixed()) {
+			bodyDefinition.fixedRotation = true;
+		}
+
+		m_body = world.createBody(bodyDefinition);
+		PolygonShape polygonCollisionShape = new PolygonShape();
+		polygonCollisionShape.setAsBox(getSize().x / 2.0f, getSize().y / 2.0f);
+		FixtureDef fixtureDefinition = new FixtureDef();
+		fixtureDefinition.shape = polygonCollisionShape;
+		fixtureDefinition.density = 0.5f;
+		fixtureDefinition.friction = 0.2f;
+		fixtureDefinition.restitution = 0.1f;
+		m_body.createFixture(fixtureDefinition);
+		polygonCollisionShape.dispose();
 	}
 
 	public void pickup() {
