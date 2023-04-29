@@ -150,7 +150,7 @@ public class Duke {
 		m_velocity.add(m_acceleration);
 
 		if(m_acceleration.x == 0.0f) {
-			m_velocity.x *= 0.9f;
+			m_velocity.x *= 0.8f;
 		}
 
 		if(m_velocity.x > MAX_VELOCITY) {
