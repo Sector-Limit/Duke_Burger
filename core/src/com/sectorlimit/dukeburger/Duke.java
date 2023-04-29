@@ -34,7 +34,7 @@ public class Duke {
 	private static final float GRAVITY = 180.0f;
 	private static final float MAX_VELOCITY = 80.0f;
 	private static final int NUMBER_OF_WALKING_FRAMES = 4;
-	private static final float WALK_ANIMATION_SPEED = 0.1f;
+	private static final float WALK_ANIMATION_SPEED = 0.07f;
 
 	public Duke() {
 		m_position = new Vector2(100.0f, 0.0f);
