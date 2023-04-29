@@ -77,6 +77,20 @@ public class Duke {
 		m_jumping = false;
 		m_walkDuration = 0.0f;
 
+		/*BodyDef bodyDefinition = new BodyDef();
+		bodyDefinition.type = BodyType.DynamicBody;
+		bodyDefinition.position.set(m_position);
+		Body body = m_world.createBody(bodyDefinition);
+		PolygonShape polygonCollisionShape = new PolygonShape();
+		polygonCollisionShape.setAsBox(DUKE_SIZE.x / 2.0f, DUKE_SIZE.y / 2.0f);
+		FixtureDef fixtureDefinition = new FixtureDef();
+		fixtureDefinition.shape = polygonCollisionShape;
+		fixtureDefinition.density = 0.5f;
+		fixtureDefinition.friction = 0.4f;
+		fixtureDefinition.restitution = 0.6f;
+		Fixture fixture = body.createFixture(fixtureDefinition);
+		polygonCollisionShape.dispose();*/
+
 		m_idleTexture = new Texture(Gdx.files.internal("sprites/duke_idle.png"));
 		m_idleHoldTexture = new Texture(Gdx.files.internal("sprites/duke_holds_idle.png"));
 		m_jumpTexture = new Texture(Gdx.files.internal("sprites/duke_jump.png"));
@@ -223,7 +237,7 @@ public class Duke {
 		}
 
 		if(m_pickupItem != null) {
-			m_pickupItem.setPosition(new Vector2(m_position).add(new Vector2(getSize()).scl(0.5f)).add(new Vector2(0.0f, getSize().y)));
+			m_pickupItem.setPosition(new Vector2(m_position).add(new Vector2(getSize()).scl(0.5f)).add(new Vector2(0.0f, getSize().y - 2)));
 		}
 
 		for(PickupItem pickupItem : m_pickupItems) {
