@@ -43,6 +43,7 @@ public class Duke {
 	private Texture m_idleTexture;
 	private Texture m_idleHoldTexture;
 	private Texture m_jumpTexture;
+	private Texture m_jumpHoldTexture;
 	private Texture m_walkSpriteSheetTexture;
 	private Texture m_walkHoldSpriteSheetTexture;
 	private Animation<TextureRegion> m_walkAnimation;
@@ -79,6 +80,7 @@ public class Duke {
 		m_idleTexture = new Texture(Gdx.files.internal("sprites/duke_idle.png"));
 		m_idleHoldTexture = new Texture(Gdx.files.internal("sprites/duke_holds_idle.png"));
 		m_jumpTexture = new Texture(Gdx.files.internal("sprites/duke_jump.png"));
+		m_jumpHoldTexture = new Texture(Gdx.files.internal("sprites/duke_holds_jump.png"));
 		m_walkSpriteSheetTexture = new Texture(Gdx.files.internal("sprites/duke_walk.png"));
 		m_walkHoldSpriteSheetTexture = new Texture(Gdx.files.internal("sprites/duke_holds_walk.png"));
 
@@ -232,7 +234,12 @@ public class Duke {
 		TextureRegion currentTextureRegion = null;
 
 		if(m_jumping) {
-			currentTexture = m_jumpTexture;
+			if(m_pickupItem != null) {
+				currentTexture = m_jumpHoldTexture;
+			}
+			else {
+				currentTexture = m_jumpTexture;
+			}
 		}
 		else if(m_walking) {
 			if(m_pickupItem != null) {
