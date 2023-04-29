@@ -71,10 +71,19 @@ public abstract class PickupItem {
 	}
 
 	public void drop(Vector2 velocity) {
-		m_body.setLinearVelocity(0.0f, 0.0f);
-		m_body.setAngularVelocity(0.0f);
 		m_body.setActive(true);
+		m_body.setAngularVelocity(0.0f);
 		m_body.setLinearVelocity(velocity);
+	}
+
+	public void toss(boolean tossLeft) {
+		m_body.setActive(true);
+
+		if(!isRotationFixed()) {
+			m_body.setAngularVelocity((float) ((Math.random() * 20.0) - 10.0));
+		}
+
+		m_body.setLinearVelocity(new Vector2((tossLeft ? -1.0f : 1.0f) * 85.0f, 60.0f));
 	}
 
 	public void render(SpriteBatch spriteBatch) {

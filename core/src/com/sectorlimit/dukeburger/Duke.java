@@ -31,6 +31,7 @@ public class Duke {
 	private PickupItemFactory m_pickupItemFactory;
 	private ProjectileFactory m_projectileFactory;
 
+	private boolean m_pickupItemButtonPressed;
 	private PickupItem m_pickupItem;
 	private Vector<PickupItem> m_pickupItems;
 
@@ -59,6 +60,7 @@ public class Duke {
 		m_projectileFactory = new ProjectileFactory();
 		m_explosionFactory = new ExplosionFactory();
 
+		m_pickupItemButtonPressed = false;
 		m_pickupItems = new Vector<PickupItem>();
 		m_pickupItems.add(m_pickupItemFactory.createBurger(new Vector2(150, 5)));
 		m_pickupItems.add(m_pickupItemFactory.createBox(new Vector2(50, 5)));
@@ -118,6 +120,15 @@ public class Duke {
 		m_pickupItem = pickupItem;
 
 		m_pickupItem.pickup();
+	}
+
+	public void throwItem() {
+		if(m_pickupItem == null) {
+			return;
+		}
+
+		m_pickupItem.toss(m_facingLeft);
+		m_pickupItem = null;
 	}
 
 	public void dropItem() {
@@ -204,16 +215,27 @@ public class Duke {
 		}
 
 		if(Gdx.input.isKeyPressed(Keys.E) || Gdx.input.isKeyPressed(Keys.F)) {
-			if(m_pickupItem == null) {
-				for(PickupItem pickupItem : m_pickupItems) {
-					if(getCenterPosition().dst(pickupItem.getCenterPosition()) <= getSize().x) {
-						m_pickupItem = pickupItem;
-						break;
+			if(!m_pickupItemButtonPressed) {
+				m_pickupItemButtonPressed = true;
+	
+				if(m_pickupItem == null) {
+					for(PickupItem pickupItem : m_pickupItems) {
+						if(getCenterPosition().dst(pickupItem.getCenterPosition()) <= getSize().x) {
+							m_pickupItem = pickupItem;
+							break;
+						}
 					}
+				}
+				else {
+					throwItem();
 				}
 			}
 		}
-		else if(Gdx.input.isKeyPressed(Keys.G)) {
+		else {
+			m_pickupItemButtonPressed = false;
+		}
+
+		if(Gdx.input.isKeyPressed(Keys.G)) {
 			dropItem();
 		}
 
