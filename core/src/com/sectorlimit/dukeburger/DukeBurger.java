@@ -1,31 +1,45 @@
 package com.sectorlimit.dukeburger;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.sectorlimit.dukeburger.factory.ExplosionFactory;
 
 public class DukeBurger extends ApplicationAdapter {
-	SpriteBatch batch;
-	Texture img;
-	
+
+	private GameStage m_gameStage;
+	private SpriteBatch m_spriteBatch;
+	private Duke m_duke;
+	private ExplosionFactory m_explosionFactory;
+
 	@Override
-	public void create () {
-		batch = new SpriteBatch();
-		img = new Texture("Duke_Nukem.png");
+	public void create() {
+		m_gameStage = new GameStage();
+		m_spriteBatch = new SpriteBatch();
+		m_duke = new Duke();
+		m_explosionFactory = new ExplosionFactory();
 	}
 
 	@Override
-	public void render () {
-		ScreenUtils.clear(0, 0, 0, 1);
-		batch.begin();
-		batch.draw(img, 0, 0);
-		batch.end();
+	public void resize (int width, int height) {
+		m_gameStage.resize(width, height);
 	}
-	
+
 	@Override
-	public void dispose () {
-		batch.dispose();
-		img.dispose();
+	public void render() {
+		ScreenUtils.clear(0, 0, 0, 1);
+		m_spriteBatch.begin();
+		m_gameStage.getViewport().apply();
+		m_gameStage.draw();
+		m_duke.render(m_spriteBatch);
+		m_spriteBatch.end();
 	}
+
+	@Override
+	public void dispose() {
+		m_spriteBatch.dispose();
+		m_duke.dispose();
+		m_explosionFactory.dispose();
+	}
+
 }

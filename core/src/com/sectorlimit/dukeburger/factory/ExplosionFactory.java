@@ -1,0 +1,40 @@
+package com.sectorlimit.dukeburger.factory;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.sectorlimit.dukeburger.object.Explosion;
+
+public class ExplosionFactory {
+
+	private Animation<TextureRegion> m_explosionAnimation;
+	private Texture m_explosionSpriteSheet;
+
+	private static final int EXPLOSION_SPRITE_SHEET_ROWS = 2;
+	private static final int EXPLOSION_SPRITE_SHEET_COLUMNS = 2;
+
+	public ExplosionFactory() {
+		m_explosionSpriteSheet = new Texture(Gdx.files.internal("sprites/explosion.png"));
+		TextureRegion[][] explosionTextureRegion = TextureRegion.split(m_explosionSpriteSheet, m_explosionSpriteSheet.getWidth() / EXPLOSION_SPRITE_SHEET_COLUMNS, m_explosionSpriteSheet.getHeight() / EXPLOSION_SPRITE_SHEET_ROWS);
+		TextureRegion[] explosionFrames = new TextureRegion[EXPLOSION_SPRITE_SHEET_ROWS * EXPLOSION_SPRITE_SHEET_COLUMNS];
+		int explosionFrameIndex = 0;
+
+		for (int i = 0; i < EXPLOSION_SPRITE_SHEET_ROWS; i++) {
+			for (int j = 0; j < EXPLOSION_SPRITE_SHEET_COLUMNS; j++) {
+				explosionFrames[explosionFrameIndex++] = explosionTextureRegion[i][j];
+			}
+		}
+
+		m_explosionAnimation = new Animation<TextureRegion>(0.15f, explosionFrames);
+	}
+
+	public Explosion createExplosion() {
+		return new Explosion(m_explosionAnimation);
+	}
+
+	public void dispose() {
+		m_explosionSpriteSheet.dispose();
+	}
+
+}
