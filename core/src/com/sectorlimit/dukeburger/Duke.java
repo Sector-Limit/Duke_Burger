@@ -223,7 +223,7 @@ public class Duke {
 		}
 
 		if(m_pickupItem != null) {
-			m_pickupItem.setPosition(new Vector2(m_position.x, m_position.y + getSize().y - 1));
+			m_pickupItem.setPosition(new Vector2(m_position).add(new Vector2(getSize()).scl(0.5f)).add(new Vector2(0.0f, getSize().y)));
 		}
 
 		for(PickupItem pickupItem : m_pickupItems) {
