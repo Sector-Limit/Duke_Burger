@@ -6,6 +6,10 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.World;
 
 public class OctaBaby extends BasicEnemy {
 
@@ -26,6 +30,32 @@ public class OctaBaby extends BasicEnemy {
 
 	public Vector2 getSize() {
 		return OCTA_BABY_SIZE;
+	}
+
+	public void assignPhysics(World world, Vector2 position) {
+		super.assignPhysics(world, position);
+
+		Vector2 halfSize = new Vector2(getSize()).scl(0.5f);
+		float halfSensorWidth = halfSize.x * 0.8f;
+		BodyDef topSensorBodyDefinition = new BodyDef();
+		topSensorBodyDefinition.fixedRotation = true;
+		PolygonShape polygonCollisionShape = new PolygonShape();
+		polygonCollisionShape.set(new Vector2[] {
+			new Vector2(-halfSensorWidth, halfSize.y + 1.0f),
+			new Vector2(halfSensorWidth, halfSize.y + 1.0f),
+			new Vector2(halfSensorWidth, halfSize.y),
+			new Vector2(-halfSensorWidth, halfSize.y)
+		});
+		FixtureDef fixtureDefinition = new FixtureDef();
+		fixtureDefinition.shape = polygonCollisionShape;
+		fixtureDefinition.isSensor = true;
+		m_body.createFixture(fixtureDefinition);
+		polygonCollisionShape.dispose();
+	}
+
+	@Override
+	public boolean isActive() {
+		return !isSquished();
 	}
 
 	public boolean isSquished() {
@@ -52,6 +82,17 @@ public class OctaBaby extends BasicEnemy {
 		if(!isAlive()) {
 			// TODO: add intermediary dying state
 			return;
+		}
+
+		if(isSquished()) {
+			if(m_body.isActive()) {
+				m_body.setActive(false);
+			}
+		}
+		else {
+			if(!m_body.isActive()) {
+				m_body.setActive(true);
+			}
 		}
 
 		float deltaTime = Gdx.graphics.getDeltaTime();

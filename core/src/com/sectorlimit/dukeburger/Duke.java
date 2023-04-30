@@ -24,7 +24,9 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.sectorlimit.dukeburger.enemy.Enemy;
+import com.sectorlimit.dukeburger.enemy.OctaBaby;
 import com.sectorlimit.dukeburger.factory.EnemyFactory;
 import com.sectorlimit.dukeburger.factory.ExplosionFactory;
 import com.sectorlimit.dukeburger.factory.PickupItemFactory;
@@ -450,16 +452,21 @@ public class Duke implements ContactListener {
 	public void beginContact(Contact contact) {
 		Object contactObjectA = contact.getFixtureA().getBody().getUserData();
 		Object contactObjectB = contact.getFixtureB().getBody().getUserData();
+		Fixture contactFixture = null;
 		Object contactObject = null;
 		boolean isPlayerContact = false;
 
 		if(contactObjectA instanceof Duke) {
-			contactObject = contactObjectB;
+			contactFixture = contact.getFixtureB();
 			isPlayerContact = true;
 		}
 		else if(contactObjectB instanceof Duke) {
-			contactObject = contactObjectA;
+			contactFixture = contact.getFixtureA();
 			isPlayerContact = true;
+		}
+
+		if(contactFixture != null) {
+			contactObject = contactFixture.getBody().getUserData();
 		}
 
 		if(isPlayerContact) {
@@ -471,7 +478,20 @@ public class Duke implements ContactListener {
 			}
 			else if(contactObject instanceof Enemy) {
 				Enemy enemy = (Enemy) contactObject;
-				enemy.attack();
+
+				if(enemy instanceof OctaBaby) {
+					OctaBaby octaBaby = (OctaBaby) enemy;
+
+					if(contactFixture.isSensor()) {
+						octaBaby.squish();
+					}
+					else if(!octaBaby.isSquished()) {
+						enemy.attack();
+					}
+				}
+				else {
+					enemy.attack();
+				}
 			}
 		}
 		else {

@@ -18,6 +18,11 @@ public abstract class BasicEnemy extends Enemy {
 	}
 
 	public void update() {
+		if(!isActive()) {
+			m_body.setLinearVelocity(new Vector2(0.0f, 0.0f));
+			return;
+		}
+
 		float deltaTime = Gdx.graphics.getDeltaTime();
 
 		if(m_previousPosition != null) {

@@ -71,6 +71,10 @@ public abstract class Enemy {
 		return m_alive;
 	}
 
+	public boolean isActive() {
+		return true;
+	}
+
 	public abstract void attack();
 
 	public void kill() {
