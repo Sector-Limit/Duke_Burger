@@ -17,8 +17,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.sectorlimit.dukeburger.factory.ExplosionFactory;
 import com.sectorlimit.dukeburger.factory.PickupItemFactory;
+import com.sectorlimit.dukeburger.factory.PowerupsFactory;
 import com.sectorlimit.dukeburger.factory.ProjectileFactory;
 import com.sectorlimit.dukeburger.object.PickupItem;
+import com.sectorlimit.dukeburger.powerup.Powerup;
 
 public class Duke {
 
@@ -33,11 +35,13 @@ public class Duke {
 	private World m_world;
 
 	private ExplosionFactory m_explosionFactory;
+	private PowerupsFactory m_powerupsFactory;
 	private PickupItemFactory m_pickupItemFactory;
 	private ProjectileFactory m_projectileFactory;
 
 	private boolean m_pickupItemButtonPressed;
 	private PickupItem m_pickupItem;
+	private Vector<Powerup> m_powerups;
 	private Vector<PickupItem> m_pickupItems;
 
 	private Texture m_idleTexture;
@@ -62,11 +66,13 @@ public class Duke {
 		m_world = world;
 
 		m_pickupItemFactory = new PickupItemFactory(m_world);
+		m_powerupsFactory = new PowerupsFactory();
 		m_projectileFactory = new ProjectileFactory();
 		m_explosionFactory = new ExplosionFactory();
 
 		m_pickupItemButtonPressed = false;
 		m_pickupItems = new Vector<PickupItem>();
+		m_powerups = new Vector<Powerup>();
 
 		MapLayers mapLayers = map.getLayers();
 		MapObjects mapObjects = mapLayers.get("objects").getObjects();
@@ -75,13 +81,19 @@ public class Duke {
 			MapObject mapObject = mapObjects.get(i);
 			TextureMapObject textureMapObject = (TextureMapObject) mapObject;
 			TextureRegion textureMapObjectTextureRegion = textureMapObject.getTextureRegion();
-			Vector2 pickupItemPosition = new Vector2(textureMapObject.getX() + (textureMapObjectTextureRegion.getRegionWidth() / 2.0f), textureMapObject.getY() + (textureMapObjectTextureRegion.getRegionHeight() / 2.0f));
+			Vector2 objectPosition = new Vector2(textureMapObject.getX() + (textureMapObjectTextureRegion.getRegionWidth() / 2.0f), textureMapObject.getY() + (textureMapObjectTextureRegion.getRegionHeight() / 2.0f));
 
 			if(mapObject.getName().equalsIgnoreCase("wooden_box")) {
-				m_pickupItems.add(m_pickupItemFactory.createBox(pickupItemPosition));
+				m_pickupItems.add(m_pickupItemFactory.createBox(objectPosition));
 			}
 			else if(mapObject.getName().equalsIgnoreCase("barrel")) {
-				m_pickupItems.add(m_pickupItemFactory.createBarrel(pickupItemPosition));
+				m_pickupItems.add(m_pickupItemFactory.createBarrel(objectPosition));
+			}
+			else if(mapObject.getName().equalsIgnoreCase("cola")) {
+				m_powerups.add(m_powerupsFactory.createCola(objectPosition));
+			}
+			else if(mapObject.getName().equalsIgnoreCase("chiken")) {
+				m_powerups.add(m_powerupsFactory.createChicken(objectPosition));
 			}
 		}
 
@@ -267,6 +279,10 @@ public class Duke {
 
 		for(PickupItem pickupItem : m_pickupItems) {
 			pickupItem.render(spriteBatch);
+		}
+
+		for(Powerup powerup : m_powerups) {
+			powerup.render(spriteBatch);
 		}
 
 		Texture currentTexture = null;
