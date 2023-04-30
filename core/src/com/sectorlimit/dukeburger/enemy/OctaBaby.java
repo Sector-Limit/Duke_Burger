@@ -68,16 +68,16 @@ public class OctaBaby extends Enemy {
 		Vector2 renderOrigin = new Vector2(getOriginPosition()).sub(new Vector2(getSize()).scl(0.5f));
 
 		if(currentTexture != null) {
-			spriteBatch.draw(currentTexture, renderOrigin.x, renderOrigin.y, getSize().x / 2, getSize().y / 2, currentTexture.getWidth(), currentTexture.getHeight(), 1.0f, 1.0f, 0.0f, 0, 0, currentTexture.getWidth(), currentTexture.getHeight(), m_facingLeft, false);
+			spriteBatch.draw(currentTexture, renderOrigin.x, renderOrigin.y, getSize().x / 2, getSize().y / 2, currentTexture.getWidth(), currentTexture.getHeight(), 1.0f, 1.0f, 0.0f, 0, 0, currentTexture.getWidth(), currentTexture.getHeight(), !m_facingLeft, false);
 		}
 		else if(currentTextureRegion != null) {
-			if(m_facingLeft) {
+			if(!m_facingLeft) {
 				currentTextureRegion.flip(true, false);
 			}
 	
 			spriteBatch.draw(currentTextureRegion, renderOrigin.x, renderOrigin.y);
 	
-			if(m_facingLeft) {
+			if(!m_facingLeft) {
 				currentTextureRegion.flip(true, false);
 			}
 		}

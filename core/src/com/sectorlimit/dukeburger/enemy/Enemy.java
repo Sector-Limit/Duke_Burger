@@ -17,7 +17,13 @@ public abstract class Enemy {
 	protected Body m_body;
 
 	public Enemy() {
-		m_facingLeft = false;
+		if(shouldRandomizeInitialDirection()) {
+			m_facingLeft = (byte) (Math.random() * 2.0) == 0;
+		}
+		else {
+			m_facingLeft = false;
+		}
+
 		m_alive = true;
 	}
 
@@ -55,6 +61,10 @@ public abstract class Enemy {
 
 	public boolean isFacingLeft() {
 		return m_facingLeft;
+	}
+
+	public boolean shouldRandomizeInitialDirection() {
+		return true;
 	}
 
 	public boolean isAlive() {
