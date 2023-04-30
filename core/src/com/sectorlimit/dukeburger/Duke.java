@@ -117,6 +117,9 @@ public class Duke implements ContactListener {
 			else if(mapObject.getName().equalsIgnoreCase("barrel")) {
 				m_pickupItems.add(m_pickupItemFactory.createBarrel(objectPosition));
 			}
+			else if(mapObject.getName().equalsIgnoreCase("burger")) {
+				m_pickupItems.add(m_pickupItemFactory.createBurger(objectPosition));
+			}
 			else if(mapObject.getName().equalsIgnoreCase("cola")) {
 				m_powerups.add(m_powerupsFactory.createCola(objectPosition));
 			}
@@ -126,7 +129,7 @@ public class Duke implements ContactListener {
 			else if(mapObject.getName().equalsIgnoreCase("octababy")) {
 				m_enemies.add(m_enemyFactory.createOctaBaby(objectPosition));
 			}
-			else if(mapObject.getName().equalsIgnoreCase("restaurant")) {
+			else if(mapObject.getName().equalsIgnoreCase("duke_rest")) {
 				m_staticObjects.add(m_staticObjectFactory.createRestaurant(objectPosition));
 			}
 			else if(!mapObject.getName().equalsIgnoreCase("player_start")){
@@ -328,6 +331,10 @@ public class Duke implements ContactListener {
 
 		if(m_pickupItem != null) {
 			m_pickupItem.setPosition(getOriginPosition().add(new Vector2(1.0f, getSize().y - 1)));
+		}
+
+		for(StaticObject staticObject : m_staticObjects) {
+			staticObject.render(spriteBatch);
 		}
 
 		Vector<PickupItem> pickupItemsToRemove = new Vector<PickupItem>();

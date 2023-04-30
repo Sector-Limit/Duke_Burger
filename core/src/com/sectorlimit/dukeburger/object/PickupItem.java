@@ -37,6 +37,10 @@ public abstract class PickupItem {
 	public abstract Vector2 getSize();
 
 	public void destroy() {
+		if(!isDestructible()) {
+			return;
+		}
+
 		m_destroyed = true;
 	}
 
@@ -60,6 +64,10 @@ public abstract class PickupItem {
 
 	public void setPosition(Vector2 position) {
 		m_body.setTransform(position, 0);
+	}
+
+	public boolean isDestructible() {
+		return true;
 	}
 
 	public boolean isRotationFixed() {

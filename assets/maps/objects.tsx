@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.10.1" name="objects" tilewidth="18" tileheight="16" tilecount="6" columns="0">
+<tileset version="1.10" tiledversion="1.10.1" name="objects" tilewidth="90" tileheight="73" tilecount="8" columns="0">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="0">
   <image width="16" height="16" source="../sprites/barrel.png"/>
@@ -18,5 +18,11 @@
  </tile>
  <tile id="5">
   <image width="16" height="16" source="../sprites/cola_object.png"/>
+ </tile>
+ <tile id="6">
+  <image width="90" height="73" source="../sprites/duke_rest_object.png"/>
+ </tile>
+ <tile id="7">
+  <image width="16" height="13" source="../sprites/burger_pickup.png"/>
  </tile>
 </tileset>

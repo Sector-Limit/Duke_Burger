@@ -46,7 +46,7 @@ public class DukeBurger extends ApplicationAdapter {
 
 	private static final Vector2 VIEWPORT_SIZE = new Vector2(320.0f, 180.0f);
 	private static final float CAMERA_SPEED = 4.0f;
-	private static final boolean MUSIC_ENABLED = true;
+	private static final boolean MUSIC_ENABLED = false;
 
 	@Override
 	public void create() {
@@ -100,9 +100,8 @@ public class DukeBurger extends ApplicationAdapter {
 		m_groundBody.createFixture(groundBox, 0.0f);
 		groundBox.dispose();
 
-		m_music = Gdx.audio.newSound(Gdx.files.internal("music/pixelduke.mp3"));
-
 		if(MUSIC_ENABLED) {
+			m_music = Gdx.audio.newSound(Gdx.files.internal("music/pixelduke.mp3"));
 			m_music.loop();
 		}
 	}

@@ -14,4 +14,10 @@ public class Burger extends PickupItem {
 	public Vector2 getSize() {
 		return BURGER_SIZE;
 	}
+
+	@Override
+	public boolean isDestructible() {
+		return false;
+	}
+
 }
