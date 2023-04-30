@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Burger extends PickupItem {
 
-	private static final Vector2 BURGER_SIZE = new Vector2(16, 16);
+	private static final Vector2 BURGER_SIZE = new Vector2(16, 13);
 
 	public Burger(Vector2 position, Texture texture) {
 		super(position, texture);

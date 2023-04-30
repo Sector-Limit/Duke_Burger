@@ -19,7 +19,7 @@ public class PickupItemFactory {
 	public PickupItemFactory(World world) {
 		m_world = world;
 
-		m_bigBurgerTexture = new Texture(Gdx.files.internal("sprites/big_burger.png"));
+		m_bigBurgerTexture = new Texture(Gdx.files.internal("sprites/burger_pickup.png"));
 		m_woodenBoxTexture = new Texture(Gdx.files.internal("sprites/wooden_box.png"));
 		m_barrelTexture = new Texture(Gdx.files.internal("sprites/barrel.png"));
 	}
