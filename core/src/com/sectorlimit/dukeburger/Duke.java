@@ -306,7 +306,7 @@ public class Duke implements ContactListener {
 		}
 
 		if(m_pickupItem != null) {
-			m_pickupItem.setPosition(getOriginPosition().add(new Vector2(getSize()).scl(0.5f)).add(new Vector2(0.0f, getSize().y - 1)));
+			m_pickupItem.setPosition(getOriginPosition().add(new Vector2(1.0f, getSize().y - 1)));
 		}
 
 		for(PickupItem pickupItem : m_pickupItems) {
