@@ -5,7 +5,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -47,6 +52,29 @@ public class DukeBurger extends ApplicationAdapter {
 		m_map = new TmxMapLoader().load("maps/test_level.tmx");
 		m_mapRenderer = new OrthogonalTiledMapRenderer(m_map);
 		m_mapRenderer.setView(m_camera);
+
+		MapLayers mapLayers = m_map.getLayers();
+		TiledMapTileLayer groundMapLayer = (TiledMapTileLayer) mapLayers.get("ground");
+
+		for(int i = 0; i < groundMapLayer.getTileWidth(); i++) {
+			for(int j = 0; j < groundMapLayer.getTileHeight(); j++) {
+				Cell groundCell = groundMapLayer.getCell(i, j);
+
+				if(groundCell == null) {
+					continue;
+				}
+
+				TiledMapTile groundTile = groundCell.getTile();
+				TextureRegion groundTileTextureRegion = groundTile.getTextureRegion();
+				BodyDef groundTileBodyDefinition = new BodyDef();
+				groundTileBodyDefinition.position.set(new Vector2((i * groundTileTextureRegion.getRegionWidth()) + (groundTileTextureRegion.getRegionWidth() / 2.0f), (j * groundTileTextureRegion.getRegionHeight()) + (groundTileTextureRegion.getRegionHeight() / 2.0f)));
+				Body groundTileBody = m_world.createBody(groundTileBodyDefinition);
+				PolygonShape groundTileBox = new PolygonShape();
+				groundTileBox.setAsBox(groundTileTextureRegion.getRegionWidth() / 2.0f, groundTileTextureRegion.getRegionHeight() / 2.0f);
+				groundTileBody.createFixture(groundTileBox, 0.0f);
+				groundTileBox.dispose();
+			}
+		}
 
 		m_duke = new Duke(m_world, m_map);
 
