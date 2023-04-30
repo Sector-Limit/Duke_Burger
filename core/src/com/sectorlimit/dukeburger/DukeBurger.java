@@ -36,10 +36,12 @@ public class DukeBurger extends ApplicationAdapter {
 
 	private Stage m_gameStage;
 	private OrthographicCamera m_camera;
+	private Vector2 m_cameraOffset;
 	private SpriteBatch m_spriteBatch;
 	private Duke m_duke;
 
 	private static final Vector2 VIEWPORT_SIZE = new Vector2(320.0f, 180.0f);
+	private static final float CAMERA_SPEED = 4.0f;
 
 	@Override
 	public void create() {
@@ -48,6 +50,7 @@ public class DukeBurger extends ApplicationAdapter {
 		m_debugRenderer = new Box2DDebugRenderer();
 		m_gameStage = new Stage(new StretchViewport(VIEWPORT_SIZE.x, VIEWPORT_SIZE.y));
 		m_camera = new OrthographicCamera(VIEWPORT_SIZE.x, VIEWPORT_SIZE.y);
+		m_cameraOffset = new Vector2(0.0f, 0.0f);
 		m_gameStage.getViewport().setCamera(m_camera);
 		m_spriteBatch = new SpriteBatch();
 
@@ -98,22 +101,29 @@ public class DukeBurger extends ApplicationAdapter {
 	@Override
 	public void render() {
 		if(Gdx.input.isKeyPressed(Keys.NUMPAD_4)) {
-			m_camera.translate(-8, 0);
+			m_cameraOffset.add(-CAMERA_SPEED, 0);
 		}
 
 		if(Gdx.input.isKeyPressed(Keys.NUMPAD_6)) {
-			m_camera.translate(8, 0);
+			m_cameraOffset.add(CAMERA_SPEED, 0);
 			
 		}
 
 		if(Gdx.input.isKeyPressed(Keys.NUMPAD_8)) {
-			m_camera.translate(0, 8);
+			m_cameraOffset.add(0, CAMERA_SPEED);
 			
 		}
 
 		if(Gdx.input.isKeyPressed(Keys.NUMPAD_2)) {
-			m_camera.translate(0, -8);
+			m_cameraOffset.add(0, -CAMERA_SPEED);
 		}
+
+		if(Gdx.input.isKeyPressed(Keys.NUMPAD_5)) {
+			m_cameraOffset.set(0.0f, 0.0f);
+		}
+
+		Vector2 newCameraPosition = new Vector2(m_duke.getCenterPosition().x, VIEWPORT_SIZE.y / 2.0f).add(m_cameraOffset);
+		m_camera.position.set(newCameraPosition.x, newCameraPosition.y, 0.0f);
 		
 		m_world.step(1 / 60f, 6, 2);
 		ScreenUtils.clear(0, 0, 0, 1);
