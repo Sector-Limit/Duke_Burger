@@ -71,6 +71,8 @@ public abstract class Enemy {
 		return m_alive;
 	}
 
+	public abstract void attack();
+
 	public void kill() {
 		m_alive = false;
 	}

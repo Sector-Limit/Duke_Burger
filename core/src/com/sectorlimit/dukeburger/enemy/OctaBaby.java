@@ -42,6 +42,10 @@ public class OctaBaby extends BasicEnemy {
 		return true;
 	}
 
+	public void attack() {
+		super.attack();
+	}
+
 	public void render(SpriteBatch spriteBatch) {
 		update();
 

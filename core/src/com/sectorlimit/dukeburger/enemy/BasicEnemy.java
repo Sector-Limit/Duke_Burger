@@ -12,7 +12,11 @@ public abstract class BasicEnemy extends Enemy {
 	public BasicEnemy() {
 		m_previousPosition = null;
 	}
-	
+
+	public void attack() {
+		m_facingLeft = !m_facingLeft;
+	}
+
 	public void update() {
 		float deltaTime = Gdx.graphics.getDeltaTime();
 

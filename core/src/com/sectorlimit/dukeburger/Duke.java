@@ -470,7 +470,8 @@ public class Duke implements ContactListener {
 				m_jumping = false;
 			}
 			else if(contactObject instanceof Enemy) {
-				// TODO: enemy contact
+				Enemy enemy = (Enemy) contactObject;
+				enemy.attack();
 			}
 		}
 		else {
