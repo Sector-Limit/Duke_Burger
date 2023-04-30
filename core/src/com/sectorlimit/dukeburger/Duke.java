@@ -30,9 +30,11 @@ import com.sectorlimit.dukeburger.factory.ExplosionFactory;
 import com.sectorlimit.dukeburger.factory.PickupItemFactory;
 import com.sectorlimit.dukeburger.factory.PowerupsFactory;
 import com.sectorlimit.dukeburger.factory.ProjectileFactory;
+import com.sectorlimit.dukeburger.factory.StaticObjectFactory;
 import com.sectorlimit.dukeburger.object.Barrel;
 import com.sectorlimit.dukeburger.object.Explosion;
 import com.sectorlimit.dukeburger.object.PickupItem;
+import com.sectorlimit.dukeburger.object.StaticObject;
 import com.sectorlimit.dukeburger.powerup.Powerup;
 
 public class Duke implements ContactListener {
@@ -51,6 +53,7 @@ public class Duke implements ContactListener {
 	private PowerupsFactory m_powerupsFactory;
 	private PickupItemFactory m_pickupItemFactory;
 	private ProjectileFactory m_projectileFactory;
+	private StaticObjectFactory m_staticObjectFactory;
 
 	private boolean m_tossingItem;
 	private boolean m_pickupItemButtonPressed;
@@ -59,6 +62,7 @@ public class Duke implements ContactListener {
 	private Vector<PickupItem> m_pickupItems;
 	private Vector<Enemy> m_enemies;
 	private Vector<Explosion> m_explosions;
+	private Vector<StaticObject> m_staticObjects;
 
 	private Texture m_idleTexture;
 	private Texture m_idleHoldTexture;
@@ -88,6 +92,7 @@ public class Duke implements ContactListener {
 		m_powerupsFactory = new PowerupsFactory();
 		m_projectileFactory = new ProjectileFactory();
 		m_explosionFactory = new ExplosionFactory();
+		m_staticObjectFactory = new StaticObjectFactory();
 
 		m_tossingItem = false;
 		m_pickupItemButtonPressed = false;
@@ -95,6 +100,7 @@ public class Duke implements ContactListener {
 		m_powerups = new Vector<Powerup>();
 		m_enemies = new Vector<Enemy>();
 		m_explosions = new Vector<Explosion>();
+		m_staticObjects = new Vector<StaticObject>();
 
 		MapLayers mapLayers = map.getLayers();
 		MapObjects mapObjects = mapLayers.get("objects").getObjects();
@@ -119,6 +125,9 @@ public class Duke implements ContactListener {
 			}
 			else if(mapObject.getName().equalsIgnoreCase("octababy")) {
 				m_enemies.add(m_enemyFactory.createOctaBaby(objectPosition));
+			}
+			else if(mapObject.getName().equalsIgnoreCase("restaurant")) {
+				m_staticObjects.add(m_staticObjectFactory.createRestaurant(objectPosition));
 			}
 			else if(!mapObject.getName().equalsIgnoreCase("player_start")){
 				System.err.println("Unexpected object name: " + mapObject.getName());
