@@ -18,8 +18,6 @@ public class OctaBaby extends Enemy {
 	private static final Vector2 OCTA_BABY_SIZE = new Vector2(16, 16);
 
 	public OctaBaby(Vector2 position, Animation<TextureRegion> octaBabyWalkAnimation, Texture octaBabySquishedTexture) {
-		super(position);
-
 		m_squished = false;
 
 		m_octaBabySquishedTexture = octaBabySquishedTexture;
@@ -51,7 +49,6 @@ public class OctaBaby extends Enemy {
 		}
 
 		float deltaTime = Gdx.graphics.getDeltaTime();
-		Vector2 renderOrigin = new Vector2(getOriginPosition()).sub(new Vector2(getSize()).scl(0.5f));
 		Texture currentTexture = null;
 		TextureRegion currentTextureRegion = null;
 	
@@ -68,8 +65,10 @@ public class OctaBaby extends Enemy {
 			currentTextureRegion = m_octaBabyWalkAnimation.getKeyFrame(m_elapsedAnimationTime, true);
 		}
 
+		Vector2 renderOrigin = new Vector2(getOriginPosition()).sub(new Vector2(getSize()).scl(0.5f));
+
 		if(currentTexture != null) {
-			spriteBatch.draw(currentTexture, m_position.x, m_position.y, renderOrigin.x, renderOrigin.y, currentTexture.getWidth(), currentTexture.getHeight(), 1.0f, 1.0f, 0.0f, 0, 0, currentTexture.getWidth(), currentTexture.getHeight(), m_facingLeft, false);
+			spriteBatch.draw(currentTexture, renderOrigin.x, renderOrigin.y, getSize().x / 2, getSize().y / 2, currentTexture.getWidth(), currentTexture.getHeight(), 1.0f, 1.0f, 0.0f, 0, 0, currentTexture.getWidth(), currentTexture.getHeight(), m_facingLeft, false);
 		}
 		else if(currentTextureRegion != null) {
 			if(m_facingLeft) {

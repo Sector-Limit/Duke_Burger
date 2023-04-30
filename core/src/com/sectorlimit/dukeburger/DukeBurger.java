@@ -47,7 +47,7 @@ public class DukeBurger extends ApplicationAdapter {
 	private static final Vector2 VIEWPORT_SIZE = new Vector2(320.0f, 180.0f);
 	private static final float CAMERA_SPEED = 4.0f;
 	private static final boolean DEBUG_CAMERA_ENABLED = true;
-	private static final boolean PHYSICS_DEBUGGING_ENABLED = false;
+	private static final boolean PHYSICS_DEBUGGING_ENABLED = true;
 	private static final boolean MUSIC_ENABLED = false;
 
 	@Override

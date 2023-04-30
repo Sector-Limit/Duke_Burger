@@ -7,8 +7,8 @@ public class Box extends PickupItem {
 
 	private static final Vector2 BOX_SIZE = new Vector2(16, 16);
 
-	public Box(Vector2 position, Texture texture) {
-		super(position, texture);
+	public Box(Texture texture) {
+		super(texture);
 	}
 
 	public Vector2 getSize() {

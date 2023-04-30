@@ -88,7 +88,7 @@ public class Duke implements ContactListener {
 		m_world.setContactListener(this);
 
 		m_pickupItemFactory = new PickupItemFactory(m_world);
-		m_enemyFactory = new EnemyFactory();
+		m_enemyFactory = new EnemyFactory(m_world);
 		m_powerupsFactory = new PowerupsFactory();
 		m_projectileFactory = new ProjectileFactory();
 		m_explosionFactory = new ExplosionFactory();

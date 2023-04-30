@@ -7,8 +7,8 @@ public class Barrel extends PickupItem {
 
 	private static final Vector2 BARREL_SIZE = new Vector2(16, 16);
 
-	public Barrel(Vector2 position, Texture texture) {
-		super(position, texture);
+	public Barrel(Texture texture) {
+		super(texture);
 	}
 
 	public Vector2 getSize() {

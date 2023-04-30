@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.World;
 import com.sectorlimit.dukeburger.enemy.OctaBaby;
 
 public class EnemyFactory {
@@ -13,9 +14,13 @@ public class EnemyFactory {
 	private Texture m_octaBabyWalkSheetTexture;
 	private Animation<TextureRegion> m_octaBabyWalkAnimation;
 
+	private World m_world;
+
 	private static final int NUMBER_OF_OCTA_BABY_WALK_FRAMES = 2;
 
-	public EnemyFactory() {
+	public EnemyFactory(World world) {
+		m_world = world;
+
 		m_octaBabyWalkSheetTexture = new Texture(Gdx.files.internal("sprites/octababy_walk.png"));
 		m_octaBabySquishedTexture = new Texture(Gdx.files.internal("sprites/octababy_flat.png"));
 
@@ -30,7 +35,9 @@ public class EnemyFactory {
 	}
 
 	public OctaBaby createOctaBaby(Vector2 position) {
-		return new OctaBaby(position, m_octaBabyWalkAnimation, m_octaBabySquishedTexture);
+		OctaBaby octaBaby = new OctaBaby(position, m_octaBabyWalkAnimation, m_octaBabySquishedTexture);
+		octaBaby.assignPhysics(m_world, position);
+		return octaBaby;
 	}
 
 	public void dispose() {

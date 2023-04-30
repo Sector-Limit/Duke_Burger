@@ -25,19 +25,19 @@ public class PickupItemFactory {
 	}
 
 	public Burger createBurger(Vector2 position) {
-		Burger burger = new Burger(position, m_bigBurgerTexture);
+		Burger burger = new Burger(m_bigBurgerTexture);
 		burger.assignPhysics(m_world, position);
 		return burger;
 	}
 
 	public Box createBox(Vector2 position) {
-		Box box = new Box(position, m_woodenBoxTexture);
+		Box box = new Box(m_woodenBoxTexture);
 		box.assignPhysics(m_world, position);
 		return box;
 	}
 
 	public Barrel createBarrel(Vector2 position) {
-		Barrel barrel = new Barrel(position, m_barrelTexture);
+		Barrel barrel = new Barrel(m_barrelTexture);
 		barrel.assignPhysics(m_world, position);
 		return barrel;
 	}
