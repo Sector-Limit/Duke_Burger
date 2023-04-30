@@ -14,7 +14,16 @@ import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.TextureMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.Manifold;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
+import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.sectorlimit.dukeburger.enemy.Enemy;
 import com.sectorlimit.dukeburger.factory.EnemyFactory;
 import com.sectorlimit.dukeburger.factory.ExplosionFactory;
@@ -24,15 +33,14 @@ import com.sectorlimit.dukeburger.factory.ProjectileFactory;
 import com.sectorlimit.dukeburger.object.PickupItem;
 import com.sectorlimit.dukeburger.powerup.Powerup;
 
-public class Duke {
+public class Duke implements ContactListener {
 
-	private Vector2 m_position;
-	private Vector2 m_velocity;
 	private Vector2 m_acceleration;
 	private boolean m_facingLeft;
 	private boolean m_walking;
 	private boolean m_jumping;
 	private float m_walkDuration;
+	private Body m_body;
 
 	private World m_world;
 
@@ -61,15 +69,15 @@ public class Duke {
 
 	private static final Vector2 DUKE_SIZE = new Vector2(16, 16);
 	private static final float ACCELERATION = 150.0f;
-	private static final float JUMP_VELOCITY = 100.0f;
+	private static final float JUMP_VELOCITY = 200.0f;
 	private static final float TOSS_VELOCITY = 75.0f;
-	private static final float GRAVITY = 180.0f;
-	private static final float MAX_VELOCITY = 80.0f;
+	private static final float MAX_HORIZONTAL_VELOCITY = 80.0f;
 	private static final int NUMBER_OF_WALKING_FRAMES = 4;
 	private static final float WALK_ANIMATION_SPEED = 0.07f;
 
 	public Duke(World world, TiledMap map) {
 		m_world = world;
+		m_world.setContactListener(this);
 
 		m_pickupItemFactory = new PickupItemFactory(m_world);
 		m_enemyFactory = new EnemyFactory();
@@ -114,9 +122,22 @@ public class Duke {
 
 		MapObject dukeMapObject = mapObjects.get("player_start");
 		TextureMapObject textureDukeMapObject = (TextureMapObject) dukeMapObject;
-		m_position = new Vector2(textureDukeMapObject.getX(), textureDukeMapObject.getY());
+		BodyDef bodyDefinition = new BodyDef();
+		bodyDefinition.type = BodyType.DynamicBody;
+		bodyDefinition.position.set(new Vector2(textureDukeMapObject.getX(), textureDukeMapObject.getY()));
+		bodyDefinition.fixedRotation = true;
+		m_body = world.createBody(bodyDefinition);
+		m_body.setUserData(this);
+		PolygonShape polygonCollisionShape = new PolygonShape();
+		polygonCollisionShape.setAsBox(getSize().x / 2.0f, getSize().y / 2.0f);
+		FixtureDef fixtureDefinition = new FixtureDef();
+		fixtureDefinition.shape = polygonCollisionShape;
+		fixtureDefinition.density = 0.5f;
+		fixtureDefinition.friction = 0.2f;
+		fixtureDefinition.restitution = 0.1f;
+		m_body.createFixture(fixtureDefinition);
+		polygonCollisionShape.dispose();
 
-		m_velocity = new Vector2(0.0f, 0.0f);
 		m_acceleration = new Vector2(0.0f, 0.0f);
 		m_facingLeft = false;
 		m_walking = false;
@@ -150,12 +171,12 @@ public class Duke {
 		m_walkHoldAnimation = new Animation<TextureRegion>(WALK_ANIMATION_SPEED, walkHoldFrames);
 	}
 
-	public Vector2 getPosition() {
-		return m_position;
+	public Vector2 getOriginPosition() {
+		return m_body.getPosition();
 	}
 
 	public Vector2 getCenterPosition() {
-		return new Vector2(m_position).add(new Vector2(getSize()).scl(0.5f));
+		return new Vector2(getOriginPosition()).add(new Vector2(getSize()).scl(0.5f));
 	}
 
 	public Vector2 getSize() {
@@ -177,7 +198,7 @@ public class Duke {
 			return;
 		}
 
-		m_velocity.y = TOSS_VELOCITY;
+		m_body.setLinearVelocity(new Vector2(m_body.getLinearVelocity()).add(new Vector2(0.0f, TOSS_VELOCITY)));
 		m_acceleration.x = 0;
 		m_tossingItem = true;
 		m_pickupItem.toss(m_facingLeft);
@@ -189,7 +210,7 @@ public class Duke {
 			return;
 		}
 
-		m_pickupItem.drop(m_velocity);
+		m_pickupItem.drop(m_body.getLinearVelocity());
 		m_pickupItem = null;
 	}
 
@@ -213,10 +234,12 @@ public class Duke {
 		}
 
 		boolean wasJumping = m_jumping;
+		Vector2 newVelocity = new Vector2(m_body.getLinearVelocity());
 		
 		if(Gdx.input.isKeyPressed(Keys.SPACE) && !m_jumping) {
+			// TODO: player must be on object or surface
 			m_jumping = true;
-			m_velocity.y = JUMP_VELOCITY;
+			newVelocity.add(new Vector2(0.0f, JUMP_VELOCITY));
 			m_acceleration.x = 0;
 		}
 
@@ -228,27 +251,25 @@ public class Duke {
 			}
 		}
 
-		m_acceleration.y = -GRAVITY;
 		m_acceleration.scl(deltaTime);
-		m_velocity.add(m_acceleration);
+		newVelocity.add(m_acceleration);
 
 		if(m_acceleration.x == 0.0f) {
-			m_velocity.x *= 0.8f;
+			newVelocity.x *= 0.8f;
 		}
 
-		if(m_velocity.x > MAX_VELOCITY) {
-			m_velocity.x = MAX_VELOCITY;
+		if(newVelocity.x > MAX_HORIZONTAL_VELOCITY) {
+			newVelocity.x = MAX_HORIZONTAL_VELOCITY;
 		}
-		else if(m_velocity.x < -MAX_VELOCITY) {
-			m_velocity.x = -MAX_VELOCITY;
+		else if(newVelocity.x < -MAX_HORIZONTAL_VELOCITY) {
+			newVelocity.x = -MAX_HORIZONTAL_VELOCITY;
 		}
 
-		Vector2 scaledVelocity = new Vector2(m_velocity.x, m_velocity.y).scl(deltaTime);
+		m_body.setLinearVelocity(newVelocity);
 
-		m_position.add(scaledVelocity);
-
-		if(m_position.y < 0.0f) {
-			m_position.y = 0.0f;
+		if(m_body.getPosition().y + DUKE_SIZE.y < 0.0f) {
+			// TODO: kill player
+			// TODO: stop jumping / tossing on collision
 
 			if(wasJumping) {
 				m_jumping = false;
@@ -285,7 +306,7 @@ public class Duke {
 		}
 
 		if(m_pickupItem != null) {
-			m_pickupItem.setPosition(new Vector2(m_position).add(new Vector2(getSize()).scl(0.5f)).add(new Vector2(0.0f, getSize().y - 1)));
+			m_pickupItem.setPosition(getOriginPosition().add(new Vector2(getSize()).scl(0.5f)).add(new Vector2(0.0f, getSize().y - 1)));
 		}
 
 		for(PickupItem pickupItem : m_pickupItems) {
@@ -345,21 +366,59 @@ public class Duke {
 			}
 		}
 
+		Vector2 renderOrigin = new Vector2(getOriginPosition()).sub(new Vector2(getSize()).scl(0.5f));
+
 		if(currentTexture != null) {
-			spriteBatch.draw(currentTexture, m_position.x, m_position.y, 0.0f, 0.0f, currentTexture.getWidth(), currentTexture.getHeight(), 1.0f, 1.0f, 0.0f, 0, 0, currentTexture.getWidth(), currentTexture.getHeight(), m_facingLeft, false);
+			spriteBatch.draw(currentTexture, renderOrigin.x, renderOrigin.y, 0.0f, 0.0f, currentTexture.getWidth(), currentTexture.getHeight(), 1.0f, 1.0f, 0.0f, 0, 0, currentTexture.getWidth(), currentTexture.getHeight(), m_facingLeft, false);
 		}
 		else if(currentTextureRegion != null) {
 			if(m_facingLeft) {
 				currentTextureRegion.flip(true, false);
 			}
 
-			spriteBatch.draw(currentTextureRegion, m_position.x, m_position.y);
+			spriteBatch.draw(currentTextureRegion, renderOrigin.x, renderOrigin.y);
 
 			if(m_facingLeft) {
 				currentTextureRegion.flip(true, false);
 			}
 		}
 	}
+
+	@Override
+	public void beginContact(Contact contact) {
+		Object contactObjectA = contact.getFixtureA().getBody().getUserData();
+		Object contactObjectB = contact.getFixtureB().getBody().getUserData();
+		Object contactObject = null;
+
+		if(contactObjectA instanceof Duke) {
+			contactObject = contactObjectB;
+		}
+		else if(contactObjectB instanceof Duke) {
+			contactObject = contactObjectA;
+		}
+		else {
+			return;
+		}
+
+		if(contactObject == null) {
+			m_jumping = false;
+		}
+		else if(contactObject instanceof PickupItem) {
+			m_jumping = false;
+		}
+		else if(contactObject instanceof Enemy) {
+			// TODO: enemy contact
+		}
+	}
+
+	@Override
+	public void endContact(Contact contact) { }
+
+	@Override
+	public void preSolve(Contact contact, Manifold oldManifold) { }
+
+	@Override
+	public void postSolve(Contact contact, ContactImpulse impulse) { }
 
 	public void dispose() {
 		m_pickupItemFactory.dispose();

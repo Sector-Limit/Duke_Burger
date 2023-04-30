@@ -47,7 +47,7 @@ public class DukeBurger extends ApplicationAdapter {
 	@Override
 	public void create() {
 		Gdx.graphics.setWindowedMode(1280, 720);
-		m_world = new World(new Vector2(0, -180), true);
+		m_world = new World(new Vector2(0, -220), true);
 		m_debugRenderer = new Box2DDebugRenderer();
 		m_gameStage = new Stage(new StretchViewport(VIEWPORT_SIZE.x, VIEWPORT_SIZE.y));
 		m_camera = new OrthographicCamera(VIEWPORT_SIZE.x, VIEWPORT_SIZE.y);

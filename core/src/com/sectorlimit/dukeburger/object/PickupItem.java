@@ -55,6 +55,7 @@ public abstract class PickupItem {
 		}
 
 		m_body = world.createBody(bodyDefinition);
+		m_body.setUserData(this);
 		PolygonShape polygonCollisionShape = new PolygonShape();
 		polygonCollisionShape.setAsBox(getSize().x / 2.0f, getSize().y / 2.0f);
 		FixtureDef fixtureDefinition = new FixtureDef();
