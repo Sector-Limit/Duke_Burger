@@ -14,15 +14,18 @@ import com.badlogic.gdx.physics.box2d.World;
 public class OctaBaby extends BasicEnemy {
 
 	private boolean m_squished;
+	private float m_squishedTimeElapsed;
 
 	private Texture m_octaBabySquishedTexture;
 	private Animation<TextureRegion> m_octaBabyWalkAnimation;
 	private float m_elapsedAnimationTime;
 
 	private static final Vector2 OCTA_BABY_SIZE = new Vector2(16, 16);
+	private static final float MAX_SQUISHED_DURATION = 3.0f;
 
 	public OctaBaby(Vector2 position, Animation<TextureRegion> octaBabyWalkAnimation, Texture octaBabySquishedTexture) {
 		m_squished = false;
+		m_squishedTimeElapsed = 0.0f;
 
 		m_octaBabySquishedTexture = octaBabySquishedTexture;
 		m_octaBabyWalkAnimation = octaBabyWalkAnimation;
@@ -72,6 +75,18 @@ public class OctaBaby extends BasicEnemy {
 		return true;
 	}
 
+	public boolean unsquish() {
+		if(!m_squished) {
+			return false;
+		}
+
+		m_squished = false;
+		m_squishedTimeElapsed = 0.0f;
+		m_body.setActive(true);
+
+		return true;
+	}
+
 	public void attack() {
 		super.attack();
 	}
@@ -84,9 +99,17 @@ public class OctaBaby extends BasicEnemy {
 			return;
 		}
 
+		float deltaTime = Gdx.graphics.getDeltaTime();
+
 		if(isSquished()) {
 			if(m_body.isActive()) {
 				m_body.setActive(false);
+			}
+
+			m_squishedTimeElapsed += deltaTime;
+
+			if(m_squishedTimeElapsed >= MAX_SQUISHED_DURATION) {
+				unsquish();
 			}
 		}
 		else {
@@ -95,7 +118,6 @@ public class OctaBaby extends BasicEnemy {
 			}
 		}
 
-		float deltaTime = Gdx.graphics.getDeltaTime();
 		Texture currentTexture = null;
 		TextureRegion currentTextureRegion = null;
 	
