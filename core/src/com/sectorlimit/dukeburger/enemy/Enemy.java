@@ -53,7 +53,7 @@ public abstract class Enemy {
 		FixtureDef fixtureDefinition = new FixtureDef();
 		fixtureDefinition.shape = polygonCollisionShape;
 		fixtureDefinition.density = 0.5f;
-		fixtureDefinition.friction = 0.2f;
+		fixtureDefinition.friction = 0.0f;
 		fixtureDefinition.restitution = 0.1f;
 		m_body.createFixture(fixtureDefinition);
 		polygonCollisionShape.dispose();

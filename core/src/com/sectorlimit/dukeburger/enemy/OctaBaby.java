@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
-public class OctaBaby extends Enemy {
+public class OctaBaby extends BasicEnemy {
 
 	private boolean m_squished;
 
@@ -43,6 +43,8 @@ public class OctaBaby extends Enemy {
 	}
 
 	public void render(SpriteBatch spriteBatch) {
+		update();
+
 		if(!isAlive()) {
 			// TODO: add intermediary dying state
 			return;
