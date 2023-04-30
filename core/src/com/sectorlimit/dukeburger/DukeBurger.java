@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapLayers;
@@ -29,6 +30,7 @@ public class DukeBurger extends ApplicationAdapter {
 	private Body m_groundBody;
 	private Box2DDebugRenderer m_debugRenderer;
 
+	private Texture m_skyTexture;
 	private TiledMap m_map;
 	private OrthogonalTiledMapRenderer m_mapRenderer;
 
@@ -49,7 +51,8 @@ public class DukeBurger extends ApplicationAdapter {
 		m_gameStage.getViewport().setCamera(m_camera);
 		m_spriteBatch = new SpriteBatch();
 
-		m_map = new TmxMapLoader().load("maps/test_level_2.tmx");
+		m_skyTexture = new Texture(Gdx.files.internal("sprites/city_bg.png"));
+		m_map = new TmxMapLoader().load("maps/test_level.tmx");
 		m_mapRenderer = new OrthogonalTiledMapRenderer(m_map);
 		m_mapRenderer.setView(m_camera);
 
@@ -115,14 +118,21 @@ public class DukeBurger extends ApplicationAdapter {
 		m_world.step(1 / 60f, 6, 2);
 		ScreenUtils.clear(0, 0, 0, 1);
 
+		m_camera.update();
+
 		m_spriteBatch.begin();
 
-		m_camera.update();
-		m_mapRenderer.setView(m_camera);
-		m_mapRenderer.render();
+		m_spriteBatch.draw(m_skyTexture, 0.0f, 0.0f, 0.0f, 0.0f, m_skyTexture.getWidth(), m_skyTexture.getHeight(), 4.0f, 4.0f, 0.0f, 0, 0, m_skyTexture.getWidth(), m_skyTexture.getHeight(), false, false);
+
+		m_spriteBatch.end();
+
+		m_spriteBatch.begin();
 
 		m_gameStage.getViewport().apply();
 		m_gameStage.draw();
+
+		m_mapRenderer.setView(m_camera);
+		m_mapRenderer.render();
 
 		m_duke.render(m_spriteBatch);
 
