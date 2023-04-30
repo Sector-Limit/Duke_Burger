@@ -267,7 +267,7 @@ public class Duke implements ContactListener {
 
 		m_body.setLinearVelocity(newVelocity);
 
-		if(m_body.getPosition().y + DUKE_SIZE.y < 0.0f) {
+		if(m_body.getPosition().y + getSize().y < 0.0f) {
 			// TODO: kill player
 			// TODO: stop jumping / tossing on collision
 
@@ -286,7 +286,7 @@ public class Duke implements ContactListener {
 
 				if(m_pickupItem == null) {
 					for(PickupItem pickupItem : m_pickupItems) {
-						if(getCenterPosition().dst(pickupItem.getCenterPosition()) <= getSize().x) {
+						if(getOriginPosition().dst(pickupItem.getOriginPosition()) <= (getSize().x / 2.0f) + pickupItem.getSize().x) {
 							m_pickupItem = pickupItem;
 							break;
 						}
