@@ -70,6 +70,7 @@ public class Duke implements ContactListener {
 	private static final Vector2 DUKE_SIZE = new Vector2(16, 16);
 	private static final float ACCELERATION = 150.0f;
 	private static final float JUMP_VELOCITY = 200.0f;
+	private static final float JUMP_HOLD_VELOCITY = 100.0f;
 	private static final float TOSS_VELOCITY = 75.0f;
 	private static final float MAX_HORIZONTAL_VELOCITY = 80.0f;
 	private static final int NUMBER_OF_WALKING_FRAMES = 4;
@@ -239,7 +240,13 @@ public class Duke implements ContactListener {
 		if(Gdx.input.isKeyPressed(Keys.SPACE) && !m_jumping) {
 			// TODO: player must be on object or surface
 			m_jumping = true;
-			newVelocity.add(new Vector2(0.0f, JUMP_VELOCITY));
+			float jumpVelocity = JUMP_VELOCITY;
+
+			if(m_pickupItem != null) {
+				jumpVelocity = JUMP_HOLD_VELOCITY;
+			}
+
+			newVelocity.add(new Vector2(0.0f, jumpVelocity));
 			m_acceleration.x = 0;
 		}
 
@@ -287,7 +294,7 @@ public class Duke implements ContactListener {
 				if(m_pickupItem == null) {
 					for(PickupItem pickupItem : m_pickupItems) {
 						if(getOriginPosition().dst(pickupItem.getOriginPosition()) <= (getSize().x / 2.0f) + pickupItem.getSize().x) {
-							m_pickupItem = pickupItem;
+							pickupItem(pickupItem);
 							break;
 						}
 					}
