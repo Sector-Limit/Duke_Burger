@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
@@ -69,17 +70,20 @@ public class Duke {
 		m_pickupItemButtonPressed = false;
 		m_pickupItems = new Vector<PickupItem>();
 
-		MapObjects mapObjects = map.getLayers().get("objects").getObjects();
+		MapLayers mapLayers = map.getLayers();
+		MapObjects mapObjects = mapLayers.get("objects").getObjects();
 
 		for(int i = 0; i < mapObjects.getCount(); i++) {
 			MapObject mapObject = mapObjects.get(i);
 			TextureMapObject textureMapObject = (TextureMapObject) mapObject;
+			TextureRegion textureMapObjectTextureRegion = textureMapObject.getTextureRegion();
+			Vector2 pickupItemPosition = new Vector2(textureMapObject.getX() + (textureMapObjectTextureRegion.getRegionWidth() / 2.0f), textureMapObject.getY() + (textureMapObjectTextureRegion.getRegionHeight() / 2.0f));
 
 			if(mapObject.getName().equalsIgnoreCase("wooden_box")) {
-				m_pickupItems.add(m_pickupItemFactory.createBox(new Vector2(textureMapObject.getX(), textureMapObject.getY())));
+				m_pickupItems.add(m_pickupItemFactory.createBox(pickupItemPosition));
 			}
 			else if(mapObject.getName().equalsIgnoreCase("barrel")) {
-				m_pickupItems.add(m_pickupItemFactory.createBarrel(new Vector2(textureMapObject.getX(), textureMapObject.getY())));
+				m_pickupItems.add(m_pickupItemFactory.createBarrel(pickupItemPosition));
 			}
 		}
 
