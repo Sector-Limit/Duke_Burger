@@ -57,7 +57,6 @@ public class DukeBurger extends ApplicationAdapter {
 		m_skyTexture = new Texture(Gdx.files.internal("sprites/city_bg.png"));
 		m_map = new TmxMapLoader().load("maps/test_level_2.tmx");
 		m_mapRenderer = new OrthogonalTiledMapRenderer(m_map);
-		m_mapRenderer.setView(m_camera);
 
 		MapLayers mapLayers = m_map.getLayers();
 		TiledMapTileLayer groundMapLayer = (TiledMapTileLayer) mapLayers.get("ground");
@@ -106,12 +105,10 @@ public class DukeBurger extends ApplicationAdapter {
 
 		if(Gdx.input.isKeyPressed(Keys.NUMPAD_6)) {
 			m_cameraOffset.add(CAMERA_SPEED, 0);
-			
 		}
 
 		if(Gdx.input.isKeyPressed(Keys.NUMPAD_8)) {
 			m_cameraOffset.add(0, CAMERA_SPEED);
-			
 		}
 
 		if(Gdx.input.isKeyPressed(Keys.NUMPAD_2)) {
@@ -124,7 +121,7 @@ public class DukeBurger extends ApplicationAdapter {
 
 		Vector2 newCameraPosition = new Vector2(m_duke.getCenterPosition().x, VIEWPORT_SIZE.y / 2.0f).add(m_cameraOffset);
 		m_camera.position.set(newCameraPosition.x, newCameraPosition.y, 0.0f);
-		
+
 		m_world.step(1 / 60f, 6, 2);
 		ScreenUtils.clear(0, 0, 0, 1);
 

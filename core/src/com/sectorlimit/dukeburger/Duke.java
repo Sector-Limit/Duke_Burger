@@ -42,6 +42,7 @@ public class Duke {
 	private PickupItemFactory m_pickupItemFactory;
 	private ProjectileFactory m_projectileFactory;
 
+	private boolean m_tossingItem;
 	private boolean m_pickupItemButtonPressed;
 	private PickupItem m_pickupItem;
 	private Vector<Powerup> m_powerups;
@@ -52,6 +53,7 @@ public class Duke {
 	private Texture m_idleHoldTexture;
 	private Texture m_jumpTexture;
 	private Texture m_jumpHoldTexture;
+	private Texture m_tossItemTexture;
 	private Texture m_walkSpriteSheetTexture;
 	private Texture m_walkHoldSpriteSheetTexture;
 	private Animation<TextureRegion> m_walkAnimation;
@@ -59,7 +61,8 @@ public class Duke {
 
 	private static final Vector2 DUKE_SIZE = new Vector2(16, 16);
 	private static final float ACCELERATION = 150.0f;
-	private static final float JUMP_VELOCITY = 90.0f;
+	private static final float JUMP_VELOCITY = 100.0f;
+	private static final float TOSS_VELOCITY = 75.0f;
 	private static final float GRAVITY = 180.0f;
 	private static final float MAX_VELOCITY = 80.0f;
 	private static final int NUMBER_OF_WALKING_FRAMES = 4;
@@ -74,6 +77,7 @@ public class Duke {
 		m_projectileFactory = new ProjectileFactory();
 		m_explosionFactory = new ExplosionFactory();
 
+		m_tossingItem = false;
 		m_pickupItemButtonPressed = false;
 		m_pickupItems = new Vector<PickupItem>();
 		m_powerups = new Vector<Powerup>();
@@ -120,6 +124,7 @@ public class Duke {
 		m_idleHoldTexture = new Texture(Gdx.files.internal("sprites/duke_holds_idle.png"));
 		m_jumpTexture = new Texture(Gdx.files.internal("sprites/duke_jump.png"));
 		m_jumpHoldTexture = new Texture(Gdx.files.internal("sprites/duke_holds_jump.png"));
+		m_tossItemTexture = new Texture(Gdx.files.internal("sprites/duke_toss.png"));
 		m_walkSpriteSheetTexture = new Texture(Gdx.files.internal("sprites/duke_walk.png"));
 		m_walkHoldSpriteSheetTexture = new Texture(Gdx.files.internal("sprites/duke_holds_walk.png"));
 
@@ -164,11 +169,14 @@ public class Duke {
 		m_pickupItem.pickup();
 	}
 
-	public void throwItem() {
+	public void tossItem() {
 		if(m_pickupItem == null) {
 			return;
 		}
 
+		m_velocity.y = TOSS_VELOCITY;
+		m_acceleration.x = 0;
+		m_tossingItem = true;
 		m_pickupItem.toss(m_facingLeft);
 		m_pickupItem = null;
 	}
@@ -244,6 +252,10 @@ public class Duke {
 			}
 		}
 
+		if(m_tossingItem) {
+			m_tossingItem = false;
+		}
+
 		if(Gdx.input.isKeyPressed(Keys.E) || Gdx.input.isKeyPressed(Keys.F)) {
 			if(!m_pickupItemButtonPressed) {
 				m_pickupItemButtonPressed = true;
@@ -257,7 +269,7 @@ public class Duke {
 					}
 				}
 				else {
-					throwItem();
+					tossItem();
 				}
 			}
 		}
@@ -302,7 +314,10 @@ public class Duke {
 		Texture currentTexture = null;
 		TextureRegion currentTextureRegion = null;
 
-		if(m_jumping) {
+		if(m_tossingItem) {
+			currentTexture = m_tossItemTexture;
+		}
+		else if(m_jumping) {
 			if(m_pickupItem != null) {
 				currentTexture = m_jumpHoldTexture;
 			}
