@@ -9,7 +9,8 @@ import com.badlogic.gdx.math.Vector2;
 public abstract class Powerup {
 
 	protected Vector2 m_position;
-	float m_elapsedAnimationTime;
+	protected boolean m_consumed;
+	protected float m_elapsedAnimationTime;
 	protected Animation<TextureRegion> m_animation;
 
 	public Powerup(Vector2 position, Animation<TextureRegion> animation) {
@@ -35,8 +36,12 @@ public abstract class Powerup {
 		return false;
 	}
 
+	public boolean isConsumed() {
+		return m_consumed;
+	}
+
 	public void consume() {
-		// TODO
+		m_consumed = true;
 	}
 
 	public void render(SpriteBatch spriteBatch) {

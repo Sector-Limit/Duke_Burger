@@ -14,7 +14,7 @@
   <image width="16" height="16" source="../sprites/octababy_object.png"/>
  </tile>
  <tile id="4">
-  <image width="16" height="16" source="../sprites/chiken_object.png"/>
+  <image width="16" height="16" source="../sprites/chicken_object.png"/>
  </tile>
  <tile id="5">
   <image width="16" height="16" source="../sprites/cola_object.png"/>

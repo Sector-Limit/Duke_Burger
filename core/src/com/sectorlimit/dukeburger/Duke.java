@@ -92,7 +92,7 @@ public class Duke {
 			else if(mapObject.getName().equalsIgnoreCase("cola")) {
 				m_powerups.add(m_powerupsFactory.createCola(objectPosition));
 			}
-			else if(mapObject.getName().equalsIgnoreCase("chiken")) {
+			else if(mapObject.getName().equalsIgnoreCase("chicken")) {
 				m_powerups.add(m_powerupsFactory.createChicken(objectPosition));
 			}
 		}
@@ -218,10 +218,10 @@ public class Duke {
 		}
 
 		if(m_velocity.x > MAX_VELOCITY) {
-			m_velocity.x = MAX_VELOCITY; 
+			m_velocity.x = MAX_VELOCITY;
 		}
 		else if(m_velocity.x < -MAX_VELOCITY) {
-			m_velocity.x = -MAX_VELOCITY; 
+			m_velocity.x = -MAX_VELOCITY;
 		}
 
 		Vector2 scaledVelocity = new Vector2(m_velocity.x, m_velocity.y).scl(deltaTime);
@@ -282,6 +282,16 @@ public class Duke {
 		}
 
 		for(Powerup powerup : m_powerups) {
+			if(powerup.isConsumed()) {
+				continue;
+			}
+
+			if(getCenterPosition().dst(powerup.getCenterPosition()) <= getSize().x) {
+				powerup.consume();
+				// TODO: apply powerup effect
+				continue;
+			}
+
 			powerup.render(spriteBatch);
 		}
 
