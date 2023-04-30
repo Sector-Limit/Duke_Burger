@@ -6,14 +6,15 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapLayers;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.objects.PolygonMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTile;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -59,25 +60,29 @@ public class DukeBurger extends ApplicationAdapter {
 		m_mapRenderer = new OrthogonalTiledMapRenderer(m_map);
 
 		MapLayers mapLayers = m_map.getLayers();
-		TiledMapTileLayer groundMapLayer = (TiledMapTileLayer) mapLayers.get("ground");
+		MapLayer collisionMapLayer = mapLayers.get("collision");
+		MapObjects collisionObjects = collisionMapLayer.getObjects();
 
-		for(int i = 0; i < groundMapLayer.getTileWidth(); i++) {
-			for(int j = 0; j < groundMapLayer.getTileHeight(); j++) {
-				Cell groundCell = groundMapLayer.getCell(i, j);
+		for(int i = 0; i < collisionObjects.getCount(); i++) {
+			MapObject collisionObject = collisionObjects.get(i);
 
-				if(groundCell == null) {
+			if(collisionObject instanceof PolygonMapObject) {
+				PolygonMapObject polygonCollisionObject = (PolygonMapObject) collisionObject;
+				Polygon polygonCollision = polygonCollisionObject.getPolygon();
+				float[] polygonCollisionVertices = polygonCollision.getVertices();
+
+				if(polygonCollisionVertices.length < 3 || polygonCollisionVertices.length > 8) {
+					System.err.println("Map has polygon collision with invalid number of vertices: " + polygonCollisionVertices.length + ". Expected between 3 and 8 vertices.");
 					continue;
 				}
-
-				TiledMapTile groundTile = groundCell.getTile();
-				TextureRegion groundTileTextureRegion = groundTile.getTextureRegion();
+				
 				BodyDef groundTileBodyDefinition = new BodyDef();
-				groundTileBodyDefinition.position.set(new Vector2((i * groundTileTextureRegion.getRegionWidth()) + (groundTileTextureRegion.getRegionWidth() / 2.0f), (j * groundTileTextureRegion.getRegionHeight()) + (groundTileTextureRegion.getRegionHeight() / 2.0f)));
-				Body groundTileBody = m_world.createBody(groundTileBodyDefinition);
-				PolygonShape groundTileBox = new PolygonShape();
-				groundTileBox.setAsBox(groundTileTextureRegion.getRegionWidth() / 2.0f, groundTileTextureRegion.getRegionHeight() / 2.0f);
-				groundTileBody.createFixture(groundTileBox, 0.0f);
-				groundTileBox.dispose();
+				groundTileBodyDefinition.position.set(new Vector2(polygonCollision.getX(), polygonCollision.getY()));
+				Body collisionObjectBody = m_world.createBody(groundTileBodyDefinition);
+				PolygonShape collisionObjectPolygonShape = new PolygonShape();
+				collisionObjectPolygonShape.set(polygonCollisionVertices);
+				collisionObjectBody.createFixture(collisionObjectPolygonShape, 0.0f);
+				collisionObjectPolygonShape.dispose();
 			}
 		}
 

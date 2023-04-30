@@ -108,7 +108,7 @@ public class Duke {
 				m_enemies.add(m_enemyFactory.createOctaBaby(objectPosition));
 			}
 			else if(!mapObject.getName().equalsIgnoreCase("player_start")){
-				System.out.println("Unexpected object name: " + mapObject.getName());
+				System.err.println("Unexpected object name: " + mapObject.getName());
 			}
 		}
 
