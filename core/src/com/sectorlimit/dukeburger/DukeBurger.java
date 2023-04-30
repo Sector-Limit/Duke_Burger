@@ -46,13 +46,19 @@ public class DukeBurger extends ApplicationAdapter {
 
 	private static final Vector2 VIEWPORT_SIZE = new Vector2(320.0f, 180.0f);
 	private static final float CAMERA_SPEED = 4.0f;
+	private static final boolean DEBUG_CAMERA_ENABLED = true;
+	private static final boolean PHYSICS_DEBUGGING_ENABLED = false;
 	private static final boolean MUSIC_ENABLED = false;
 
 	@Override
 	public void create() {
 		Gdx.graphics.setWindowedMode(1280, 720);
 		m_world = new World(new Vector2(0, -220), true);
-		m_debugRenderer = new Box2DDebugRenderer();
+
+		if(PHYSICS_DEBUGGING_ENABLED) {
+			m_debugRenderer = new Box2DDebugRenderer();
+		}
+
 		m_gameStage = new Stage(new StretchViewport(VIEWPORT_SIZE.x, VIEWPORT_SIZE.y));
 		m_camera = new OrthographicCamera(VIEWPORT_SIZE.x, VIEWPORT_SIZE.y);
 		m_cameraOffset = new Vector2(0.0f, 0.0f);
@@ -113,24 +119,26 @@ public class DukeBurger extends ApplicationAdapter {
 
 	@Override
 	public void render() {
-		if(Gdx.input.isKeyPressed(Keys.NUMPAD_4)) {
-			m_cameraOffset.add(-CAMERA_SPEED, 0);
-		}
-
-		if(Gdx.input.isKeyPressed(Keys.NUMPAD_6)) {
-			m_cameraOffset.add(CAMERA_SPEED, 0);
-		}
-
-		if(Gdx.input.isKeyPressed(Keys.NUMPAD_8)) {
-			m_cameraOffset.add(0, CAMERA_SPEED);
-		}
-
-		if(Gdx.input.isKeyPressed(Keys.NUMPAD_2)) {
-			m_cameraOffset.add(0, -CAMERA_SPEED);
-		}
-
-		if(Gdx.input.isKeyPressed(Keys.NUMPAD_5)) {
-			m_cameraOffset.set(0.0f, 0.0f);
+		if(DEBUG_CAMERA_ENABLED) {
+			if(Gdx.input.isKeyPressed(Keys.NUMPAD_4)) {
+				m_cameraOffset.add(-CAMERA_SPEED, 0);
+			}
+	
+			if(Gdx.input.isKeyPressed(Keys.NUMPAD_6)) {
+				m_cameraOffset.add(CAMERA_SPEED, 0);
+			}
+	
+			if(Gdx.input.isKeyPressed(Keys.NUMPAD_8)) {
+				m_cameraOffset.add(0, CAMERA_SPEED);
+			}
+	
+			if(Gdx.input.isKeyPressed(Keys.NUMPAD_2)) {
+				m_cameraOffset.add(0, -CAMERA_SPEED);
+			}
+	
+			if(Gdx.input.isKeyPressed(Keys.NUMPAD_5)) {
+				m_cameraOffset.set(0.0f, 0.0f);
+			}
 		}
 
 		Vector2 newCameraPosition = new Vector2(m_duke.getCenterPosition().x, VIEWPORT_SIZE.y / 2.0f).add(m_cameraOffset);
@@ -159,7 +167,9 @@ public class DukeBurger extends ApplicationAdapter {
 
 		m_spriteBatch.end();
 
-		m_debugRenderer.render(m_world, m_gameStage.getCamera().combined);
+		if(m_debugRenderer != null) {
+			m_debugRenderer.render(m_world, m_gameStage.getCamera().combined);
+		}
 	}
 
 	@Override
