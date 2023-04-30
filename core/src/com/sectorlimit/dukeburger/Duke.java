@@ -8,6 +8,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.maps.objects.TextureMapObject;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.sectorlimit.dukeburger.factory.ExplosionFactory;
@@ -53,7 +59,7 @@ public class Duke {
 	private static final int NUMBER_OF_WALKING_FRAMES = 4;
 	private static final float WALK_ANIMATION_SPEED = 0.07f;
 
-	public Duke(World world) {
+	public Duke(World world, TiledMap map) {
 		m_world = world;
 
 		m_pickupItemFactory = new PickupItemFactory(m_world);
@@ -62,11 +68,25 @@ public class Duke {
 
 		m_pickupItemButtonPressed = false;
 		m_pickupItems = new Vector<PickupItem>();
-		m_pickupItems.add(m_pickupItemFactory.createBurger(new Vector2(150, 5)));
-		m_pickupItems.add(m_pickupItemFactory.createBox(new Vector2(50, 5)));
-		m_pickupItems.add(m_pickupItemFactory.createBarrel(new Vector2(75, 5)));
 
-		m_position = new Vector2(100.0f, 0.0f);
+		MapObjects mapObjects = map.getLayers().get("objects").getObjects();
+
+		for(int i = 0; i < mapObjects.getCount(); i++) {
+			MapObject mapObject = mapObjects.get(i);
+			TextureMapObject textureMapObject = (TextureMapObject) mapObject;
+
+			if(mapObject.getName().equalsIgnoreCase("wooden_box")) {
+				m_pickupItems.add(m_pickupItemFactory.createBox(new Vector2(textureMapObject.getX(), textureMapObject.getY())));
+			}
+			else if(mapObject.getName().equalsIgnoreCase("barrel")) {
+				m_pickupItems.add(m_pickupItemFactory.createBarrel(new Vector2(textureMapObject.getX(), textureMapObject.getY())));
+			}
+		}
+
+		MapObject dukeMapObject = mapObjects.get("player_start");
+		TextureMapObject textureDukeMapObject = (TextureMapObject) dukeMapObject;
+		m_position = new Vector2(textureDukeMapObject.getX(), textureDukeMapObject.getY());
+
 		m_velocity = new Vector2(0.0f, 0.0f);
 		m_acceleration = new Vector2(0.0f, 0.0f);
 		m_facingLeft = false;
@@ -217,7 +237,7 @@ public class Duke {
 		if(Gdx.input.isKeyPressed(Keys.E) || Gdx.input.isKeyPressed(Keys.F)) {
 			if(!m_pickupItemButtonPressed) {
 				m_pickupItemButtonPressed = true;
-	
+
 				if(m_pickupItem == null) {
 					for(PickupItem pickupItem : m_pickupItems) {
 						if(getCenterPosition().dst(pickupItem.getCenterPosition()) <= getSize().x) {

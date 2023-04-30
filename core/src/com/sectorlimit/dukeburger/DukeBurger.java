@@ -9,7 +9,6 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -44,11 +43,12 @@ public class DukeBurger extends ApplicationAdapter {
 		m_camera = new OrthographicCamera(VIEWPORT_SIZE.x, VIEWPORT_SIZE.y);
 		m_gameStage.getViewport().setCamera(m_camera);
 		m_spriteBatch = new SpriteBatch();
-		m_duke = new Duke(m_world);
 
 		m_map = new TmxMapLoader().load("maps/test_level.tmx");
 		m_mapRenderer = new OrthogonalTiledMapRenderer(m_map);
 		m_mapRenderer.setView(m_camera);
+
+		m_duke = new Duke(m_world, m_map);
 
 		BodyDef groundBodyDefinition = new BodyDef();
 		groundBodyDefinition.position.set(new Vector2(0.0f, -1.0f));
