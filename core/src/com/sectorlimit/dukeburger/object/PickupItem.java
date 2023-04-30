@@ -13,11 +13,16 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 public abstract class PickupItem {
 
+	protected boolean m_destroyed;
+	protected boolean m_tossed;
+
 	protected Body m_body;
 
 	protected Texture m_texture;
 
 	public PickupItem(Vector2 position, Texture texture) {
+		m_destroyed = false;
+		m_tossed = false;
 		m_texture = texture;
 	}
 
@@ -31,6 +36,22 @@ public abstract class PickupItem {
 
 	public abstract Vector2 getSize();
 
+	public void destroy() {
+		m_destroyed = true;
+	}
+
+	public boolean isDestroyed() {
+		return m_destroyed;
+	}
+
+	public void cleanup(World world) {
+		world.destroyBody(m_body);
+	}
+
+	public boolean isTossed() {
+		return m_tossed;
+	}
+	
 	public void setPhysicsProperties(Body body, Fixture fixture) {
 		m_body = body;
 		
@@ -78,6 +99,7 @@ public abstract class PickupItem {
 	}
 
 	public void toss(boolean tossLeft) {
+		m_tossed = true;
 		m_body.setActive(true);
 
 		if(!isRotationFixed()) {

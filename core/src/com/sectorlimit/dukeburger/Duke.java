@@ -30,6 +30,8 @@ import com.sectorlimit.dukeburger.factory.ExplosionFactory;
 import com.sectorlimit.dukeburger.factory.PickupItemFactory;
 import com.sectorlimit.dukeburger.factory.PowerupsFactory;
 import com.sectorlimit.dukeburger.factory.ProjectileFactory;
+import com.sectorlimit.dukeburger.object.Barrel;
+import com.sectorlimit.dukeburger.object.Explosion;
 import com.sectorlimit.dukeburger.object.PickupItem;
 import com.sectorlimit.dukeburger.powerup.Powerup;
 
@@ -56,6 +58,7 @@ public class Duke implements ContactListener {
 	private Vector<Powerup> m_powerups;
 	private Vector<PickupItem> m_pickupItems;
 	private Vector<Enemy> m_enemies;
+	private Vector<Explosion> m_explosions;
 
 	private Texture m_idleTexture;
 	private Texture m_idleHoldTexture;
@@ -91,6 +94,7 @@ public class Duke implements ContactListener {
 		m_pickupItems = new Vector<PickupItem>();
 		m_powerups = new Vector<Powerup>();
 		m_enemies = new Vector<Enemy>();
+		m_explosions = new Vector<Explosion>();
 
 		MapLayers mapLayers = map.getLayers();
 		MapObjects mapObjects = mapLayers.get("objects").getObjects();
@@ -211,6 +215,7 @@ public class Duke implements ContactListener {
 			return;
 		}
 
+		// TODO: drop in front of player instead of on top of? maybe disable collisions temporarily?
 		m_pickupItem.drop(m_body.getLinearVelocity());
 		m_pickupItem = null;
 	}
@@ -316,9 +321,23 @@ public class Duke implements ContactListener {
 			m_pickupItem.setPosition(getOriginPosition().add(new Vector2(1.0f, getSize().y - 1)));
 		}
 
+		Vector<PickupItem> pickupItemsToRemove = new Vector<PickupItem>();
+
 		for(PickupItem pickupItem : m_pickupItems) {
+			if(pickupItem.isDestroyed()) {
+				pickupItemsToRemove.add(pickupItem);
+				continue;
+			}
+
 			pickupItem.render(spriteBatch);
 		}
+
+		for(PickupItem pickupItem : pickupItemsToRemove) {
+			pickupItem.cleanup(m_world);
+			m_pickupItems.remove(pickupItem);
+		}
+
+		Vector<Powerup> powerupsToRemove = new Vector<Powerup>();
 
 		for(Powerup powerup : m_powerups) {
 			if(powerup.isConsumed()) {
@@ -327,11 +346,16 @@ public class Duke implements ContactListener {
 
 			if(getCenterPosition().dst(powerup.getCenterPosition()) <= getSize().x) {
 				powerup.consume();
+				powerupsToRemove.add(powerup);
 				// TODO: apply powerup effect
 				continue;
 			}
 
 			powerup.render(spriteBatch);
+		}
+
+		for(Powerup powerup : powerupsToRemove) {
+			m_powerups.remove(powerup);
 		}
 
 		for(Enemy enemy : m_enemies) {
@@ -340,6 +364,21 @@ public class Duke implements ContactListener {
 			}
 
 			enemy.render(spriteBatch);
+		}
+
+		Vector<Explosion> explosionsToRemove = new Vector<Explosion>();
+
+		for(Explosion explosion : m_explosions) {
+			if(explosion.isExpired()) {
+				explosionsToRemove.add(explosion);
+			}
+			else {
+				explosion.render(spriteBatch);
+			}
+		}
+
+		for(Explosion explosion : explosionsToRemove) {
+			m_explosions.remove(explosion);
 		}
 
 		Texture currentTexture = null;
@@ -396,25 +435,45 @@ public class Duke implements ContactListener {
 		Object contactObjectA = contact.getFixtureA().getBody().getUserData();
 		Object contactObjectB = contact.getFixtureB().getBody().getUserData();
 		Object contactObject = null;
+		boolean isPlayerContact = false;
 
 		if(contactObjectA instanceof Duke) {
 			contactObject = contactObjectB;
+			isPlayerContact = true;
 		}
 		else if(contactObjectB instanceof Duke) {
 			contactObject = contactObjectA;
-		}
-		else {
-			return;
+			isPlayerContact = true;
 		}
 
-		if(contactObject == null) {
-			m_jumping = false;
+		if(isPlayerContact) {
+			if(contactObject == null) {
+				m_jumping = false;
+			}
+			else if(contactObject instanceof PickupItem) {
+				m_jumping = false;
+			}
+			else if(contactObject instanceof Enemy) {
+				// TODO: enemy contact
+			}
 		}
-		else if(contactObject instanceof PickupItem) {
-			m_jumping = false;
-		}
-		else if(contactObject instanceof Enemy) {
-			// TODO: enemy contact
+		else {
+			PickupItem tossedPickupItem = null;
+
+			if(contactObjectA instanceof PickupItem && ((PickupItem) contactObjectA).isTossed()) {
+				tossedPickupItem = (PickupItem) contactObjectA;
+			}
+			else if(contactObjectB instanceof PickupItem && ((PickupItem) contactObjectB).isTossed()) {
+				tossedPickupItem = (PickupItem) contactObjectB;
+			}
+
+			if(tossedPickupItem != null) {
+				if(tossedPickupItem instanceof Barrel) {
+					m_explosions.add(m_explosionFactory.createExplosion(new Vector2(tossedPickupItem.getOriginPosition()).sub(new Vector2())));
+				}
+
+				tossedPickupItem.destroy();
+			}
 		}
 	}
 

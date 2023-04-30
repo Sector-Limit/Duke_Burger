@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.sectorlimit.dukeburger.object.Explosion;
 
 public class ExplosionFactory {
@@ -11,11 +12,11 @@ public class ExplosionFactory {
 	private Animation<TextureRegion> m_explosionAnimation;
 	private Texture m_explosionSpriteSheet;
 
-	private static final int EXPLOSION_SPRITE_SHEET_ROWS = 2;
-	private static final int EXPLOSION_SPRITE_SHEET_COLUMNS = 2;
+	private static final int EXPLOSION_SPRITE_SHEET_ROWS = 1;
+	private static final int EXPLOSION_SPRITE_SHEET_COLUMNS = 6;
 
 	public ExplosionFactory() {
-		m_explosionSpriteSheet = new Texture(Gdx.files.internal("sprites/explosion.png"));
+		m_explosionSpriteSheet = new Texture(Gdx.files.internal("sprites/exp.png"));
 		TextureRegion[][] explosionTextureRegion = TextureRegion.split(m_explosionSpriteSheet, m_explosionSpriteSheet.getWidth() / EXPLOSION_SPRITE_SHEET_COLUMNS, m_explosionSpriteSheet.getHeight() / EXPLOSION_SPRITE_SHEET_ROWS);
 		TextureRegion[] explosionFrames = new TextureRegion[EXPLOSION_SPRITE_SHEET_ROWS * EXPLOSION_SPRITE_SHEET_COLUMNS];
 		int explosionFrameIndex = 0;
@@ -26,11 +27,11 @@ public class ExplosionFactory {
 			}
 		}
 
-		m_explosionAnimation = new Animation<TextureRegion>(0.15f, explosionFrames);
+		m_explosionAnimation = new Animation<TextureRegion>(0.07f, explosionFrames);
 	}
 
-	public Explosion createExplosion() {
-		return new Explosion(m_explosionAnimation);
+	public Explosion createExplosion(Vector2 position) {
+		return new Explosion(position, m_explosionAnimation);
 	}
 
 	public void dispose() {

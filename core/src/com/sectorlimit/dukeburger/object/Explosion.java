@@ -10,22 +10,34 @@ public class Explosion {
 
 	private Vector2 m_position;
 	private Animation<TextureRegion> m_explosionAnimation;
-	private float m_stateTime;
+	private float m_animationTimeElapsed;
 
-	public Explosion(Animation<TextureRegion> explosionAnimation) {
+	private Vector2 EXPLOSION_SIZE = new Vector2(50.0f, 50.0f);
+
+	public Explosion(Vector2 position, Animation<TextureRegion> explosionAnimation) {
+		m_position = position;
 		m_explosionAnimation = explosionAnimation;
-		m_position = new Vector2(100, 100);
+		m_animationTimeElapsed = 0.0f;
 	}
 
-	public Vector2 getPosition() {
+	public Vector2 getOriginPosition() {
 		return m_position;
 	}
 
-	public void render(SpriteBatch spriteBatch) {
-		m_stateTime += Gdx.graphics.getDeltaTime();
+	public Vector2 getSize() {
+		return EXPLOSION_SIZE;
+	}
 
-		if(m_stateTime <= m_explosionAnimation.getAnimationDuration()) {
-			spriteBatch.draw(m_explosionAnimation.getKeyFrame(m_stateTime, true), m_position.x, m_position.y);
+	public boolean isExpired() {
+		return m_animationTimeElapsed > m_explosionAnimation.getAnimationDuration();
+	}
+
+	public void render(SpriteBatch spriteBatch) {
+		if(!isExpired()) {
+			Vector2 renderOrigin = new Vector2(getOriginPosition()).sub(new Vector2(getSize()).scl(0.5f));
+			spriteBatch.draw(m_explosionAnimation.getKeyFrame(m_animationTimeElapsed, true), renderOrigin.x, renderOrigin.y);
+
+			m_animationTimeElapsed += Gdx.graphics.getDeltaTime();
 		}
 	}
 
