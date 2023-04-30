@@ -53,7 +53,6 @@ public class Duke {
 	private Animation<TextureRegion> m_walkAnimation;
 	private Animation<TextureRegion> m_walkHoldAnimation;
 
-	private static final Vector2 SCREEN_SIZE = new Vector2(320, 180);
 	private static final Vector2 DUKE_SIZE = new Vector2(16, 16);
 	private static final float ACCELERATION = 150.0f;
 	private static final float JUMP_VELOCITY = 90.0f;
@@ -228,24 +227,12 @@ public class Duke {
 
 		m_position.add(scaledVelocity);
 
-		if(m_position.x < 0.0f) {
-			m_position.x = 0.0f;
-		}
-
 		if(m_position.y < 0.0f) {
 			m_position.y = 0.0f;
 
 			if(wasJumping) {
 				m_jumping = false;
 			}
-		}
-
-		if(m_position.x + getSize().x > SCREEN_SIZE.x) {
-			m_position.x = SCREEN_SIZE.x - getSize().x;
-		}
-
-		if(m_position.y + getSize().y > SCREEN_SIZE.y) {
-			m_position.y = SCREEN_SIZE.y - getSize().y;
 		}
 
 		if(Gdx.input.isKeyPressed(Keys.E) || Gdx.input.isKeyPressed(Keys.F)) {
