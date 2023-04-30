@@ -15,6 +15,8 @@ import com.badlogic.gdx.maps.objects.TextureMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
+import com.sectorlimit.dukeburger.enemy.Enemy;
+import com.sectorlimit.dukeburger.factory.EnemyFactory;
 import com.sectorlimit.dukeburger.factory.ExplosionFactory;
 import com.sectorlimit.dukeburger.factory.PickupItemFactory;
 import com.sectorlimit.dukeburger.factory.PowerupsFactory;
@@ -35,6 +37,7 @@ public class Duke {
 	private World m_world;
 
 	private ExplosionFactory m_explosionFactory;
+	private EnemyFactory m_enemyFactory;
 	private PowerupsFactory m_powerupsFactory;
 	private PickupItemFactory m_pickupItemFactory;
 	private ProjectileFactory m_projectileFactory;
@@ -43,6 +46,7 @@ public class Duke {
 	private PickupItem m_pickupItem;
 	private Vector<Powerup> m_powerups;
 	private Vector<PickupItem> m_pickupItems;
+	private Vector<Enemy> m_enemies;
 
 	private Texture m_idleTexture;
 	private Texture m_idleHoldTexture;
@@ -65,6 +69,7 @@ public class Duke {
 		m_world = world;
 
 		m_pickupItemFactory = new PickupItemFactory(m_world);
+		m_enemyFactory = new EnemyFactory();
 		m_powerupsFactory = new PowerupsFactory();
 		m_projectileFactory = new ProjectileFactory();
 		m_explosionFactory = new ExplosionFactory();
@@ -72,6 +77,7 @@ public class Duke {
 		m_pickupItemButtonPressed = false;
 		m_pickupItems = new Vector<PickupItem>();
 		m_powerups = new Vector<Powerup>();
+		m_enemies = new Vector<Enemy>();
 
 		MapLayers mapLayers = map.getLayers();
 		MapObjects mapObjects = mapLayers.get("objects").getObjects();
@@ -93,6 +99,9 @@ public class Duke {
 			}
 			else if(mapObject.getName().equalsIgnoreCase("chicken")) {
 				m_powerups.add(m_powerupsFactory.createChicken(objectPosition));
+			}
+			else if(mapObject.getName().equalsIgnoreCase("octababy")) {
+				m_enemies.add(m_enemyFactory.createOctaBaby(objectPosition));
 			}
 		}
 
@@ -280,6 +289,14 @@ public class Duke {
 			}
 
 			powerup.render(spriteBatch);
+		}
+
+		for(Enemy enemy : m_enemies) {
+			if(!enemy.isAlive()) {
+				continue;
+			}
+
+			enemy.render(spriteBatch);
 		}
 
 		Texture currentTexture = null;

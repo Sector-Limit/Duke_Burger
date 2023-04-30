@@ -55,7 +55,7 @@ public class DukeBurger extends ApplicationAdapter {
 		m_spriteBatch = new SpriteBatch();
 
 		m_skyTexture = new Texture(Gdx.files.internal("sprites/city_bg.png"));
-		m_map = new TmxMapLoader().load("maps/test_level.tmx");
+		m_map = new TmxMapLoader().load("maps/test_level_2.tmx");
 		m_mapRenderer = new OrthogonalTiledMapRenderer(m_map);
 		m_mapRenderer.setView(m_camera);
 
