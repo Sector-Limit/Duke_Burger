@@ -3,6 +3,7 @@ package com.sectorlimit.dukeburger;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -41,8 +42,11 @@ public class DukeBurger extends ApplicationAdapter {
 	private SpriteBatch m_spriteBatch;
 	private Duke m_duke;
 
+	private Sound m_music;
+
 	private static final Vector2 VIEWPORT_SIZE = new Vector2(320.0f, 180.0f);
 	private static final float CAMERA_SPEED = 4.0f;
+	private static final boolean MUSIC_ENABLED = true;
 
 	@Override
 	public void create() {
@@ -95,6 +99,12 @@ public class DukeBurger extends ApplicationAdapter {
 		groundBox.setAsBox(m_gameStage.getCamera().viewportWidth * 2.0f, 1.0f);
 		m_groundBody.createFixture(groundBox, 0.0f);
 		groundBox.dispose();
+
+		m_music = Gdx.audio.newSound(Gdx.files.internal("music/pixelduke.mp3"));
+
+		if(MUSIC_ENABLED) {
+			m_music.loop();
+		}
 	}
 
 	@Override
