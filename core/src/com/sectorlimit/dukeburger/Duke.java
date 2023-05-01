@@ -208,7 +208,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 		if(dukeMapObject != null) {
 			TextureMapObject textureDukeMapObject = (TextureMapObject) dukeMapObject;
-			spawnPosition = new Vector2(textureDukeMapObject.getX(), textureDukeMapObject.getY());
+			spawnPosition = new Vector2(textureDukeMapObject.getX(), textureDukeMapObject.getY()).add(new Vector2(getSize()).scl(0.5f));
 		}
 		else {
 			System.err.println("Missing player spawn position objece with name: 'player_start'.");
