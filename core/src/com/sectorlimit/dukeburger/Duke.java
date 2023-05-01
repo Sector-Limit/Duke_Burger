@@ -92,6 +92,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private Sound m_pickupSound;
 	private Sound m_tossSound;
 	private Sound m_doorSound;
+	private Sound m_extraLifeSound;
 
 	public static final int MAX_HEALTH = 3;
 	public static final int MAX_LIVES = 3;
@@ -103,7 +104,6 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private static final float MAX_HORIZONTAL_VELOCITY = 80.0f;
 	private static final int NUMBER_OF_WALKING_FRAMES = 4;
 	private static final float WALK_ANIMATION_SPEED = 0.07f;
-	private static final boolean ALLOW_DROPPING = false;
 
 	public Duke(World world, TiledMap map) {
 		this(world, map, MAX_LIVES);
@@ -245,6 +245,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_pickupSound = Gdx.audio.newSound(Gdx.files.internal("sounds/PickUp.wav"));
 		m_tossSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Toss.wav"));
 		m_doorSound = Gdx.audio.newSound(Gdx.files.internal("sounds/DoorOpen.wav"));
+		m_extraLifeSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Chicken.wav"));
 	}
 
 	public int getHealth() {
@@ -278,9 +279,11 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 		if(m_coins >= 100) {
 			m_coins -= 100;
-		}
 
-		addLife();
+			m_extraLifeSound.play();
+
+			addLife();
+		}
 	}
 
 	public Vector2 getOriginPosition() {
@@ -464,10 +467,6 @@ public class Duke implements ContactListener, HUDDataProvider {
 		}
 		else {
 			m_pickupItemButtonPressed = false;
-		}
-
-		if(Gdx.input.isKeyPressed(Keys.G) && ALLOW_DROPPING) {
-			dropItem();
 		}
 
 		if(m_pickupItem != null) {
