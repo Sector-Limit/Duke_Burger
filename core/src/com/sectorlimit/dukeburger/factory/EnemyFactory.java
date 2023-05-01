@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
+import com.sectorlimit.dukeburger.enemy.Octa;
 import com.sectorlimit.dukeburger.enemy.OctaBaby;
 import com.sectorlimit.dukeburger.enemy.OctaBaby.Type;
 
@@ -16,10 +17,15 @@ public class EnemyFactory {
 	private Texture m_octaBabySquishedTextures[];
 	private Texture m_octaBabyWalkSheetTextures[];
 	private Vector<Animation<TextureRegion>> m_octaBabyWalkAnimations;
+	private Texture m_octaSheetTexture;
+	private Texture m_octaDeadTexture;
+	private TextureRegion m_octaRisingTextureRegion;
+	private TextureRegion m_octaFallingTextureRegion;
 
 	private World m_world;
 
 	private static final int NUMBER_OF_OCTA_BABY_WALK_FRAMES = 2;
+	private static final int NUMBER_OF_OCTA_SPRITES = 2;
 
 	public EnemyFactory(World world) {
 		m_world = world;
@@ -46,12 +52,25 @@ public class EnemyFactory {
 	
 			m_octaBabyWalkAnimations.add(new Animation<TextureRegion>(0.2f, octaBabyWalkFrames));
 		}
+
+		m_octaDeadTexture = new Texture(Gdx.files.internal("sprites/octa_object.png"));
+		m_octaSheetTexture = new Texture(Gdx.files.internal("sprites/octa.png"));
+
+		TextureRegion[][] octaTextureRegion = TextureRegion.split(m_octaSheetTexture, m_octaSheetTexture.getWidth() / NUMBER_OF_OCTA_SPRITES, m_octaSheetTexture.getHeight());
+		m_octaRisingTextureRegion = octaTextureRegion[0][0];
+		m_octaFallingTextureRegion = octaTextureRegion[0][1];
 	}
 
 	public OctaBaby createOctaBaby(OctaBaby.Type type, Vector2 position) {
-		OctaBaby octaBaby = new OctaBaby(type, position, m_octaBabyWalkAnimations.elementAt(type.ordinal()), m_octaBabySquishedTextures[type.ordinal()]);
+		OctaBaby octaBaby = new OctaBaby(type, m_octaBabyWalkAnimations.elementAt(type.ordinal()), m_octaBabySquishedTextures[type.ordinal()]);
 		octaBaby.assignPhysics(m_world, position);
 		return octaBaby;
+	}
+
+	public Octa createOcta(Vector2 position) {
+		Octa octa = new Octa(m_octaRisingTextureRegion, m_octaFallingTextureRegion, m_octaDeadTexture);
+		octa.assignPhysics(m_world, position);
+		return octa;
 	}
 
 	public void dispose() {

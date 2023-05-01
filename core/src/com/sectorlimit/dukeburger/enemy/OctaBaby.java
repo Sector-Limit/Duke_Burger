@@ -32,7 +32,7 @@ public class OctaBaby extends BasicEnemy {
 		Blue
 	}
 
-	public OctaBaby(Type type, Vector2 position, Animation<TextureRegion> octaBabyWalkAnimation, Texture octaBabySquishedTexture) {
+	public OctaBaby(Type type, Animation<TextureRegion> octaBabyWalkAnimation, Texture octaBabySquishedTexture) {
 		m_type = type;
 		m_squished = false;
 		m_squishedTimeElapsed = 0.0f;
@@ -110,9 +110,8 @@ public class OctaBaby extends BasicEnemy {
 		return true;
 	}
 
-	public void attack() {
-		super.attack();
-	}
+	@Override
+	public void attack() { }
 
 	@Override
 	public void kill() {
