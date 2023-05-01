@@ -70,6 +70,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		m_spriteBatch = new SpriteBatch();
 		m_citySkyTexture = new Texture(Gdx.files.internal("sprites/city_bg.png"));
 
+		//m_currentLevelFileName = "mission_1.tmx";
 		m_currentLevelFileName = "test_level_4.tmx";
 
 		startNewGame(m_currentLevelFileName);

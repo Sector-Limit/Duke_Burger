@@ -174,7 +174,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 			else if(mapObject.getName().equalsIgnoreCase("octababy_blue")) {
 				m_enemies.add(m_enemyFactory.createOctaBaby(Type.Blue, objectPosition));
 			}
-			else if(mapObject.getName().equalsIgnoreCase("duke_rest")) {
+			else if(mapObject.getName().equalsIgnoreCase("duke_rest") || mapObject.getName().equalsIgnoreCase("duke_burger")) {
 				m_staticObjects.add(m_staticObjectFactory.createRestaurant(objectPosition));
 			}
 			else if(mapObject.getName().equalsIgnoreCase("door")) {
