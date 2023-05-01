@@ -33,6 +33,10 @@ public abstract class StaticObject {
 	}
 
 	public void render(SpriteBatch spriteBatch) {
+		if(m_animation == null) {
+			return;
+		}
+
 		float deltaTime = Gdx.graphics.getDeltaTime();
 
 		m_elapsedAnimationTime += deltaTime;
