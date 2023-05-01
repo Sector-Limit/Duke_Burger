@@ -301,12 +301,6 @@ public class Duke implements ContactListener, HUDDataProvider {
 		}
 
 		m_lives--;
-
-		// TODO: re-start level
-
-		if(m_lives <= 0) {
-			// TODO: game over
-		}
 	}
 
 	public void addCoin() {
