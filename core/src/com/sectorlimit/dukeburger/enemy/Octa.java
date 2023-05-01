@@ -95,9 +95,9 @@ public class Octa extends Enemy {
 					m_rising = true;
 				}
 			}
-		}
 
-		setPosition(new Vector2(m_startingPosition).add(new Vector2(0.0f, m_verticalRiseOffset)));
+			setPosition(new Vector2(m_startingPosition).add(new Vector2(0.0f, m_verticalRiseOffset)));
+		}
 
 		Texture currentTexture = null;
 		TextureRegion currentTextureRegion = null;

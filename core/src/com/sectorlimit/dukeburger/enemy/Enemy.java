@@ -166,14 +166,13 @@ public abstract class Enemy {
 	public void update() {
 		if(!m_alive) {
 			if(m_wasAlive) {
-				m_wasAlive = false;
-
 				Fixture firstFixture = m_body.getFixtureList().first();
 				Filter disabledFilter = new Filter();
 				disabledFilter.maskBits = 0x0000;
 				firstFixture.setFilterData(disabledFilter);
 				firstFixture.setDensity(0.5f);
 				firstFixture.setRestitution(0.1f);
+				m_body.setType(BodyType.DynamicBody);
 				m_body.setAngularVelocity((float) ((Math.random() * 20.0) - 10.0));
 				m_body.setLinearVelocity(new Vector2((((int) (Math.random() * 2.0) == 0) ? -1.0f : 1.0f) * 65.0f, (float) (Math.random() * 15.0 + 25.0)));
 				m_body.setActive(true);
