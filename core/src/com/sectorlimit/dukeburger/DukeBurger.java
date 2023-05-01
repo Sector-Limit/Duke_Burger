@@ -208,6 +208,11 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		}
 
 		Vector2 newCameraPosition = new Vector2(m_duke.getCenterPosition().x, VIEWPORT_SIZE.y / 2.0f).add(m_cameraOffset);
+
+		if(m_duke.getCenterPosition().y > VIEWPORT_SIZE.y * 0.75f) {
+			newCameraPosition.add(new Vector2(0.0f, m_duke.getCenterPosition().y - VIEWPORT_SIZE.y * 0.75f));
+		}
+
 		m_camera.position.set(newCameraPosition.x, newCameraPosition.y, 0.0f);
 
 		m_world.step(1 / 60f, 6, 2);
