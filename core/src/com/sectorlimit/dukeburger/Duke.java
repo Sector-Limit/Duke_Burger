@@ -553,11 +553,18 @@ public class Duke implements ContactListener, HUDDataProvider {
 			m_pickupItemButtonPressed = false;
 		}
 
+
+		float pickupObjectVerticalOffset = -1.0f;
+
 		if(m_pickupItem != null) {
-			m_pickupItem.setPosition(getOriginPosition().add(new Vector2(1.0f, getSize().y - 1)));
+			if(m_pickupItem instanceof Burger) {
+				pickupObjectVerticalOffset = -2.0f;
+			}
+
+			m_pickupItem.setPosition(getOriginPosition().add(new Vector2(1.0f, getSize().y + pickupObjectVerticalOffset)));
 		}
 		else if(m_pickupEnemy != null) {
-			m_pickupEnemy.setPosition(getOriginPosition().add(new Vector2(1.0f, getSize().y - 1)));
+			m_pickupEnemy.setPosition(getOriginPosition().add(new Vector2(1.0f, getSize().y + pickupObjectVerticalOffset)));
 		}
 
 		for(StaticObject staticObject : m_staticObjects) {
