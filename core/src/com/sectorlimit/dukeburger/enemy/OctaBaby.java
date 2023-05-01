@@ -105,7 +105,7 @@ public class OctaBaby extends BasicEnemy {
 			// TODO: add intermediary dying state?
 	
 			if(isSquished()) {
-				if(m_body.isActive()) {
+				if(m_body.isActive() && !isTossed()) {
 					m_body.setActive(false);
 				}
 	
