@@ -11,6 +11,7 @@ import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.objects.PolygonMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -34,6 +35,7 @@ public class DukeBurger extends ApplicationAdapter {
 	private Body m_groundBody;
 	private Box2DDebugRenderer m_debugRenderer;
 
+	private Texture m_citySkyTexture;
 	private Texture m_skyTexture;
 	private TiledMap m_map;
 	private OrthogonalTiledMapRenderer m_mapRenderer;
@@ -64,7 +66,7 @@ public class DukeBurger extends ApplicationAdapter {
 		m_gameStage.getViewport().setCamera(m_camera);
 
 		m_spriteBatch = new SpriteBatch();
-		m_skyTexture = new Texture(Gdx.files.internal("sprites/city_bg.png"));
+		m_citySkyTexture = new Texture(Gdx.files.internal("sprites/city_bg.png"));
 
 		startNewGame("test_level_4.tmx", m_lives);
 
@@ -126,6 +128,25 @@ public class DukeBurger extends ApplicationAdapter {
 		groundBox.setAsBox(m_gameStage.getCamera().viewportWidth * 2.0f, 1.0f);
 		m_groundBody.createFixture(groundBox, 0.0f);
 		groundBox.dispose();
+
+		MapProperties mapProperties = m_map.getProperties();
+
+		m_skyTexture = null;
+
+		if(mapProperties != null && mapProperties.containsKey("background")) {
+			Object backgroundTypeObject = mapProperties.get("background");
+
+			if(backgroundTypeObject instanceof String) {
+				String backgroundType = (String) backgroundTypeObject;
+
+				if(backgroundType.equalsIgnoreCase("city")) {
+					m_skyTexture = m_citySkyTexture;
+				}
+				else {
+					System.err.println("Invalid background type: '" + backgroundType + "'.");
+				}
+			}
+		}
 	}
 
 	public void stopGame() {
@@ -142,6 +163,7 @@ public class DukeBurger extends ApplicationAdapter {
 		m_groundBody = null;
 		m_world = null;
 		m_duke = null;
+		m_skyTexture = null;
 	}
 
 	@Override
@@ -185,11 +207,13 @@ public class DukeBurger extends ApplicationAdapter {
 
 		m_camera.update();
 
-		m_spriteBatch.begin();
-
-		m_spriteBatch.draw(m_skyTexture, 0.0f, 0.0f, 0.0f, 0.0f, m_skyTexture.getWidth(), m_skyTexture.getHeight(), 4.0f, 4.0f, 0.0f, 0, 0, m_skyTexture.getWidth(), m_skyTexture.getHeight(), false, false);
-
-		m_spriteBatch.end();
+		if(m_skyTexture != null) {
+			m_spriteBatch.begin();
+	
+			m_spriteBatch.draw(m_skyTexture, 0.0f, 0.0f, 0.0f, 0.0f, m_skyTexture.getWidth(), m_skyTexture.getHeight(), 4.0f, 4.0f, 0.0f, 0, 0, m_skyTexture.getWidth(), m_skyTexture.getHeight(), false, false);
+	
+			m_spriteBatch.end();
+		}
 
 		m_spriteBatch.begin();
 
@@ -225,7 +249,8 @@ public class DukeBurger extends ApplicationAdapter {
 			m_duke.dispose();
 		}
 
-		m_skyTexture.dispose();
+		m_skyTexture = null;
+		m_citySkyTexture.dispose();
 		m_spriteBatch.dispose();
 		m_gameStage.dispose();
 	}
