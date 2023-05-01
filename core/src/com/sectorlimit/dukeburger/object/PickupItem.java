@@ -1,5 +1,6 @@
 package com.sectorlimit.dukeburger.object;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -22,10 +23,17 @@ public abstract class PickupItem {
 
 	protected Texture m_texture;
 
+	protected Sound m_destroySound;
+
 	public PickupItem(Texture texture) {
+		this(texture, null);
+	}
+
+	public PickupItem(Texture texture, Sound destroySound) {
 		m_destroyed = false;
 		m_tossed = false;
 		m_texture = texture;
+		m_destroySound = destroySound;
 	}
 
 	public Vector2 getOriginPosition() {
@@ -48,6 +56,10 @@ public abstract class PickupItem {
 		}
 
 		m_destroyed = true;
+
+		if(m_destroySound != null) {
+			m_destroySound.play();
+		}
 	}
 
 	public boolean isDestroyed() {
