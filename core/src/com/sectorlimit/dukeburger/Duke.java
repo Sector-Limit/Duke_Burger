@@ -57,9 +57,10 @@ public class Duke implements ContactListener {
 	private ProjectileFactory m_projectileFactory;
 	private StaticObjectFactory m_staticObjectFactory;
 
-	private boolean m_tossingItem;
+	private boolean m_tossingSomething;
 	private boolean m_pickupItemButtonPressed;
 	private PickupItem m_pickupItem;
+	private Enemy m_pickupEnemy;
 	private Vector<Powerup> m_powerups;
 	private Vector<PickupItem> m_pickupItems;
 	private Vector<Enemy> m_enemies;
@@ -96,7 +97,7 @@ public class Duke implements ContactListener {
 		m_explosionFactory = new ExplosionFactory();
 		m_staticObjectFactory = new StaticObjectFactory();
 
-		m_tossingItem = false;
+		m_tossingSomething = false;
 		m_pickupItemButtonPressed = false;
 		m_pickupItems = new Vector<PickupItem>();
 		m_powerups = new Vector<Powerup>();
@@ -202,13 +203,16 @@ public class Duke implements ContactListener {
 		return DUKE_SIZE;
 	}
 
+	public boolean isHoldingSomething() {
+		return m_pickupItem != null || m_pickupEnemy != null;
+	}
+
 	public void pickupItem(PickupItem pickupItem) {
-		if(m_pickupItem != null) {
+		if(isHoldingSomething()) {
 			return;
 		}
 
 		m_pickupItem = pickupItem;
-
 		m_pickupItem.pickup();
 	}
 
@@ -219,7 +223,7 @@ public class Duke implements ContactListener {
 
 		m_body.setLinearVelocity(new Vector2(m_body.getLinearVelocity()).add(new Vector2(0.0f, TOSS_VELOCITY)));
 		m_acceleration.x = 0;
-		m_tossingItem = true;
+		m_tossingSomething = true;
 		m_pickupItem.toss(m_facingLeft);
 		m_pickupItem = null;
 	}
@@ -232,6 +236,27 @@ public class Duke implements ContactListener {
 		// TODO: drop in front of player instead of on top of? maybe disable collisions temporarily?
 		m_pickupItem.drop(m_body.getLinearVelocity());
 		m_pickupItem = null;
+	}
+
+	public void pickupEnemy(Enemy enemy) {
+		if(isHoldingSomething() || !enemy.isPickupable()) {
+			return;
+		}
+
+		m_pickupEnemy = enemy;
+		m_pickupEnemy.pickup();
+	}
+
+	public void tossEnemy() {
+		if(m_pickupEnemy == null) {
+			return;
+		}
+
+		m_body.setLinearVelocity(new Vector2(m_body.getLinearVelocity()).add(new Vector2(0.0f, TOSS_VELOCITY)));
+		m_acceleration.x = 0;
+		m_tossingSomething = true;
+		m_pickupEnemy.toss(m_facingLeft);
+		m_pickupEnemy = null;
 	}
 
 	public void render(SpriteBatch spriteBatch) {
@@ -261,7 +286,7 @@ public class Duke implements ContactListener {
 			m_jumping = true;
 			float jumpVelocity = JUMP_VELOCITY;
 
-			if(m_pickupItem != null) {
+			if(isHoldingSomething()) {
 				jumpVelocity = JUMP_HOLD_VELOCITY;
 			}
 
@@ -302,24 +327,38 @@ public class Duke implements ContactListener {
 			}
 		}
 
-		if(m_tossingItem) {
-			m_tossingItem = false;
+		if(m_tossingSomething) {
+			m_tossingSomething = false;
 		}
 
 		if(Gdx.input.isKeyPressed(Keys.E) || Gdx.input.isKeyPressed(Keys.F)) {
 			if(!m_pickupItemButtonPressed) {
 				m_pickupItemButtonPressed = true;
 
-				if(m_pickupItem == null) {
-					for(PickupItem pickupItem : m_pickupItems) {
-						if(getOriginPosition().dst(pickupItem.getOriginPosition()) <= (getSize().x / 2.0f) + pickupItem.getSize().x) {
-							pickupItem(pickupItem);
+				if(!isHoldingSomething()) {
+					for(Enemy enemy : m_enemies) {
+						if(enemy.isPickupable() && getOriginPosition().dst(enemy.getOriginPosition()) <= (getSize().x / 2.0f) + (enemy.getSize().x / 2.0f)) {
+							pickupEnemy(enemy);
 							break;
+						}
+					}
+
+					if(!isHoldingSomething()) {
+						for(PickupItem pickupItem : m_pickupItems) {
+							if(getOriginPosition().dst(pickupItem.getOriginPosition()) <= (getSize().x / 2.0f) + pickupItem.getSize().x) {
+								pickupItem(pickupItem);
+								break;
+							}
 						}
 					}
 				}
 				else {
-					tossItem();
+					if(m_pickupItem != null) {
+						tossItem();
+					}
+					else if(m_pickupEnemy != null) {
+						tossEnemy();
+					}
 				}
 			}
 		}
@@ -333,6 +372,9 @@ public class Duke implements ContactListener {
 
 		if(m_pickupItem != null) {
 			m_pickupItem.setPosition(getOriginPosition().add(new Vector2(1.0f, getSize().y - 1)));
+		}
+		else if(m_pickupEnemy != null) {
+			m_pickupEnemy.setPosition(getOriginPosition().add(new Vector2(1.0f, getSize().y - 1)));
 		}
 
 		for(StaticObject staticObject : m_staticObjects) {
@@ -402,11 +444,11 @@ public class Duke implements ContactListener {
 		Texture currentTexture = null;
 		TextureRegion currentTextureRegion = null;
 
-		if(m_tossingItem) {
+		if(m_tossingSomething) {
 			currentTexture = m_tossItemTexture;
 		}
 		else if(m_jumping) {
-			if(m_pickupItem != null) {
+			if(isHoldingSomething()) {
 				currentTexture = m_jumpHoldTexture;
 			}
 			else {
@@ -414,7 +456,7 @@ public class Duke implements ContactListener {
 			}
 		}
 		else if(m_walking) {
-			if(m_pickupItem != null) {
+			if(isHoldingSomething()) {
 				currentTextureRegion = m_walkHoldAnimation.getKeyFrame(m_walkDuration, true);
 			}
 			else {
@@ -422,7 +464,7 @@ public class Duke implements ContactListener {
 			}
 		}
 		else {
-			if(m_pickupItem != null) {
+			if(isHoldingSomething()) {
 				currentTexture = m_idleHoldTexture;
 			}
 			else {

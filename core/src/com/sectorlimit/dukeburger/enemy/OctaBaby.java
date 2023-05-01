@@ -61,6 +61,11 @@ public class OctaBaby extends BasicEnemy {
 		return !isSquished();
 	}
 
+	@Override
+	public boolean isPickupable() {
+		return !isPickedUp() && !isTossed() && isSquished();
+	}
+
 	public boolean isSquished() {
 		return m_squished;
 	}
@@ -76,7 +81,7 @@ public class OctaBaby extends BasicEnemy {
 	}
 
 	public boolean unsquish() {
-		if(!m_squished) {
+		if(!m_squished || isPickedUp() || isTossed()) {
 			return false;
 		}
 
@@ -94,27 +99,26 @@ public class OctaBaby extends BasicEnemy {
 	public void render(SpriteBatch spriteBatch) {
 		update();
 
-		if(!isAlive()) {
-			// TODO: add intermediary dying state
-			return;
-		}
-
 		float deltaTime = Gdx.graphics.getDeltaTime();
 
-		if(isSquished()) {
-			if(m_body.isActive()) {
-				m_body.setActive(false);
+		if(isAlive()) {
+			// TODO: add intermediary dying state?
+	
+			if(isSquished()) {
+				if(m_body.isActive()) {
+					m_body.setActive(false);
+				}
+	
+				m_squishedTimeElapsed += deltaTime;
+	
+				if(m_squishedTimeElapsed >= MAX_SQUISHED_DURATION) {
+					unsquish();
+				}
 			}
-
-			m_squishedTimeElapsed += deltaTime;
-
-			if(m_squishedTimeElapsed >= MAX_SQUISHED_DURATION) {
-				unsquish();
-			}
-		}
-		else {
-			if(!m_body.isActive()) {
-				m_body.setActive(true);
+			else {
+				if(!m_body.isActive()) {
+					m_body.setActive(true);
+				}
 			}
 		}
 
@@ -136,8 +140,12 @@ public class OctaBaby extends BasicEnemy {
 
 		Vector2 renderOrigin = new Vector2(getOriginPosition()).sub(new Vector2(getSize()).scl(0.5f));
 
+		if(m_pickedUp) {
+			renderOrigin.sub(new Vector2(-1.0f, getSize().y * 0.5f));
+		}
+
 		if(currentTexture != null) {
-			spriteBatch.draw(currentTexture, renderOrigin.x, renderOrigin.y, getSize().x / 2, getSize().y / 2, currentTexture.getWidth(), currentTexture.getHeight(), 1.0f, 1.0f, 0.0f, 0, 0, currentTexture.getWidth(), currentTexture.getHeight(), !m_facingLeft, false);
+			spriteBatch.draw(currentTexture, renderOrigin.x, renderOrigin.y, getSize().x / 2, getSize().y / 2, currentTexture.getWidth(), currentTexture.getHeight(), 1.0f, 1.0f, 0.0f, 0, 0, currentTexture.getWidth(), currentTexture.getHeight(), !m_facingLeft, m_pickedUp);
 		}
 		else if(currentTextureRegion != null) {
 			if(!m_facingLeft) {

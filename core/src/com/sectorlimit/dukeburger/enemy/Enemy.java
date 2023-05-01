@@ -13,6 +13,8 @@ public abstract class Enemy {
 
 	protected boolean m_facingLeft;
 	protected boolean m_alive;
+	protected boolean m_pickedUp;
+	protected boolean m_tossed;
 
 	protected Body m_body;
 
@@ -25,6 +27,8 @@ public abstract class Enemy {
 		}
 
 		m_alive = true;
+		m_pickedUp = false;
+		m_tossed = false;
 	}
 
 	public Vector2 getOriginPosition() {
@@ -61,6 +65,43 @@ public abstract class Enemy {
 
 	public boolean isFacingLeft() {
 		return m_facingLeft;
+	}
+
+	public boolean isPickupable() {
+		return false;
+	}
+
+	public boolean isPickedUp() {
+		return m_pickedUp;
+	}
+
+	public boolean isTossed() {
+		return m_tossed;
+	}
+
+	public boolean pickup() {
+		if(!isPickupable()) {
+			return false;
+		}
+
+		m_pickedUp = true;
+		m_body.setActive(false);
+
+		return true;
+	}
+
+	public boolean toss(boolean tossLeft) {
+		if(!isPickedUp()) {
+			return false;
+		}
+
+		m_pickedUp = false;
+		m_tossed = true;
+		m_body.setActive(true);
+		m_body.setAngularVelocity((float) ((Math.random() * 20.0) - 10.0));
+		m_body.setLinearVelocity(new Vector2((tossLeft ? -1.0f : 1.0f) * 85.0f, 60.0f));
+
+		return true;
 	}
 
 	public boolean shouldRandomizeInitialDirection() {
