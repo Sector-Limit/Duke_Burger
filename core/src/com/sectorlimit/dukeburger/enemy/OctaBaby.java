@@ -114,14 +114,19 @@ public class OctaBaby extends BasicEnemy {
 		super.attack();
 	}
 
+	@Override
+	public void kill() {
+		squish();
+
+		super.kill();
+	}
+
 	public void render(SpriteBatch spriteBatch) {
 		update();
 
 		float deltaTime = Gdx.graphics.getDeltaTime();
 
 		if(isAlive()) {
-			// TODO: add intermediary dying state?
-	
 			if(!isTossed()) {
 				if(isSquished()) {
 					if(m_body.isActive()) {
@@ -165,7 +170,7 @@ public class OctaBaby extends BasicEnemy {
 		}
 
 		if(currentTexture != null) {
-			spriteBatch.draw(currentTexture, renderOrigin.x, renderOrigin.y, getSize().x / 2, getSize().y / 2, currentTexture.getWidth(), currentTexture.getHeight(), 1.0f, 1.0f, 0.0f, 0, 0, currentTexture.getWidth(), currentTexture.getHeight(), !m_facingLeft, m_pickedUp);
+			spriteBatch.draw(currentTexture, renderOrigin.x, renderOrigin.y, getSize().x / 2, getSize().y / 2, currentTexture.getWidth(), currentTexture.getHeight(), 1.0f, 1.0f, (float) Math.toDegrees(m_body.getAngle()), 0, 0, currentTexture.getWidth(), currentTexture.getHeight(), !m_facingLeft, m_pickedUp);
 		}
 		else if(currentTextureRegion != null) {
 			if(!m_facingLeft) {

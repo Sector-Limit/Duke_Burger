@@ -16,6 +16,8 @@ public abstract class Enemy {
 
 	protected boolean m_facingLeft;
 	protected boolean m_alive;
+	protected boolean m_wasAlive;
+	protected boolean m_destroyed;
 	protected boolean m_pickedUp;
 	protected boolean m_tossed;
 
@@ -30,6 +32,8 @@ public abstract class Enemy {
 		}
 
 		m_alive = true;
+		m_wasAlive = true;
+		m_destroyed = false;
 		m_pickedUp = false;
 		m_tossed = false;
 	}
@@ -137,6 +141,18 @@ public abstract class Enemy {
 		return true;
 	}
 
+	public boolean isDestroyed() {
+		return m_destroyed;
+	}
+
+	public void destroy() {
+		if(m_alive) {
+			kill();
+		}
+
+		m_destroyed = true;
+	}
+
 	public abstract void attack();
 
 	public void kill() {
@@ -148,9 +164,27 @@ public abstract class Enemy {
 	}
 
 	public void update() {
-		if(m_body.getPosition().y + getSize().y < 0.0f) {
-			kill();
+		if(!m_alive) {
+			if(m_wasAlive) {
+				m_wasAlive = false;
+
+				Fixture firstFixture = m_body.getFixtureList().first();
+				Filter disabledFilter = new Filter();
+				disabledFilter.maskBits = 0x0000;
+				firstFixture.setFilterData(disabledFilter);
+				firstFixture.setDensity(0.5f);
+				firstFixture.setRestitution(0.1f);
+				m_body.setAngularVelocity((float) ((Math.random() * 20.0) - 10.0));
+				m_body.setLinearVelocity(new Vector2((((int) (Math.random() * 2.0) == 0) ? -1.0f : 1.0f) * 65.0f, (float) (Math.random() * 15.0 + 25.0)));
+				m_body.setActive(true);
+			}
 		}
+
+		if(m_body.getPosition().y + getSize().y < 0.0f) {
+			destroy();
+		}
+
+		m_wasAlive = m_alive;
 	}
 
 	public abstract void render(SpriteBatch spriteBatch);

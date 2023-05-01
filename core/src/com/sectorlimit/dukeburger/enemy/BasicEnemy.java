@@ -22,7 +22,7 @@ public abstract class BasicEnemy extends Enemy {
 		super.update();
 
 		if(!isActive()) {
-			if(!isTossed()) {
+			if(!isTossed() && isAlive()) {
 				m_body.setLinearVelocity(new Vector2(0.0f, 0.0f));
 			}
 

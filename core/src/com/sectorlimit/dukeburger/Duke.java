@@ -627,7 +627,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		Vector<Enemy> enemiesToRemove = new Vector<Enemy>();
 
 		for(Enemy enemy : m_enemies) {
-			if(!enemy.isAlive()) {
+			if(enemy.isDestroyed()) {
 				enemiesToRemove.add(enemy);
 				continue;
 			}
@@ -785,7 +785,6 @@ public class Duke implements ContactListener, HUDDataProvider {
 				if(otherContactObject instanceof Enemy) {
 					Enemy enemy = (Enemy) otherContactObject;
 					enemy.kill();
-					// TODO: knock off of map
 				}
 				else if(tossedPickupItem instanceof Box) {
 					int randomNumber = (int) (Math.random() * 100.0);
