@@ -40,6 +40,9 @@ import com.sectorlimit.dukeburger.object.Barrel;
 import com.sectorlimit.dukeburger.object.Explosion;
 import com.sectorlimit.dukeburger.object.PickupItem;
 import com.sectorlimit.dukeburger.object.StaticObject;
+import com.sectorlimit.dukeburger.powerup.Chicken;
+import com.sectorlimit.dukeburger.powerup.Coin;
+import com.sectorlimit.dukeburger.powerup.Cola;
 import com.sectorlimit.dukeburger.powerup.Powerup;
 
 public class Duke implements ContactListener, HUDDataProvider {
@@ -88,7 +91,6 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private Sound m_squishSound;
 	private Sound m_pickupSound;
 	private Sound m_tossSound;
-	private Sound m_coinSound;
 	private Sound m_doorSound;
 
 	public static final int MAX_HEALTH = 3;
@@ -166,6 +168,9 @@ public class Duke implements ContactListener, HUDDataProvider {
 			else if(mapObject.getName().equalsIgnoreCase("duke_rest")) {
 				m_staticObjects.add(m_staticObjectFactory.createRestaurant(objectPosition));
 			}
+			else if(mapObject.getName().equalsIgnoreCase("coin")) {
+				m_powerups.add(m_powerupsFactory.createCoin(objectPosition));
+			}
 			else if(!mapObject.getName().equalsIgnoreCase("player_start")){
 				System.err.println("Unexpected object name: " + mapObject.getName());
 			}
@@ -239,7 +244,6 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_squishSound = Gdx.audio.newSound(Gdx.files.internal("sounds/GetHit.wav"));
 		m_pickupSound = Gdx.audio.newSound(Gdx.files.internal("sounds/PickUp.wav"));
 		m_tossSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Toss.wav"));
-		m_coinSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Coin.wav"));
 		m_doorSound = Gdx.audio.newSound(Gdx.files.internal("sounds/DoorOpen.wav"));
 	}
 
@@ -253,6 +257,30 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 	public int getCoins() {
 		return m_coins;
+	}
+
+	public boolean addHealth() {
+		if(m_health >= MAX_HEALTH) {
+			return false;
+		}
+
+		m_health++;
+
+		return true;
+	}
+
+	public void addLife() {
+		m_lives++;
+	}
+
+	public void addCoin() {
+		m_coins++;
+
+		if(m_coins >= 100) {
+			m_coins -= 100;
+		}
+
+		addLife();
 	}
 
 	public Vector2 getOriginPosition() {
@@ -477,10 +505,26 @@ public class Duke implements ContactListener, HUDDataProvider {
 			}
 
 			if(getCenterPosition().dst(powerup.getCenterPosition()) <= getSize().x) {
-				powerup.consume();
-				powerupsToRemove.add(powerup);
-				// TODO: apply powerup effect
-				continue;
+				boolean consume = true;
+
+				if(powerup instanceof Cola) {
+					if(!addHealth()) {
+						consume = false;
+					}
+				}
+				else if(powerup instanceof Chicken) {
+					addLife();			
+				}
+				else if(powerup instanceof Coin) {
+					addCoin();
+				}
+
+				if(consume) {
+					powerup.consume();
+					powerupsToRemove.add(powerup);
+
+					continue;
+				}
 			}
 
 			powerup.render(spriteBatch);
