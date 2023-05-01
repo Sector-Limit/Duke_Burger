@@ -8,6 +8,8 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.Filter;
+import com.badlogic.gdx.physics.box2d.Fixture;
 
 public abstract class Enemy {
 
@@ -97,9 +99,15 @@ public abstract class Enemy {
 
 		m_pickedUp = false;
 		m_tossed = true;
-		m_body.setActive(true);
+		Fixture firstFixture = m_body.getFixtureList().first();
+		Filter disabledFilter = new Filter();
+		disabledFilter.maskBits = 0x0002;
+		firstFixture.setFilterData(disabledFilter);
+		firstFixture.setDensity(0.5f);
+		firstFixture.setRestitution(0.1f);
 		m_body.setAngularVelocity((float) ((Math.random() * 20.0) - 10.0));
 		m_body.setLinearVelocity(new Vector2((tossLeft ? -1.0f : 1.0f) * 85.0f, 60.0f));
+		m_body.setActive(true);
 
 		return true;
 	}

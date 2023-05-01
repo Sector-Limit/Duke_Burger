@@ -58,7 +58,7 @@ public class OctaBaby extends BasicEnemy {
 
 	@Override
 	public boolean isActive() {
-		return !isSquished();
+		return !isPickedUp() && !isTossed() && !isSquished();
 	}
 
 	@Override
@@ -104,20 +104,22 @@ public class OctaBaby extends BasicEnemy {
 		if(isAlive()) {
 			// TODO: add intermediary dying state?
 	
-			if(isSquished()) {
-				if(m_body.isActive() && !isTossed()) {
-					m_body.setActive(false);
+			if(!isTossed()) {
+				if(isSquished()) {
+					if(m_body.isActive()) {
+						m_body.setActive(false);
+					}
+		
+					m_squishedTimeElapsed += deltaTime;
+		
+					if(m_squishedTimeElapsed >= MAX_SQUISHED_DURATION) {
+						unsquish();
+					}
 				}
-	
-				m_squishedTimeElapsed += deltaTime;
-	
-				if(m_squishedTimeElapsed >= MAX_SQUISHED_DURATION) {
-					unsquish();
-				}
-			}
-			else {
-				if(!m_body.isActive()) {
-					m_body.setActive(true);
+				else {
+					if(!m_body.isActive()) {
+						m_body.setActive(true);
+					}
 				}
 			}
 		}
