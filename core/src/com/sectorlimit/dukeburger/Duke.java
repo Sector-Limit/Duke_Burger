@@ -4,6 +4,7 @@ import java.util.Vector;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -81,6 +82,13 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private Texture m_walkHoldSpriteSheetTexture;
 	private Animation<TextureRegion> m_walkAnimation;
 	private Animation<TextureRegion> m_walkHoldAnimation;
+
+	private Sound m_hitSound;
+	private Sound m_squishSound;
+	private Sound m_pickupSound;
+	private Sound m_tossSound;
+	private Sound m_coinSound;
+	private Sound m_doorSound;
 
 	public static final int MAX_HEALTH = 3;
 	public static final int MAX_LIVES = 3;
@@ -209,6 +217,13 @@ public class Duke implements ContactListener, HUDDataProvider {
 		}
 
 		m_walkHoldAnimation = new Animation<TextureRegion>(WALK_ANIMATION_SPEED, walkHoldFrames);
+
+		m_hitSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Squish.wav"));
+		m_squishSound = Gdx.audio.newSound(Gdx.files.internal("sounds/GetHit.wav"));
+		m_pickupSound = Gdx.audio.newSound(Gdx.files.internal("sounds/PickUp.wav"));
+		m_tossSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Toss.wav"));
+		m_coinSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Coin.wav"));
+		m_doorSound = Gdx.audio.newSound(Gdx.files.internal("sounds/DoorOpen.wav"));
 	}
 
 	public int getHealth() {
@@ -246,6 +261,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 		m_pickupItem = pickupItem;
 		m_pickupItem.pickup();
+
+		m_pickupSound.play();
 	}
 
 	public void tossItem() {
@@ -258,6 +275,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_tossingSomething = true;
 		m_pickupItem.toss(m_facingLeft);
 		m_pickupItem = null;
+
+		m_tossSound.play();
 	}
 
 	public void dropItem() {
@@ -277,6 +296,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 		m_pickupEnemy = enemy;
 		m_pickupEnemy.pickup();
+
+		m_pickupSound.play();
 	}
 
 	public void tossEnemy() {
@@ -289,6 +310,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_tossingSomething = true;
 		m_pickupEnemy.toss(m_facingLeft);
 		m_pickupEnemy = null;
+
+		m_tossSound.play();
 	}
 
 	public void render(SpriteBatch spriteBatch) {
@@ -569,6 +592,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 					OctaBaby octaBaby = (OctaBaby) enemy;
 
 					if(m_jumping && contactFixture.isSensor()) {
+						m_squishSound.play();
 						octaBaby.squish();
 					}
 					else if(!octaBaby.isSquished()) {

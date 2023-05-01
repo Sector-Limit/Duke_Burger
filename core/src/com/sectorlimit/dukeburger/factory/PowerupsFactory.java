@@ -1,6 +1,7 @@
 package com.sectorlimit.dukeburger.factory;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -14,6 +15,9 @@ public class PowerupsFactory {
 	private Texture m_chickenSpriteSheetTexture;
 	private Animation<TextureRegion> m_colaAnimation;
 	private Animation<TextureRegion> m_chickenAnimation;
+
+	private Sound m_colaConsumeSound;
+	private Sound m_chickenConsumeSound;
 
 	private static final int NUMBER_OF_COLA_FRAMES = 8;
 	private static final int NUMBER_OF_CHICKEN_FRAMES = 2;
@@ -39,14 +43,17 @@ public class PowerupsFactory {
 		}
 
 		m_chickenAnimation = new Animation<TextureRegion>(0.225f, chickenFrames);
+
+		m_colaConsumeSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Cola.wav"));
+		m_chickenConsumeSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Chicken.wav"));
 	}
 
 	public Cola createCola(Vector2 position) {
-		return new Cola(position, m_colaAnimation);
+		return new Cola(position, m_colaAnimation, m_colaConsumeSound);
 	}
 
 	public Chicken createChicken(Vector2 position) {
-		return new Chicken(position, m_chickenAnimation);
+		return new Chicken(position, m_chickenAnimation, m_chickenConsumeSound);
 	}
 
 	public void dispose() {

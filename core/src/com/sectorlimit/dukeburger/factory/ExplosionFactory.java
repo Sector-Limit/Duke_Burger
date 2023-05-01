@@ -1,6 +1,7 @@
 package com.sectorlimit.dukeburger.factory;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -11,6 +12,8 @@ public class ExplosionFactory {
 
 	private Animation<TextureRegion> m_explosionAnimation;
 	private Texture m_explosionSpriteSheet;
+
+	private Sound m_explosionSound;
 
 	private static final int EXPLOSION_SPRITE_SHEET_ROWS = 1;
 	private static final int EXPLOSION_SPRITE_SHEET_COLUMNS = 6;
@@ -28,9 +31,13 @@ public class ExplosionFactory {
 		}
 
 		m_explosionAnimation = new Animation<TextureRegion>(0.07f, explosionFrames);
+
+		m_explosionSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Explosion.wav"));
 	}
 
 	public Explosion createExplosion(Vector2 position) {
+		m_explosionSound.play();
+
 		return new Explosion(position, m_explosionAnimation);
 	}
 
