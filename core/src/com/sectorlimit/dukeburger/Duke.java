@@ -51,6 +51,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 	private Vector2 m_acceleration;
 	private boolean m_facingLeft;
+	private boolean m_grounded;
 	private boolean m_walking;
 	private boolean m_jumping;
 	private float m_walkDuration;
@@ -133,6 +134,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_explosionFactory = new ExplosionFactory();
 		m_staticObjectFactory = new StaticObjectFactory();
 
+		m_grounded = false;
 		m_tossingSomething = false;
 		m_pickupItemButtonPressed = false;
 		m_pickupItems = new Vector<PickupItem>();
@@ -438,7 +440,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		boolean wasJumping = m_jumping;
 		Vector2 newVelocity = new Vector2(m_body.getLinearVelocity());
 		
-		if((Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.Z)) && !m_jumping) {
+		if((Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.Z)) && !m_jumping && !m_tossingSomething && m_grounded) {
 			// TODO: player must be on object or surface
 			m_jumping = true;
 			float jumpVelocity = JUMP_VELOCITY;
@@ -479,14 +481,6 @@ public class Duke implements ContactListener, HUDDataProvider {
 			kill();
 
 			// TODO: stop jumping / tossing on collision
-
-			if(wasJumping) {
-				m_jumping = false;
-			}
-		}
-
-		if(m_tossingSomething) {
-			m_tossingSomething = false;
 		}
 
 		if(Gdx.input.isKeyPressed(Keys.E) || Gdx.input.isKeyPressed(Keys.F) || Gdx.input.isKeyPressed(Keys.X)) {
@@ -670,6 +664,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 				currentTextureRegion.flip(true, false);
 			}
 		}
+
+		m_grounded = false;
 	}
 
 	public void renderHUD(SpriteBatch spriteBatch) {
@@ -700,9 +696,13 @@ public class Duke implements ContactListener, HUDDataProvider {
 		if(isPlayerContact) {
 			if(contactObject == null) {
 				m_jumping = false;
+				m_tossingSomething = false;
+				m_grounded = true;
 			}
 			else if(contactObject instanceof PickupItem) {
 				m_jumping = false;
+				m_tossingSomething = false;
+				m_grounded = true;
 			}
 			else if(contactObject instanceof Enemy) {
 				Enemy enemy = (Enemy) contactObject;
