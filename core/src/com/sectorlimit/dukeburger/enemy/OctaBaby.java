@@ -7,9 +7,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Filter;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.sectorlimit.dukeburger.CollisionCategories;
 
 public class OctaBaby extends BasicEnemy {
 
@@ -63,8 +66,12 @@ public class OctaBaby extends BasicEnemy {
 		FixtureDef fixtureDefinition = new FixtureDef();
 		fixtureDefinition.shape = polygonCollisionShape;
 		fixtureDefinition.isSensor = true;
-		m_body.createFixture(fixtureDefinition);
+		Fixture collisionFixture = m_body.createFixture(fixtureDefinition);
 		polygonCollisionShape.dispose();
+		Filter collisionFilter = new Filter();
+		collisionFilter.categoryBits = CollisionCategories.ENEMY;
+		collisionFilter.maskBits = CollisionCategories.DUKE;
+		collisionFixture.setFilterData(collisionFilter);
 	}
 
 	@Override

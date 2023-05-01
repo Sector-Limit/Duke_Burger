@@ -2,6 +2,7 @@ package com.sectorlimit.dukeburger.object;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import com.sectorlimit.dukeburger.CollisionCategories;
 
 public class Burger extends PickupItem {
 
@@ -13,6 +14,16 @@ public class Burger extends PickupItem {
 
 	public Vector2 getSize() {
 		return BURGER_SIZE;
+	}
+
+	@Override
+	public short getCollisionCategory() {
+		return CollisionCategories.BURGER;
+	}
+
+	@Override
+	public short getCollisionMask() {
+		return CollisionCategories.GROUND;
 	}
 
 	@Override

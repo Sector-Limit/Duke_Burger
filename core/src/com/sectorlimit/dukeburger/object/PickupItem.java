@@ -74,6 +74,14 @@ public abstract class PickupItem {
 		return false;
 	}
 
+	public short getCollisionCategory() {
+		return CollisionCategories.OBJECT;
+	}
+
+	public short getCollisionMask() {
+		return CollisionCategories.GROUND | CollisionCategories.DUKE | CollisionCategories.OBJECT | CollisionCategories.ENEMY;
+	}
+
 	public void assignPhysics(World world, Vector2 position) {
 		BodyDef bodyDefinition = new BodyDef();
 		bodyDefinition.type = BodyType.DynamicBody;
@@ -95,8 +103,8 @@ public abstract class PickupItem {
 		Fixture collisionFixture = m_body.createFixture(fixtureDefinition);
 		polygonCollisionShape.dispose();
 		Filter collisionFilter = new Filter();
-		collisionFilter.categoryBits = CollisionCategories.OBJECT;
-		collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.DUKE | CollisionCategories.OBJECT | CollisionCategories.ENEMY;
+		collisionFilter.categoryBits = getCollisionCategory();
+		collisionFilter.maskBits = getCollisionMask();
 		collisionFixture.setFilterData(collisionFilter);
 	}
 
