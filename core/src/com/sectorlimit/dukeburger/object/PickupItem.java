@@ -5,10 +5,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Filter;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.sectorlimit.dukeburger.CollisionCategories;
 
 public abstract class PickupItem {
 
@@ -85,8 +88,12 @@ public abstract class PickupItem {
 		fixtureDefinition.density = 0.5f;
 		fixtureDefinition.friction = 0.2f;
 		fixtureDefinition.restitution = 0.1f;
-		m_body.createFixture(fixtureDefinition);
+		Fixture collisionFixture = m_body.createFixture(fixtureDefinition);
 		polygonCollisionShape.dispose();
+		Filter collisionFilter = new Filter();
+		collisionFilter.categoryBits = CollisionCategories.OBJECT;
+		collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.DUKE | CollisionCategories.OBJECT | CollisionCategories.ENEMY;
+		collisionFixture.setFilterData(collisionFilter);
 	}
 
 	public void pickup() {

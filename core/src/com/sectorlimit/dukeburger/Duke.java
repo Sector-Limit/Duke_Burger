@@ -24,6 +24,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.sectorlimit.dukeburger.enemy.Enemy;
 import com.sectorlimit.dukeburger.enemy.OctaBaby;
@@ -150,13 +151,18 @@ public class Duke implements ContactListener {
 		m_body.setUserData(this);
 		PolygonShape polygonCollisionShape = new PolygonShape();
 		polygonCollisionShape.setAsBox(getSize().x / 2.0f, getSize().y / 2.0f);
+
 		FixtureDef fixtureDefinition = new FixtureDef();
 		fixtureDefinition.shape = polygonCollisionShape;
 		fixtureDefinition.density = 0.5f;
 		fixtureDefinition.friction = 0.2f;
 		fixtureDefinition.restitution = 0.1f;
-		m_body.createFixture(fixtureDefinition);
+		Fixture collisionFixture = m_body.createFixture(fixtureDefinition);
 		polygonCollisionShape.dispose();
+		Filter collisionFilter = new Filter();
+		collisionFilter.categoryBits = CollisionCategories.DUKE;
+		collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.OBJECT;
+		collisionFixture.setFilterData(collisionFilter);
 
 		m_acceleration = new Vector2(0.0f, 0.0f);
 		m_facingLeft = false;

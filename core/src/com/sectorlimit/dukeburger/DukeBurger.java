@@ -20,6 +20,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.Filter;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -91,8 +93,12 @@ public class DukeBurger extends ApplicationAdapter {
 				Body collisionObjectBody = m_world.createBody(groundTileBodyDefinition);
 				PolygonShape collisionObjectPolygonShape = new PolygonShape();
 				collisionObjectPolygonShape.set(polygonCollisionVertices);
-				collisionObjectBody.createFixture(collisionObjectPolygonShape, 0.0f);
+				Fixture collisionFixture = collisionObjectBody.createFixture(collisionObjectPolygonShape, 0.0f);
 				collisionObjectPolygonShape.dispose();
+				Filter collisionFilter = new Filter();
+				collisionFilter.categoryBits = CollisionCategories.GROUND;
+				collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.DUKE | CollisionCategories.OBJECT | CollisionCategories.ENEMY;
+				collisionFixture.setFilterData(collisionFilter);
 			}
 		}
 

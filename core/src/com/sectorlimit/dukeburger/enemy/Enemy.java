@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.sectorlimit.dukeburger.CollisionCategories;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
 
@@ -61,8 +62,12 @@ public abstract class Enemy {
 		fixtureDefinition.density = 0.5f;
 		fixtureDefinition.friction = 0.0f;
 		fixtureDefinition.restitution = 0.1f;
-		m_body.createFixture(fixtureDefinition);
+		Fixture collisionFixture = m_body.createFixture(fixtureDefinition);
 		polygonCollisionShape.dispose();
+		Filter collisionFilter = new Filter();
+		collisionFilter.categoryBits = CollisionCategories.ENEMY;
+		collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.OBJECT;
+		collisionFixture.setFilterData(collisionFilter);
 	}
 
 	public boolean isFacingLeft() {
@@ -101,7 +106,7 @@ public abstract class Enemy {
 		m_tossed = true;
 		Fixture firstFixture = m_body.getFixtureList().first();
 		Filter disabledFilter = new Filter();
-		disabledFilter.maskBits = 0x0002;
+		disabledFilter.maskBits = 0x0000;
 		firstFixture.setFilterData(disabledFilter);
 		firstFixture.setDensity(0.5f);
 		firstFixture.setRestitution(0.1f);
