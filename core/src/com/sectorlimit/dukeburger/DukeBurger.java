@@ -51,6 +51,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	private Sound m_music;
 
 	public static final Vector2 VIEWPORT_SIZE = new Vector2(320.0f, 180.0f);
+	private static final float CAMERA_FOLLOW_VERTICAL_OFFSET_PERCENTAGE = 0.5f;
 	private static final float CAMERA_SPEED = 4.0f;
 	private static final boolean DEBUG_CAMERA_ENABLED = false;
 	private static final boolean PHYSICS_DEBUGGING_ENABLED = false;
@@ -212,8 +213,8 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 		Vector2 newCameraPosition = new Vector2(m_duke.getCenterPosition().x, VIEWPORT_SIZE.y / 2.0f).add(m_cameraOffset);
 
-		if(m_duke.getCenterPosition().y > VIEWPORT_SIZE.y * 0.75f) {
-			newCameraPosition.add(new Vector2(0.0f, m_duke.getCenterPosition().y - VIEWPORT_SIZE.y * 0.75f));
+		if(m_duke.getCenterPosition().y > VIEWPORT_SIZE.y * CAMERA_FOLLOW_VERTICAL_OFFSET_PERCENTAGE) {
+			newCameraPosition.add(new Vector2(0.0f, m_duke.getCenterPosition().y - VIEWPORT_SIZE.y * CAMERA_FOLLOW_VERTICAL_OFFSET_PERCENTAGE));
 		}
 
 		m_camera.position.set(newCameraPosition.x, newCameraPosition.y, 0.0f);
