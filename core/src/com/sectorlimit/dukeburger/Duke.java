@@ -37,6 +37,7 @@ import com.sectorlimit.dukeburger.factory.PowerupsFactory;
 import com.sectorlimit.dukeburger.factory.ProjectileFactory;
 import com.sectorlimit.dukeburger.factory.StaticObjectFactory;
 import com.sectorlimit.dukeburger.object.Barrel;
+import com.sectorlimit.dukeburger.object.Box;
 import com.sectorlimit.dukeburger.object.Burger;
 import com.sectorlimit.dukeburger.object.Door;
 import com.sectorlimit.dukeburger.object.Explosion;
@@ -775,7 +776,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 			if(tossedPickupItem != null) {
 				if(tossedPickupItem instanceof Barrel) {
-					m_explosions.add(m_explosionFactory.createExplosion(new Vector2(tossedPickupItem.getOriginPosition()).sub(new Vector2())));
+					m_explosions.add(m_explosionFactory.createExplosion(new Vector2(tossedPickupItem.getOriginPosition())));
 				}
 
 				tossedPickupItem.onImpact();
@@ -785,6 +786,17 @@ public class Duke implements ContactListener, HUDDataProvider {
 					Enemy enemy = (Enemy) otherContactObject;
 					enemy.kill();
 					// TODO: knock off of map
+				}
+				else if(tossedPickupItem instanceof Box) {
+					int randomNumber = (int) (Math.random() * 100.0);
+					Vector2 newItemPosition = new Vector2(tossedPickupItem.getOriginPosition());
+
+					if(randomNumber < 10) {
+						m_powerups.add(m_powerupsFactory.createChicken(newItemPosition));
+					}
+					else if(randomNumber < 30) {
+						m_powerups.add(m_powerupsFactory.createCola(newItemPosition));
+					}
 				}
 			}
 		}
