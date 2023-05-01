@@ -54,6 +54,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private boolean m_walking;
 	private boolean m_jumping;
 	private float m_walkDuration;
+	private boolean m_alive;
+	private boolean m_wasAlive;
 	private int m_health;
 	private int m_lives;
 	private int m_coins;
@@ -97,6 +99,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private Sound m_doorSound;
 	private Sound m_extraLifeSound;
 
+	private DukeListener m_listener;
+
 	public static final int MAX_HEALTH = 3;
 	public static final int MAX_LIVES = 3;
 	private static final Vector2 DUKE_SIZE = new Vector2(16, 16);
@@ -109,16 +113,18 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private static final float WALK_ANIMATION_SPEED = 0.07f;
 
 	public Duke(World world, TiledMap map) {
-		this(world, map, MAX_LIVES);
+		this(world, map, MAX_LIVES, 0);
 	}
 
-	public Duke(World world, TiledMap map, int lives) {
+	public Duke(World world, TiledMap map, int lives, int coins) {
 		m_world = world;
 		m_world.setContactListener(this);
 
+		m_alive = true;
+		m_wasAlive = true;
 		m_health = MAX_HEALTH;
-		m_lives = MAX_LIVES;
-		m_coins = 0;
+		m_lives = lives;
+		m_coins = coins;
 		m_hud = new HUD(this);
 		m_pickupItemFactory = new PickupItemFactory(m_world);
 		m_enemyFactory = new EnemyFactory(m_world);
@@ -290,7 +296,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	}
 
 	public void removeLife() {
-		if(m_lives <= 1) {
+		if(m_lives <= 0) {
 			return;
 		}
 
@@ -397,10 +403,26 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 	public void kill() {
 		removeLife();
+
+		m_alive = false;
+
 		// TODO: mark as dead, disable interaction, destroy collision body
 	}
 
+	public void setListener(DukeListener listener) {
+		m_listener = listener;
+	}
+
 	public void render(SpriteBatch spriteBatch) {
+		if(!m_alive) {
+			if(m_wasAlive) {
+				m_wasAlive = false;
+				m_listener.onKilled();
+			}
+
+			return;
+		}
+
 		float deltaTime = Gdx.graphics.getDeltaTime();
 
 		m_walking = false;
@@ -460,7 +482,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_body.setLinearVelocity(newVelocity);
 
 		if(m_body.getPosition().y + getSize().y < 0.0f) {
-			// TODO: kill player
+			kill();
+
 			// TODO: stop jumping / tossing on collision
 
 			if(wasJumping) {

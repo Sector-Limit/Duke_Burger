@@ -29,7 +29,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 
-public class DukeBurger extends ApplicationAdapter {
+public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 	private World m_world;
 	private Box2DDebugRenderer m_debugRenderer;
@@ -45,6 +45,8 @@ public class DukeBurger extends ApplicationAdapter {
 	private SpriteBatch m_spriteBatch;
 	private Duke m_duke;
 	private int m_lives;
+	private int m_coins;
+	private String m_currentLevelFileName;
 
 	private Sound m_music;
 
@@ -59,6 +61,7 @@ public class DukeBurger extends ApplicationAdapter {
 		Gdx.graphics.setWindowedMode(1280, 720);
 
 		m_lives = Duke.MAX_LIVES;
+		m_coins = 0;
 
 		m_camera = new OrthographicCamera(VIEWPORT_SIZE.x, VIEWPORT_SIZE.y);
 		m_gameStage = new Stage(new StretchViewport(VIEWPORT_SIZE.x, VIEWPORT_SIZE.y));
@@ -67,7 +70,9 @@ public class DukeBurger extends ApplicationAdapter {
 		m_spriteBatch = new SpriteBatch();
 		m_citySkyTexture = new Texture(Gdx.files.internal("sprites/city_bg.png"));
 
-		startNewGame("test_level_4.tmx", m_lives);
+		m_currentLevelFileName = "test_level_4.tmx";
+
+		startNewGame(m_currentLevelFileName);
 
 		if(MUSIC_ENABLED) {
 			m_music = Gdx.audio.newSound(Gdx.files.internal("music/pixelduke.mp3"));
@@ -75,7 +80,11 @@ public class DukeBurger extends ApplicationAdapter {
 		}
 	}
 
-	public void startNewGame(String levelFileName, int lives) {
+	public void startNewGame(String levelFileName) {
+		startNewGame(levelFileName, Duke.MAX_LIVES, 0);
+	}
+
+	public void startNewGame(String levelFileName, int lives, int coins) {
 		m_world = new World(new Vector2(0, -220), true);
 
 		if(PHYSICS_DEBUGGING_ENABLED) {
@@ -118,7 +127,8 @@ public class DukeBurger extends ApplicationAdapter {
 			}
 		}
 
-		m_duke = new Duke(m_world, m_map, lives);
+		m_duke = new Duke(m_world, m_map, lives, coins);
+		m_duke.setListener(this);
 
 		MapProperties mapProperties = m_map.getProperties();
 
@@ -153,6 +163,14 @@ public class DukeBurger extends ApplicationAdapter {
 		m_world = null;
 		m_duke = null;
 		m_skyTexture = null;
+	}
+
+	public void onKilled() {
+		m_lives = m_duke.getLives();
+		m_coins = m_duke.getCoins();
+
+		stopGame();
+		startNewGame(m_currentLevelFileName, m_lives, m_coins);
 	}
 
 	@Override
