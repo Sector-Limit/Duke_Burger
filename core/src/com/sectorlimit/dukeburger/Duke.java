@@ -418,12 +418,20 @@ public class Duke implements ContactListener {
 			m_powerups.remove(powerup);
 		}
 
+		Vector<Enemy> enemiesToRemove = new Vector<Enemy>();
+
 		for(Enemy enemy : m_enemies) {
 			if(!enemy.isAlive()) {
+				enemiesToRemove.add(enemy);
 				continue;
 			}
 
 			enemy.render(spriteBatch);
+		}
+
+		for(Enemy enemy : enemiesToRemove) {
+			enemy.cleanup(m_world);
+			m_enemies.remove(enemy);
 		}
 
 		Vector<Explosion> explosionsToRemove = new Vector<Explosion>();
@@ -524,7 +532,7 @@ public class Duke implements ContactListener {
 				if(enemy instanceof OctaBaby) {
 					OctaBaby octaBaby = (OctaBaby) enemy;
 
-					if(contactFixture.isSensor()) {
+					if(m_jumping && contactFixture.isSensor()) {
 						octaBaby.squish();
 					}
 					else if(!octaBaby.isSquished()) {
@@ -538,12 +546,15 @@ public class Duke implements ContactListener {
 		}
 		else {
 			PickupItem tossedPickupItem = null;
+			Object otherContactObject = null;
 
 			if(contactObjectA instanceof PickupItem && ((PickupItem) contactObjectA).isTossed()) {
 				tossedPickupItem = (PickupItem) contactObjectA;
+				otherContactObject = contactObjectB;
 			}
 			else if(contactObjectB instanceof PickupItem && ((PickupItem) contactObjectB).isTossed()) {
 				tossedPickupItem = (PickupItem) contactObjectB;
+				otherContactObject = contactObjectA;
 			}
 
 			if(tossedPickupItem != null) {
@@ -552,6 +563,12 @@ public class Duke implements ContactListener {
 				}
 
 				tossedPickupItem.destroy();
+
+				if(otherContactObject instanceof Enemy) {
+					Enemy enemy = (Enemy) otherContactObject;
+					enemy.kill();
+					// TODO: knock off of map
+				}
 			}
 		}
 	}

@@ -17,7 +17,10 @@ public abstract class BasicEnemy extends Enemy {
 		m_facingLeft = !m_facingLeft;
 	}
 
+	@Override
 	public void update() {
+		super.update();
+
 		if(!isActive()) {
 			m_body.setLinearVelocity(new Vector2(0.0f, 0.0f));
 			return;

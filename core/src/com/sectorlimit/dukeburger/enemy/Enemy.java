@@ -122,6 +122,16 @@ public abstract class Enemy {
 		m_alive = false;
 	}
 
+	public void cleanup(World world) {
+		world.destroyBody(m_body);
+	}
+
+	public void update() {
+		if(m_body.getPosition().y + getSize().y < 0.0f) {
+			kill();
+		}
+	}
+
 	public abstract void render(SpriteBatch spriteBatch);
 
 }
