@@ -52,9 +52,9 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 	public static final Vector2 VIEWPORT_SIZE = new Vector2(320.0f, 180.0f);
 	private static final float CAMERA_SPEED = 4.0f;
-	private static final boolean DEBUG_CAMERA_ENABLED = true;
-	private static final boolean PHYSICS_DEBUGGING_ENABLED = true;
-	private static final boolean MUSIC_ENABLED = false;
+	private static final boolean DEBUG_CAMERA_ENABLED = false;
+	private static final boolean PHYSICS_DEBUGGING_ENABLED = false;
+	private static final boolean MUSIC_ENABLED = true;
 
 	@Override
 	public void create() {
@@ -70,8 +70,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		m_spriteBatch = new SpriteBatch();
 		m_citySkyTexture = new Texture(Gdx.files.internal("sprites/city_bg.png"));
 
-		//m_currentLevelFileName = "mission_1.tmx";
-		m_currentLevelFileName = "test_level_4.tmx";
+		m_currentLevelFileName = "mission_1.tmx";
 
 		startNewGame(m_currentLevelFileName);
 
