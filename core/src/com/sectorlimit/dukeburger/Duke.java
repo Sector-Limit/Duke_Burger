@@ -380,7 +380,6 @@ public class Duke implements ContactListener, HUDDataProvider {
 			return;
 		}
 
-		// TODO: drop in front of player instead of on top of? maybe disable collisions temporarily?
 		m_pickupItem.drop(m_body.getLinearVelocity());
 		m_pickupItem = null;
 	}
@@ -414,8 +413,6 @@ public class Duke implements ContactListener, HUDDataProvider {
 		removeLife();
 
 		m_alive = false;
-
-		// TODO: mark as dead, disable interaction, destroy collision body
 	}
 
 	public boolean onAttacked(Enemy enemy) {
@@ -479,7 +476,6 @@ public class Duke implements ContactListener, HUDDataProvider {
 		Vector2 newVelocity = new Vector2(m_body.getLinearVelocity());
 		
 		if((Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.Z)) && !m_jumping && !m_tossingSomething && m_grounded) {
-			// TODO: player must be on object or surface
 			m_jumping = true;
 			float jumpVelocity = JUMP_VELOCITY;
 
@@ -517,8 +513,6 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 		if(m_body.getPosition().y + getSize().y < 0.0f) {
 			kill();
-
-			// TODO: stop jumping / tossing on collision
 		}
 
 		if(Gdx.input.isKeyPressed(Keys.E) || Gdx.input.isKeyPressed(Keys.F) || Gdx.input.isKeyPressed(Keys.X)) {
