@@ -69,7 +69,7 @@ public abstract class Enemy {
 		Fixture collisionFixture = m_body.createFixture(fixtureDefinition);
 		Filter collisionFilter = new Filter();
 		collisionFilter.categoryBits = CollisionCategories.ENEMY;
-		collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.OBJECT;
+		collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.ENEMY_BOUNDARY | CollisionCategories.OBJECT;
 		collisionFixture.setFilterData(collisionFilter);
 		FixtureDef sensorFixtureDefinition = new FixtureDef();
 		sensorFixtureDefinition.shape = polygonCollisionShape;

@@ -155,6 +155,42 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 			}
 		}
 
+		MapLayer enemyBoundaryCollisionMapLayer = mapLayers.get("enemy_collision");
+
+		if(enemyBoundaryCollisionMapLayer != null) {
+			MapObjects enemyBoundaryCollisionObjects = enemyBoundaryCollisionMapLayer.getObjects();
+
+			if(enemyBoundaryCollisionObjects.getCount() != 0) {
+				for(int i = 0; i < enemyBoundaryCollisionObjects.getCount(); i++) {
+					MapObject enemyBoundaryCollisionObject = enemyBoundaryCollisionObjects.get(i);
+
+					if(enemyBoundaryCollisionObject instanceof PolygonMapObject) {
+						PolygonMapObject enemyBoundaryPolygonCollisionObject = (PolygonMapObject) enemyBoundaryCollisionObject;
+						Polygon enemyBoundaryPolygonCollision = enemyBoundaryPolygonCollisionObject.getPolygon();
+						float[] enemyBoundaryPolygonCollisionVertices = enemyBoundaryPolygonCollision.getVertices();
+
+						if(enemyBoundaryPolygonCollisionVertices.length < 3 || enemyBoundaryPolygonCollisionVertices.length > 8) {
+							System.err.println("Map has enemy boundary polygon collision with invalid number of vertices: " + enemyBoundaryPolygonCollisionVertices.length + ". Expected between 3 and 8 vertices.");
+							continue;
+						}
+
+						BodyDef enemyBoundaryBodyDefinition = new BodyDef();
+						enemyBoundaryBodyDefinition.position.set(new Vector2(enemyBoundaryPolygonCollision.getX(), enemyBoundaryPolygonCollision.getY()));
+						Body enemyBoundaryCollisionObjectBody = m_world.createBody(enemyBoundaryBodyDefinition);
+						enemyBoundaryCollisionObjectBody.setUserData("enemy_boundary");
+						PolygonShape enemyBoundaryCollisionObjectPolygonShape = new PolygonShape();
+						enemyBoundaryCollisionObjectPolygonShape.set(enemyBoundaryPolygonCollisionVertices);
+						Fixture collisionFixture = enemyBoundaryCollisionObjectBody.createFixture(enemyBoundaryCollisionObjectPolygonShape, 0.0f);
+						enemyBoundaryCollisionObjectPolygonShape.dispose();
+						Filter enemyBoundaryenemyBoundaryCollisionFixture = new Filter();
+						enemyBoundaryenemyBoundaryCollisionFixture.categoryBits = CollisionCategories.ENEMY_BOUNDARY;
+						enemyBoundaryenemyBoundaryCollisionFixture.maskBits = CollisionCategories.ENEMY;
+						collisionFixture.setFilterData(enemyBoundaryenemyBoundaryCollisionFixture);
+					}
+				}
+			}
+		}
+
 		MapLayer finishCollisionMapLayer = mapLayers.get("finish_collision");
 
 		if(finishCollisionMapLayer != null) {
