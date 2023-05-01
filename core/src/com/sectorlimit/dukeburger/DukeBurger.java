@@ -66,7 +66,7 @@ public class DukeBurger extends ApplicationAdapter {
 		m_spriteBatch = new SpriteBatch();
 		m_skyTexture = new Texture(Gdx.files.internal("sprites/city_bg.png"));
 
-		startNewGame("test_level_2.tmx", m_lives);
+		startNewGame("test_level_4.tmx", m_lives);
 
 		if(MUSIC_ENABLED) {
 			m_music = Gdx.audio.newSound(Gdx.files.internal("music/pixelduke.mp3"));
