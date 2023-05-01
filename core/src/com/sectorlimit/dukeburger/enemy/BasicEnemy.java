@@ -13,10 +13,6 @@ public abstract class BasicEnemy extends Enemy {
 		m_previousPosition = null;
 	}
 
-	public void attack() {
-		m_facingLeft = !m_facingLeft;
-	}
-
 	@Override
 	public void update() {
 		super.update();
