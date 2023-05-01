@@ -121,14 +121,6 @@ public class DukeBurger extends ApplicationAdapter {
 
 		m_duke = new Duke(m_world, m_map, lives);
 
-		BodyDef groundBodyDefinition = new BodyDef();
-		groundBodyDefinition.position.set(new Vector2(0.0f, -1.0f));
-		m_groundBody = m_world.createBody(groundBodyDefinition);
-		PolygonShape groundBox = new PolygonShape();
-		groundBox.setAsBox(m_gameStage.getCamera().viewportWidth * 2.0f, 1.0f);
-		m_groundBody.createFixture(groundBox, 0.0f);
-		groundBox.dispose();
-
 		MapProperties mapProperties = m_map.getProperties();
 
 		m_skyTexture = null;
