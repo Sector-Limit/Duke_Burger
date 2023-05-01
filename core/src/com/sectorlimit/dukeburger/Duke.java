@@ -138,7 +138,10 @@ public class Duke implements ContactListener, HUDDataProvider {
 			TextureRegion textureMapObjectTextureRegion = textureMapObject.getTextureRegion();
 			Vector2 objectPosition = new Vector2(textureMapObject.getX() + (textureMapObjectTextureRegion.getRegionWidth() / 2.0f), textureMapObject.getY() + (textureMapObjectTextureRegion.getRegionHeight() / 2.0f));
 
-			if(mapObject.getName().equalsIgnoreCase("wooden_box")) {
+			if(mapObject.getName() == null) {
+				System.err.println("Map object is missing name.");
+			}
+			else if(mapObject.getName().equalsIgnoreCase("wooden_box")) {
 				m_pickupItems.add(m_pickupItemFactory.createBox(objectPosition));
 			}
 			else if(mapObject.getName().equalsIgnoreCase("barrel")) {
@@ -164,11 +167,20 @@ public class Duke implements ContactListener, HUDDataProvider {
 			}
 		}
 
+		Vector2 spawnPosition = new Vector2(0.0f, 0.0f);
 		MapObject dukeMapObject = mapObjects.get("player_start");
-		TextureMapObject textureDukeMapObject = (TextureMapObject) dukeMapObject;
+
+		if(dukeMapObject != null) {
+			TextureMapObject textureDukeMapObject = (TextureMapObject) dukeMapObject;
+			spawnPosition = new Vector2(textureDukeMapObject.getX(), textureDukeMapObject.getY());
+		}
+		else {
+			System.err.println("Missing player spawn position objece with name: 'player_start'.");
+		}
+
 		BodyDef bodyDefinition = new BodyDef();
 		bodyDefinition.type = BodyType.DynamicBody;
-		bodyDefinition.position.set(new Vector2(textureDukeMapObject.getX(), textureDukeMapObject.getY()));
+		bodyDefinition.position.set(spawnPosition);
 		bodyDefinition.fixedRotation = true;
 		m_body = world.createBody(bodyDefinition);
 		m_body.setUserData(this);
