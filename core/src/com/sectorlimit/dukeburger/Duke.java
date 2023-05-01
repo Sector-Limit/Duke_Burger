@@ -47,9 +47,11 @@ public class Duke implements ContactListener {
 	private boolean m_walking;
 	private boolean m_jumping;
 	private float m_walkDuration;
-	private Body m_body;
+	private int m_health;
+	private int m_lives;
 
 	private World m_world;
+	private Body m_body;
 
 	private ExplosionFactory m_explosionFactory;
 	private EnemyFactory m_enemyFactory;
@@ -78,6 +80,8 @@ public class Duke implements ContactListener {
 	private Animation<TextureRegion> m_walkAnimation;
 	private Animation<TextureRegion> m_walkHoldAnimation;
 
+	public static final int MAX_HEALTH = 3;
+	public static final int MAX_LIVES = 3;
 	private static final Vector2 DUKE_SIZE = new Vector2(16, 16);
 	private static final float ACCELERATION = 150.0f;
 	private static final float JUMP_VELOCITY = 200.0f;
@@ -88,6 +92,10 @@ public class Duke implements ContactListener {
 	private static final float WALK_ANIMATION_SPEED = 0.07f;
 
 	public Duke(World world, TiledMap map) {
+		this(world, map, MAX_LIVES);
+	}
+
+	public Duke(World world, TiledMap map, int lives) {
 		m_world = world;
 		m_world.setContactListener(this);
 
@@ -169,6 +177,8 @@ public class Duke implements ContactListener {
 		m_walking = false;
 		m_jumping = false;
 		m_walkDuration = 0.0f;
+		m_health = MAX_HEALTH;
+		m_lives = MAX_LIVES;
 
 		m_idleTexture = new Texture(Gdx.files.internal("sprites/duke_idle.png"));
 		m_idleHoldTexture = new Texture(Gdx.files.internal("sprites/duke_holds_idle.png"));
@@ -195,6 +205,14 @@ public class Duke implements ContactListener {
 		}
 
 		m_walkHoldAnimation = new Animation<TextureRegion>(WALK_ANIMATION_SPEED, walkHoldFrames);
+	}
+
+	public int getHealth() {
+		return m_health;
+	}
+
+	public int getLives() {
+		return m_lives;
 	}
 
 	public Vector2 getOriginPosition() {

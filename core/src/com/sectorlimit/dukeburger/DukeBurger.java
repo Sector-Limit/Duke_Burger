@@ -43,6 +43,7 @@ public class DukeBurger extends ApplicationAdapter {
 	private Vector2 m_cameraOffset;
 	private SpriteBatch m_spriteBatch;
 	private Duke m_duke;
+	private int m_lives;
 
 	private Sound m_music;
 
@@ -55,20 +56,34 @@ public class DukeBurger extends ApplicationAdapter {
 	@Override
 	public void create() {
 		Gdx.graphics.setWindowedMode(1280, 720);
+
+		m_lives = Duke.MAX_LIVES;
+
+		m_camera = new OrthographicCamera(VIEWPORT_SIZE.x, VIEWPORT_SIZE.y);
+		m_gameStage = new Stage(new StretchViewport(VIEWPORT_SIZE.x, VIEWPORT_SIZE.y));
+		m_gameStage.getViewport().setCamera(m_camera);
+
+		m_spriteBatch = new SpriteBatch();
+		m_skyTexture = new Texture(Gdx.files.internal("sprites/city_bg.png"));
+
+		startNewGame("test_level_2.tmx", m_lives);
+
+		if(MUSIC_ENABLED) {
+			m_music = Gdx.audio.newSound(Gdx.files.internal("music/pixelduke.mp3"));
+			m_music.loop();
+		}
+	}
+
+	public void startNewGame(String levelFileName, int lives) {
 		m_world = new World(new Vector2(0, -220), true);
 
 		if(PHYSICS_DEBUGGING_ENABLED) {
 			m_debugRenderer = new Box2DDebugRenderer();
 		}
 
-		m_gameStage = new Stage(new StretchViewport(VIEWPORT_SIZE.x, VIEWPORT_SIZE.y));
-		m_camera = new OrthographicCamera(VIEWPORT_SIZE.x, VIEWPORT_SIZE.y);
 		m_cameraOffset = new Vector2(0.0f, 0.0f);
-		m_gameStage.getViewport().setCamera(m_camera);
-		m_spriteBatch = new SpriteBatch();
 
-		m_skyTexture = new Texture(Gdx.files.internal("sprites/city_bg.png"));
-		m_map = new TmxMapLoader().load("maps/test_level_2.tmx");
+		m_map = new TmxMapLoader().load("maps/" + levelFileName);
 		m_mapRenderer = new OrthogonalTiledMapRenderer(m_map);
 
 		MapLayers mapLayers = m_map.getLayers();
@@ -102,7 +117,7 @@ public class DukeBurger extends ApplicationAdapter {
 			}
 		}
 
-		m_duke = new Duke(m_world, m_map);
+		m_duke = new Duke(m_world, m_map, lives);
 
 		BodyDef groundBodyDefinition = new BodyDef();
 		groundBodyDefinition.position.set(new Vector2(0.0f, -1.0f));
@@ -111,11 +126,22 @@ public class DukeBurger extends ApplicationAdapter {
 		groundBox.setAsBox(m_gameStage.getCamera().viewportWidth * 2.0f, 1.0f);
 		m_groundBody.createFixture(groundBox, 0.0f);
 		groundBox.dispose();
+	}
 
-		if(MUSIC_ENABLED) {
-			m_music = Gdx.audio.newSound(Gdx.files.internal("music/pixelduke.mp3"));
-			m_music.loop();
-		}
+	public void stopGame() {
+		m_mapRenderer.dispose();
+		m_map.dispose();
+		m_debugRenderer.dispose();
+		m_world.destroyBody(m_groundBody);
+		m_world.dispose();
+		m_duke.dispose();
+
+		m_mapRenderer = null;
+		m_map = null;
+		m_debugRenderer = null;
+		m_groundBody = null;
+		m_world = null;
+		m_duke = null;
 	}
 
 	@Override
@@ -125,6 +151,10 @@ public class DukeBurger extends ApplicationAdapter {
 
 	@Override
 	public void render() {
+		if(m_duke == null) {
+			return;
+		}
+
 		if(DEBUG_CAMERA_ENABLED) {
 			if(Gdx.input.isKeyPressed(Keys.NUMPAD_4)) {
 				m_cameraOffset.add(-CAMERA_SPEED, 0);
@@ -180,8 +210,18 @@ public class DukeBurger extends ApplicationAdapter {
 
 	@Override
 	public void dispose() {
+		if(m_duke != null) {
+			m_mapRenderer.dispose();
+			m_map.dispose();
+			m_debugRenderer.dispose();
+			m_world.destroyBody(m_groundBody);
+			m_world.dispose();
+			m_duke.dispose();
+		}
+
+		m_skyTexture.dispose();
 		m_spriteBatch.dispose();
-		m_duke.dispose();
+		m_gameStage.dispose();
 	}
 
 }
