@@ -63,11 +63,19 @@ public abstract class Enemy {
 		fixtureDefinition.friction = 0.0f;
 		fixtureDefinition.restitution = 0.1f;
 		Fixture collisionFixture = m_body.createFixture(fixtureDefinition);
-		polygonCollisionShape.dispose();
 		Filter collisionFilter = new Filter();
 		collisionFilter.categoryBits = CollisionCategories.ENEMY;
 		collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.OBJECT;
 		collisionFixture.setFilterData(collisionFilter);
+		FixtureDef sensorFixtureDefinition = new FixtureDef();
+		sensorFixtureDefinition.shape = polygonCollisionShape;
+		sensorFixtureDefinition.isSensor = true;
+		Fixture sensorCollisionFixture = m_body.createFixture(sensorFixtureDefinition);
+		Filter sensorCollisionFilter = new Filter();
+		sensorCollisionFilter.categoryBits = CollisionCategories.ENEMY_SENSOR;
+		sensorCollisionFilter.maskBits = CollisionCategories.DUKE;
+		sensorCollisionFixture.setFilterData(sensorCollisionFilter);
+		polygonCollisionShape.dispose();
 	}
 
 	public boolean isFacingLeft() {

@@ -55,6 +55,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private boolean m_walking;
 	private boolean m_jumping;
 	private float m_walkDuration;
+	private boolean m_underAttack;
+	private float m_attackCooldownTimeElapsed;
 	private boolean m_alive;
 	private boolean m_wasAlive;
 	private int m_health;
@@ -112,6 +114,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private static final float MAX_HORIZONTAL_VELOCITY = 80.0f;
 	private static final int NUMBER_OF_WALKING_FRAMES = 4;
 	private static final float WALK_ANIMATION_SPEED = 0.07f;
+	private static final float ATTACK_COOLDOWN = 3.0f;
 
 	public Duke(World world, TiledMap map) {
 		this(world, map, MAX_LIVES, 0);
@@ -121,6 +124,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_world = world;
 		m_world.setContactListener(this);
 
+		m_underAttack = false;
+		m_attackCooldownTimeElapsed = 0.0f;
 		m_alive = true;
 		m_wasAlive = true;
 		m_health = MAX_HEALTH;
@@ -196,7 +201,6 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 		if(m_door == null) {
 			System.err.println("Map is missing 'door' object.");
-			return;
 		}
 
 		Vector2 spawnPosition = new Vector2(0.0f, 0.0f);
@@ -228,7 +232,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		polygonCollisionShape.dispose();
 		Filter collisionFilter = new Filter();
 		collisionFilter.categoryBits = CollisionCategories.DUKE;
-		collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.OBJECT;
+		collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.OBJECT | CollisionCategories.ENEMY_SENSOR;
 		collisionFixture.setFilterData(collisionFilter);
 
 		m_acceleration = new Vector2(0.0f, 0.0f);
@@ -291,6 +295,14 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_health++;
 
 		return true;
+	}
+
+	public void removeHealth() {
+		m_health--;
+
+		if(m_health <= 0) {
+			kill();
+		}
 	}
 
 	public void addLife() {
@@ -405,6 +417,23 @@ public class Duke implements ContactListener, HUDDataProvider {
 		// TODO: mark as dead, disable interaction, destroy collision body
 	}
 
+	public boolean onAttacked(Enemy enemy) {
+		if(m_underAttack) {
+			return false;
+		}
+
+		m_underAttack = true;
+		m_attackCooldownTimeElapsed = 0.0f;
+
+		removeHealth();
+
+		m_hitSound.play();
+
+		enemy.attack();
+
+		return true;
+	}
+
 	public void setListener(DukeListener listener) {
 		m_listener = listener;
 	}
@@ -420,6 +449,15 @@ public class Duke implements ContactListener, HUDDataProvider {
 		}
 
 		float deltaTime = Gdx.graphics.getDeltaTime();
+
+		if(m_underAttack) {
+			m_attackCooldownTimeElapsed += deltaTime;
+
+			if(m_attackCooldownTimeElapsed > ATTACK_COOLDOWN) {
+				m_underAttack = false;
+				m_attackCooldownTimeElapsed = 0.0f;
+			}
+		}
 
 		m_walking = false;
 
@@ -437,7 +475,6 @@ public class Duke implements ContactListener, HUDDataProvider {
 			m_acceleration.x = 0;
 		}
 
-		boolean wasJumping = m_jumping;
 		Vector2 newVelocity = new Vector2(m_body.getLinearVelocity());
 		
 		if((Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.Z)) && !m_jumping && !m_tossingSomething && m_grounded) {
@@ -715,11 +752,11 @@ public class Duke implements ContactListener, HUDDataProvider {
 						octaBaby.squish();
 					}
 					else if(!octaBaby.isSquished()) {
-						enemy.attack();
+						onAttacked(enemy);
 					}
 				}
 				else {
-					enemy.attack();
+					onAttacked(enemy);
 				}
 			}
 		}
