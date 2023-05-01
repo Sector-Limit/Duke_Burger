@@ -32,7 +32,6 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 public class DukeBurger extends ApplicationAdapter {
 
 	private World m_world;
-	private Body m_groundBody;
 	private Box2DDebugRenderer m_debugRenderer;
 
 	private Texture m_citySkyTexture;
@@ -145,14 +144,12 @@ public class DukeBurger extends ApplicationAdapter {
 		m_mapRenderer.dispose();
 		m_map.dispose();
 		m_debugRenderer.dispose();
-		m_world.destroyBody(m_groundBody);
 		m_world.dispose();
 		m_duke.dispose();
 
 		m_mapRenderer = null;
 		m_map = null;
 		m_debugRenderer = null;
-		m_groundBody = null;
 		m_world = null;
 		m_duke = null;
 		m_skyTexture = null;
@@ -236,7 +233,6 @@ public class DukeBurger extends ApplicationAdapter {
 			m_mapRenderer.dispose();
 			m_map.dispose();
 			m_debugRenderer.dispose();
-			m_world.destroyBody(m_groundBody);
 			m_world.dispose();
 			m_duke.dispose();
 		}
