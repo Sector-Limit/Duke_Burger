@@ -102,6 +102,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private Sound m_tossSound;
 	private Sound m_doorSound;
 	private Sound m_extraLifeSound;
+	private Sound m_deathSound;
+	private Sound m_winSound;
 
 	private DukeListener m_listener;
 
@@ -277,6 +279,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_tossSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Toss.wav"));
 		m_doorSound = Gdx.audio.newSound(Gdx.files.internal("sounds/DoorOpen.wav"));
 		m_extraLifeSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Chicken.wav"));
+		m_deathSound = Gdx.audio.newSound(Gdx.files.internal("sounds/DeathSound.wav"));
+		m_winSound = Gdx.audio.newSound(Gdx.files.internal("sounds/WinSound.wav"));
 	}
 
 	public int getHealth() {
@@ -416,6 +420,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 		removeLife();
 
 		m_alive = false;
+
+		m_deathSound.play(0.15f);
 	}
 
 	public boolean onAttacked(Enemy enemy) {
