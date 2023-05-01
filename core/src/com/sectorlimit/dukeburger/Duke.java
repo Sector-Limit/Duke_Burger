@@ -42,6 +42,7 @@ import com.sectorlimit.dukeburger.object.Burger;
 import com.sectorlimit.dukeburger.object.Door;
 import com.sectorlimit.dukeburger.object.Explosion;
 import com.sectorlimit.dukeburger.object.PickupItem;
+import com.sectorlimit.dukeburger.object.PigCop;
 import com.sectorlimit.dukeburger.object.StaticObject;
 import com.sectorlimit.dukeburger.powerup.Chicken;
 import com.sectorlimit.dukeburger.powerup.Coin;
@@ -83,6 +84,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private PickupItem m_pickupItem;
 	private Enemy m_pickupEnemy;
 	private Door m_door;
+	private PigCop m_pigCop;
 	private Vector<Powerup> m_powerups;
 	private Vector<PickupItem> m_pickupItems;
 	private Vector<Enemy> m_enemies;
@@ -209,6 +211,13 @@ public class Duke implements ContactListener, HUDDataProvider {
 			}
 			else if(mapObject.getName().equalsIgnoreCase("finish_text_2")) {
 				m_staticObjects.add(m_staticObjectFactory.createFinishText(2, objectPosition));
+			}
+			else if(mapObject.getName().equalsIgnoreCase("pigcop_1") || mapObject.getName().equalsIgnoreCase("pigcop_finish")) {
+				m_pigCop = m_staticObjectFactory.createPigCop(1, objectPosition);
+				m_staticObjects.add(m_pigCop);
+			}
+			else if(mapObject.getName().equalsIgnoreCase("pigcop_2")) {
+				m_staticObjects.add(m_staticObjectFactory.createPigCop(2, objectPosition));
 			}
 			else if(mapObject.getName().equalsIgnoreCase("coin")) {
 				m_powerups.add(m_powerupsFactory.createCoin(objectPosition));
@@ -447,6 +456,10 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_levelCompleted = true;
 		m_levelEnded = false;
 		m_levelCompletedTimeElapsed = 0.0f;
+
+		if(m_pigCop != null) {
+			m_pigCop.setVisible(true);
+		}
 
 		m_winSound.play(0.1f);
 
