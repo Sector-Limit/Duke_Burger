@@ -37,6 +37,8 @@ import com.sectorlimit.dukeburger.factory.PowerupsFactory;
 import com.sectorlimit.dukeburger.factory.ProjectileFactory;
 import com.sectorlimit.dukeburger.factory.StaticObjectFactory;
 import com.sectorlimit.dukeburger.object.Barrel;
+import com.sectorlimit.dukeburger.object.Burger;
+import com.sectorlimit.dukeburger.object.Door;
 import com.sectorlimit.dukeburger.object.Explosion;
 import com.sectorlimit.dukeburger.object.PickupItem;
 import com.sectorlimit.dukeburger.object.StaticObject;
@@ -71,6 +73,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private boolean m_pickupItemButtonPressed;
 	private PickupItem m_pickupItem;
 	private Enemy m_pickupEnemy;
+	private Door m_door;
 	private Vector<Powerup> m_powerups;
 	private Vector<PickupItem> m_pickupItems;
 	private Vector<Enemy> m_enemies;
@@ -169,7 +172,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 				m_staticObjects.add(m_staticObjectFactory.createRestaurant(objectPosition));
 			}
 			else if(mapObject.getName().equalsIgnoreCase("door")) {
-				m_staticObjects.add(m_staticObjectFactory.createDoor(objectPosition));
+				m_door = m_staticObjectFactory.createDoor(objectPosition);
+				m_staticObjects.add(m_door);
 			}
 			else if(mapObject.getName().equalsIgnoreCase("coin")) {
 				m_powerups.add(m_powerupsFactory.createCoin(objectPosition));
@@ -177,6 +181,11 @@ public class Duke implements ContactListener, HUDDataProvider {
 			else if(!mapObject.getName().equalsIgnoreCase("player_start")){
 				System.err.println("Unexpected object name: " + mapObject.getName());
 			}
+		}
+
+		if(m_door == null) {
+			System.err.println("Map is missing 'door' object.");
+			return;
 		}
 
 		Vector2 spawnPosition = new Vector2(0.0f, 0.0f);
@@ -303,6 +312,10 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 	public boolean isHoldingSomething() {
 		return m_pickupItem != null || m_pickupEnemy != null;
+	}
+
+	public boolean isHoldingBurger() {
+		return m_pickupItem instanceof Burger;
 	}
 
 	public void pickupItem(PickupItem pickupItem) {
