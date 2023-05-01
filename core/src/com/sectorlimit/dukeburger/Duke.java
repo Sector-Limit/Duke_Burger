@@ -63,6 +63,9 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private int m_health;
 	private int m_lives;
 	private int m_coins;
+	private boolean m_levelCompleted;
+	private boolean m_levelEnded;
+	private float m_levelCompletedTimeElapsed;
 
 	private World m_world;
 	private Body m_body;
@@ -118,6 +121,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private static final float WALK_ANIMATION_SPEED = 0.07f;
 	private static final float ATTACK_COOLDOWN = 3.0f;
 	private static final float DOOR_OPEN_DISTANCE = DUKE_SIZE.y + (16.0f * 1.5f);
+	private static final float LEVEL_COMPLETED_DELAY = 3.0f;
 
 	public Duke(World world, TiledMap map) {
 		this(world, map, MAX_LIVES, 0);
@@ -134,6 +138,9 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_health = MAX_HEALTH;
 		m_lives = lives;
 		m_coins = coins;
+		m_levelCompleted = false;
+		m_levelEnded = false;
+		m_levelCompletedTimeElapsed = 0.0f;
 		m_hud = new HUD(this);
 		m_pickupItemFactory = new PickupItemFactory(m_world);
 		m_enemyFactory = new EnemyFactory(m_world);
@@ -426,6 +433,20 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_deathSound.play(0.15f);
 	}
 
+	public boolean completeLevel() {
+		if(m_levelCompleted) {
+			return false;
+		}
+		
+		m_levelCompleted = true;
+		m_levelEnded = false;
+		m_levelCompletedTimeElapsed = 0.0f;
+
+		m_winSound.play(0.1f);
+
+		return true;
+	}
+
 	public boolean onAttacked(Enemy enemy) {
 		if(m_underAttack) {
 			return false;
@@ -448,6 +469,20 @@ public class Duke implements ContactListener, HUDDataProvider {
 	}
 
 	public void render(SpriteBatch spriteBatch) {
+		float deltaTime = Gdx.graphics.getDeltaTime();
+
+		if(m_levelCompleted) {
+			if(!m_levelEnded) {
+				m_levelCompletedTimeElapsed += deltaTime;
+	
+				if(m_levelCompletedTimeElapsed >= LEVEL_COMPLETED_DELAY) {
+					m_levelEnded = true;
+
+					m_listener.onCompleteLevel();
+				}
+			}
+		}
+
 		if(!m_alive) {
 			if(m_wasAlive) {
 				m_wasAlive = false;
@@ -456,8 +491,6 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 			return;
 		}
-
-		float deltaTime = Gdx.graphics.getDeltaTime();
 
 		if(m_underAttack) {
 			m_attackCooldownTimeElapsed += deltaTime;
@@ -781,6 +814,13 @@ public class Duke implements ContactListener, HUDDataProvider {
 				}
 				else {
 					onAttacked(enemy);
+				}
+			}
+			else if(contactObject instanceof String) {
+				String colliderName = (String) contactObject;
+
+				if(colliderName.equalsIgnoreCase("finish")) {
+					completeLevel();
 				}
 			}
 		}

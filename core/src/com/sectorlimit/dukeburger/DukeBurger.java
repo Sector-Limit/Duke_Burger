@@ -46,6 +46,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	private Duke m_duke;
 	private int m_lives;
 	private int m_coins;
+	private int m_currentLevel;
 	private String m_currentLevelFileName;
 
 	private Sound m_themeMusic;
@@ -53,6 +54,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	private Sound m_subwayMusic;
 
 	public static final Vector2 VIEWPORT_SIZE = new Vector2(320.0f, 180.0f);
+	private static final int NUMBER_OF_MISSIONS = 4;
 	private static final float CAMERA_FOLLOW_VERTICAL_OFFSET_PERCENTAGE = 0.5f;
 	private static final float CAMERA_SPEED = 4.0f;
 	private static final boolean DEBUG_CAMERA_ENABLED = false;
@@ -64,6 +66,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	public void create() {
 		Gdx.graphics.setWindowedMode(1280, 720);
 
+		m_currentLevel = 1;
 		m_lives = Duke.MAX_LIVES;
 		m_coins = 0;
 
@@ -85,6 +88,22 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		}
 
 		startNewGame(m_currentLevelFileName);
+	}
+
+	public void nextLevel() {
+		m_lives = m_duke.getLives();
+		m_coins = m_duke.getCoins();
+
+		stopGame();
+
+		if(m_currentLevel == NUMBER_OF_MISSIONS) {
+			return;
+		}
+
+		m_currentLevel++;
+		m_currentLevelFileName = "mission_" + m_currentLevel + ".tmx";
+
+		startNewGame(m_currentLevelFileName, m_lives, m_coins);
 	}
 
 	public void startNewGame(String levelFileName) {
@@ -134,6 +153,49 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 				collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.DUKE | CollisionCategories.OBJECT | CollisionCategories.BURGER | CollisionCategories.ENEMY;
 				collisionFixture.setFilterData(collisionFilter);
 			}
+		}
+
+		MapLayer finishCollisionMapLayer = mapLayers.get("finish_collision");
+
+		if(finishCollisionMapLayer != null) {
+			MapObjects finishCollisionObjects = finishCollisionMapLayer.getObjects();
+
+			if(finishCollisionObjects.getCount() != 0) {
+				for(int i = 0; i < finishCollisionObjects.getCount(); i++) {
+					MapObject finishCollisionObject = finishCollisionObjects.get(i);
+
+					if(finishCollisionObject instanceof PolygonMapObject) {
+						PolygonMapObject finishPolygonCollisionObject = (PolygonMapObject) finishCollisionObject;
+						Polygon finishPolygonCollision = finishPolygonCollisionObject.getPolygon();
+						float[] finishPolygonCollisionVertices = finishPolygonCollision.getVertices();
+
+						if(finishPolygonCollisionVertices.length < 3 || finishPolygonCollisionVertices.length > 8) {
+							System.err.println("Map has finish polygon collision with invalid number of vertices: " + finishPolygonCollisionVertices.length + ". Expected between 3 and 8 vertices.");
+							continue;
+						}
+
+						BodyDef finishBodyDefinition = new BodyDef();
+						finishBodyDefinition.position.set(new Vector2(finishPolygonCollision.getX(), finishPolygonCollision.getY()));
+						Body finishCollisionObjectBody = m_world.createBody(finishBodyDefinition);
+						finishCollisionObjectBody.setUserData("finish");
+						PolygonShape finishCollisionObjectPolygonShape = new PolygonShape();
+						finishCollisionObjectPolygonShape.set(finishPolygonCollisionVertices);
+						Fixture collisionFixture = finishCollisionObjectBody.createFixture(finishCollisionObjectPolygonShape, 0.0f);
+						collisionFixture.setSensor(true);
+						finishCollisionObjectPolygonShape.dispose();
+						Filter finishfinishCollisionFixture = new Filter();
+						finishfinishCollisionFixture.categoryBits = CollisionCategories.GROUND;
+						finishfinishCollisionFixture.maskBits = CollisionCategories.GROUND | CollisionCategories.DUKE | CollisionCategories.OBJECT | CollisionCategories.BURGER | CollisionCategories.ENEMY;
+						collisionFixture.setFilterData(finishfinishCollisionFixture);
+					}
+				}
+			}
+			else {
+				System.err.println("Map 'finish_collision' layer has no objects.");
+			}
+		}
+		else {
+			System.err.println("Map is missing 'finish_collision' layer.");
 		}
 
 		m_duke = new Duke(m_world, m_map, lives, coins);
@@ -195,15 +257,9 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	}
 
 	public void stopGame() {
-		m_mapRenderer.dispose();
-		m_map.dispose();
-		
-		if(m_debugRenderer != null) {
-			m_debugRenderer.dispose();
+		if(m_duke == null) {
+			return;
 		}
-
-		m_world.dispose();
-		m_duke.dispose();
 
 		m_mapRenderer = null;
 		m_map = null;
@@ -213,12 +269,18 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		m_skyTexture = null;
 	}
 
+	@Override
 	public void onKilled() {
 		m_lives = m_duke.getLives();
 		m_coins = m_duke.getCoins();
 
 		stopGame();
 		startNewGame(m_currentLevelFileName, m_lives, m_coins);
+	}
+
+	@Override
+	public void onCompleteLevel() {
+		nextLevel();
 	}
 
 	@Override
@@ -286,6 +348,10 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		m_duke.render(m_spriteBatch);
 
 		m_spriteBatch.end();
+
+		if(m_duke == null) {
+			return;
+		}
 
 		m_spriteBatch.begin();
 
