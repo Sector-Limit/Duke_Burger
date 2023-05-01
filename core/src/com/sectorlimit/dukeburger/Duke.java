@@ -40,7 +40,7 @@ import com.sectorlimit.dukeburger.object.PickupItem;
 import com.sectorlimit.dukeburger.object.StaticObject;
 import com.sectorlimit.dukeburger.powerup.Powerup;
 
-public class Duke implements ContactListener {
+public class Duke implements ContactListener, HUDDataProvider {
 
 	private Vector2 m_acceleration;
 	private boolean m_facingLeft;
@@ -49,10 +49,12 @@ public class Duke implements ContactListener {
 	private float m_walkDuration;
 	private int m_health;
 	private int m_lives;
+	private int m_coins;
 
 	private World m_world;
 	private Body m_body;
 
+	private HUD m_hud;
 	private ExplosionFactory m_explosionFactory;
 	private EnemyFactory m_enemyFactory;
 	private PowerupsFactory m_powerupsFactory;
@@ -99,6 +101,10 @@ public class Duke implements ContactListener {
 		m_world = world;
 		m_world.setContactListener(this);
 
+		m_health = MAX_HEALTH;
+		m_lives = MAX_LIVES;
+		m_coins = 0;
+		m_hud = new HUD(this);
 		m_pickupItemFactory = new PickupItemFactory(m_world);
 		m_enemyFactory = new EnemyFactory(m_world);
 		m_powerupsFactory = new PowerupsFactory();
@@ -177,8 +183,6 @@ public class Duke implements ContactListener {
 		m_walking = false;
 		m_jumping = false;
 		m_walkDuration = 0.0f;
-		m_health = MAX_HEALTH;
-		m_lives = MAX_LIVES;
 
 		m_idleTexture = new Texture(Gdx.files.internal("sprites/duke_idle.png"));
 		m_idleHoldTexture = new Texture(Gdx.files.internal("sprites/duke_holds_idle.png"));
@@ -213,6 +217,10 @@ public class Duke implements ContactListener {
 
 	public int getLives() {
 		return m_lives;
+	}
+
+	public int getCoins() {
+		return m_coins;
 	}
 
 	public Vector2 getOriginPosition() {
@@ -520,6 +528,10 @@ public class Duke implements ContactListener {
 				currentTextureRegion.flip(true, false);
 			}
 		}
+	}
+
+	public void renderHUD(SpriteBatch spriteBatch) {
+		m_hud.render(spriteBatch);
 	}
 
 	@Override

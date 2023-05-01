@@ -47,7 +47,7 @@ public class DukeBurger extends ApplicationAdapter {
 
 	private Sound m_music;
 
-	private static final Vector2 VIEWPORT_SIZE = new Vector2(320.0f, 180.0f);
+	public static final Vector2 VIEWPORT_SIZE = new Vector2(320.0f, 180.0f);
 	private static final float CAMERA_SPEED = 4.0f;
 	private static final boolean DEBUG_CAMERA_ENABLED = true;
 	private static final boolean PHYSICS_DEBUGGING_ENABLED = true;
@@ -200,6 +200,12 @@ public class DukeBurger extends ApplicationAdapter {
 		m_mapRenderer.render();
 
 		m_duke.render(m_spriteBatch);
+
+		m_spriteBatch.end();
+
+		m_spriteBatch.begin();
+
+		m_duke.renderHUD(m_spriteBatch);
 
 		m_spriteBatch.end();
 
