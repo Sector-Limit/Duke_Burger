@@ -24,16 +24,22 @@ public abstract class PickupItem {
 	protected Texture m_texture;
 
 	protected Sound m_destroySound;
+	protected Sound m_impactSound;
 
 	public PickupItem(Texture texture) {
-		this(texture, null);
+		this(texture, null, null);
 	}
 
 	public PickupItem(Texture texture, Sound destroySound) {
+		this(texture, destroySound, null);
+	}
+
+	public PickupItem(Texture texture, Sound destroySound, Sound impactSound) {
 		m_destroyed = false;
 		m_tossed = false;
 		m_texture = texture;
 		m_destroySound = destroySound;
+		m_impactSound = impactSound;
 	}
 
 	public Vector2 getOriginPosition() {
@@ -64,6 +70,18 @@ public abstract class PickupItem {
 
 	public boolean isDestroyed() {
 		return m_destroyed;
+	}
+
+	public void onImpact() {
+		if(!m_tossed) {
+			return;
+		}
+
+		m_tossed = false;
+
+		if(m_impactSound != null) {
+			m_impactSound.play();
+		}
 	}
 
 	public void cleanup(World world) {

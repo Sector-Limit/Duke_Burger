@@ -18,6 +18,7 @@ public class PickupItemFactory {
 	private Texture m_barrelTexture;
 
 	private Sound m_destroyBoxSound;
+	private Sound m_burgerImpactSound;
 
 	public PickupItemFactory(World world) {
 		m_world = world;
@@ -27,10 +28,11 @@ public class PickupItemFactory {
 		m_barrelTexture = new Texture(Gdx.files.internal("sprites/barrel.png"));
 
 		m_destroyBoxSound = Gdx.audio.newSound(Gdx.files.internal("sounds/BoxHit.wav"));
+		m_burgerImpactSound = Gdx.audio.newSound(Gdx.files.internal("sounds/BurgerDrop.wav"));
 	}
 
 	public Burger createBurger(Vector2 position) {
-		Burger burger = new Burger(m_bigBurgerTexture);
+		Burger burger = new Burger(m_bigBurgerTexture, m_burgerImpactSound);
 		burger.assignPhysics(m_world, position);
 		return burger;
 	}

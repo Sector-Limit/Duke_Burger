@@ -778,6 +778,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 					m_explosions.add(m_explosionFactory.createExplosion(new Vector2(tossedPickupItem.getOriginPosition()).sub(new Vector2())));
 				}
 
+				tossedPickupItem.onImpact();
 				tossedPickupItem.destroy();
 
 				if(otherContactObject instanceof Enemy) {
