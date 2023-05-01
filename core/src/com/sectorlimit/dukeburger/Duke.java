@@ -100,6 +100,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private static final float MAX_HORIZONTAL_VELOCITY = 80.0f;
 	private static final int NUMBER_OF_WALKING_FRAMES = 4;
 	private static final float WALK_ANIMATION_SPEED = 0.07f;
+	private static final boolean ALLOW_DROPPING = false;
 
 	public Duke(World world, TiledMap map) {
 		this(world, map, MAX_LIVES);
@@ -336,7 +337,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		boolean wasJumping = m_jumping;
 		Vector2 newVelocity = new Vector2(m_body.getLinearVelocity());
 		
-		if(Gdx.input.isKeyPressed(Keys.SPACE) && !m_jumping) {
+		if((Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.Z)) && !m_jumping) {
 			// TODO: player must be on object or surface
 			m_jumping = true;
 			float jumpVelocity = JUMP_VELOCITY;
@@ -386,7 +387,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 			m_tossingSomething = false;
 		}
 
-		if(Gdx.input.isKeyPressed(Keys.E) || Gdx.input.isKeyPressed(Keys.F)) {
+		if(Gdx.input.isKeyPressed(Keys.E) || Gdx.input.isKeyPressed(Keys.F) || Gdx.input.isKeyPressed(Keys.X)) {
 			if(!m_pickupItemButtonPressed) {
 				m_pickupItemButtonPressed = true;
 
@@ -421,7 +422,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 			m_pickupItemButtonPressed = false;
 		}
 
-		if(Gdx.input.isKeyPressed(Keys.G)) {
+		if(Gdx.input.isKeyPressed(Keys.G) && ALLOW_DROPPING) {
 			dropItem();
 		}
 
