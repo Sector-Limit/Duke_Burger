@@ -29,6 +29,7 @@ import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.sectorlimit.dukeburger.enemy.Enemy;
 import com.sectorlimit.dukeburger.enemy.OctaBaby;
+import com.sectorlimit.dukeburger.enemy.OctaBaby.Type;
 import com.sectorlimit.dukeburger.factory.EnemyFactory;
 import com.sectorlimit.dukeburger.factory.ExplosionFactory;
 import com.sectorlimit.dukeburger.factory.PickupItemFactory;
@@ -157,7 +158,10 @@ public class Duke implements ContactListener, HUDDataProvider {
 				m_powerups.add(m_powerupsFactory.createChicken(objectPosition));
 			}
 			else if(mapObject.getName().equalsIgnoreCase("octababy")) {
-				m_enemies.add(m_enemyFactory.createOctaBaby(objectPosition));
+				m_enemies.add(m_enemyFactory.createOctaBaby(Type.Green, objectPosition));
+			}
+			else if(mapObject.getName().equalsIgnoreCase("octababy_blue")) {
+				m_enemies.add(m_enemyFactory.createOctaBaby(Type.Blue, objectPosition));
 			}
 			else if(mapObject.getName().equalsIgnoreCase("duke_rest")) {
 				m_staticObjects.add(m_staticObjectFactory.createRestaurant(objectPosition));

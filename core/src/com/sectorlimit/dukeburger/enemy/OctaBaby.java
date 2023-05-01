@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 public class OctaBaby extends BasicEnemy {
 
+	private Type m_type;
 	private boolean m_squished;
 	private float m_squishedTimeElapsed;
 
@@ -23,12 +24,22 @@ public class OctaBaby extends BasicEnemy {
 	private static final Vector2 OCTA_BABY_SIZE = new Vector2(16, 16);
 	private static final float MAX_SQUISHED_DURATION = 3.0f;
 
-	public OctaBaby(Vector2 position, Animation<TextureRegion> octaBabyWalkAnimation, Texture octaBabySquishedTexture) {
+	public enum Type {
+		Green,
+		Blue
+	}
+
+	public OctaBaby(Type type, Vector2 position, Animation<TextureRegion> octaBabyWalkAnimation, Texture octaBabySquishedTexture) {
+		m_type = type;
 		m_squished = false;
 		m_squishedTimeElapsed = 0.0f;
 
 		m_octaBabySquishedTexture = octaBabySquishedTexture;
 		m_octaBabyWalkAnimation = octaBabyWalkAnimation;
+	}
+
+	public Type getType() {
+		return m_type;
 	}
 
 	public Vector2 getSize() {
