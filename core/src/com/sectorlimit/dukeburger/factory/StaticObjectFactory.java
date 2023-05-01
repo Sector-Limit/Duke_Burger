@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.World;
 import com.sectorlimit.dukeburger.object.Door;
 import com.sectorlimit.dukeburger.object.Lava;
 import com.sectorlimit.dukeburger.object.Restaurant;
@@ -19,11 +20,15 @@ public class StaticObjectFactory {
 	private TextureRegion m_doorClosedTextureRegion;
 	private TextureRegion m_doorOpenTextureRegion;
 
+	private World m_world;
+
 	private static final int NUMBER_OF_RESTAURANT_FRAMES = 2;
 	private static final int NUMBER_OF_LAVA_FRAMES = 16;
 	private static final int NUMBER_OF_DOOR_FRAMES = 2;
 
-	public StaticObjectFactory() {
+	public StaticObjectFactory(World world) {
+		m_world = world;
+
 		m_restaurantSheetTexture = new Texture(Gdx.files.internal("sprites/duke_rest.png"));
 
 		TextureRegion[][] restaurantTextureRegion = TextureRegion.split(m_restaurantSheetTexture, m_restaurantSheetTexture.getWidth() / NUMBER_OF_RESTAURANT_FRAMES, m_restaurantSheetTexture.getHeight());
@@ -63,7 +68,9 @@ public class StaticObjectFactory {
 	}
 
 	public Door createDoor(Vector2 position) {
-		return new Door(position, m_doorClosedTextureRegion, m_doorOpenTextureRegion);
+		Door door = new Door(position, m_doorClosedTextureRegion, m_doorOpenTextureRegion);
+		door.assignPhysics(m_world, position);
+		return door;
 	}
 
 	public void dispose() {

@@ -3,10 +3,21 @@ package com.sectorlimit.dukeburger.object;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Filter;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.sectorlimit.dukeburger.CollisionCategories;
 
 public class Door extends StaticObject {
 
 	private boolean m_open;
+
+	protected Body m_body;
 
 	private TextureRegion m_doorClosedTextureRegion;
 	private TextureRegion m_doorOpenTextureRegion;
@@ -26,8 +37,25 @@ public class Door extends StaticObject {
 		return m_open;
 	}
 
+	public boolean isClosed() {
+		return !m_open;
+	}
+
 	public void setOpen(boolean open) {
+		if(m_open == open) {
+			return;
+		}
+
 		m_open = open;
+
+		Fixture firstFixture = m_body.getFixtureList().first();
+
+		if(m_open) {
+			firstFixture.setSensor(true);
+		}
+		else {
+			firstFixture.setSensor(false);
+		}
 	}
 
 	public void open() {
@@ -41,6 +69,24 @@ public class Door extends StaticObject {
 	@Override
 	public Vector2 getSize() {
 		return DOOR_SIZE;
+	}
+
+	public void assignPhysics(World world, Vector2 position) {
+		BodyDef bodyDefinition = new BodyDef();
+		bodyDefinition.type = BodyType.StaticBody;
+		bodyDefinition.position.set(position);
+		m_body = world.createBody(bodyDefinition);
+		m_body.setUserData(this);
+		PolygonShape polygonCollisionShape = new PolygonShape();
+		polygonCollisionShape.setAsBox(getSize().x / 2.0f, getSize().y / 2.0f);
+		FixtureDef fixtureDefinition = new FixtureDef();
+		fixtureDefinition.shape = polygonCollisionShape;
+		Fixture collisionFixture = m_body.createFixture(fixtureDefinition);
+		Filter collisionFilter = new Filter();
+		collisionFilter.categoryBits = CollisionCategories.OBJECT | CollisionCategories.DOOR;
+		collisionFilter.maskBits = CollisionCategories.OBJECT | CollisionCategories.DUKE | CollisionCategories.BURGER | CollisionCategories.ENEMY | CollisionCategories.ENEMY_SENSOR;
+		collisionFixture.setFilterData(collisionFilter);
+		polygonCollisionShape.dispose();
 	}
 
 	public void render(SpriteBatch spriteBatch) {

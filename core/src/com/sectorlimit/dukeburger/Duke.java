@@ -118,6 +118,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private static final int NUMBER_OF_WALKING_FRAMES = 4;
 	private static final float WALK_ANIMATION_SPEED = 0.07f;
 	private static final float ATTACK_COOLDOWN = 3.0f;
+	private static final float DOOR_OPEN_DISTANCE = DUKE_SIZE.y + (16.0f * 1.5f);
 
 	public Duke(World world, TiledMap map) {
 		this(world, map, MAX_LIVES, 0);
@@ -140,7 +141,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_powerupsFactory = new PowerupsFactory();
 		m_projectileFactory = new ProjectileFactory();
 		m_explosionFactory = new ExplosionFactory();
-		m_staticObjectFactory = new StaticObjectFactory();
+		m_staticObjectFactory = new StaticObjectFactory(m_world);
 
 		m_grounded = false;
 		m_tossingSomething = false;
@@ -238,7 +239,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		polygonCollisionShape.dispose();
 		Filter collisionFilter = new Filter();
 		collisionFilter.categoryBits = CollisionCategories.DUKE;
-		collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.OBJECT | CollisionCategories.ENEMY_SENSOR;
+		collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.OBJECT | CollisionCategories.ENEMY_SENSOR | CollisionCategories.DOOR;
 		collisionFixture.setFilterData(collisionFilter);
 
 		m_acceleration = new Vector2(0.0f, 0.0f);
@@ -370,6 +371,9 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 	public void tossItem() {
 		if(m_pickupItem == null) {
+			return;
+		}
+		else if(m_pickupItem instanceof Burger && m_door.isOpen()) {
 			return;
 		}
 
@@ -559,7 +563,6 @@ public class Duke implements ContactListener, HUDDataProvider {
 			m_pickupItemButtonPressed = false;
 		}
 
-
 		float pickupObjectVerticalOffset = -1.0f;
 
 		if(m_pickupItem != null) {
@@ -694,6 +697,18 @@ public class Duke implements ContactListener, HUDDataProvider {
 			else {
 				currentTexture = m_idleTexture;
 			}
+		}
+
+		if(m_pickupItem instanceof Burger) {
+			if(getOriginPosition().dst(m_door.getOriginPosition()) <= DOOR_OPEN_DISTANCE) {
+				m_door.open();
+			}
+			else {
+				m_door.close();
+			}
+		}
+		else {
+			m_door.close();
 		}
 
 		Vector2 renderOrigin = new Vector2(getOriginPosition()).sub(new Vector2(getSize()).scl(0.5f));

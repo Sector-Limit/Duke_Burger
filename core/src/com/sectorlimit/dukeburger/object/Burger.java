@@ -24,7 +24,7 @@ public class Burger extends PickupItem {
 
 	@Override
 	public short getCollisionMask() {
-		return CollisionCategories.GROUND;
+		return CollisionCategories.GROUND | CollisionCategories.DOOR;
 	}
 
 	@Override
