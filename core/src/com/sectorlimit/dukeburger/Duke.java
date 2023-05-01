@@ -204,6 +204,12 @@ public class Duke implements ContactListener, HUDDataProvider {
 			else if(mapObject.getName().equalsIgnoreCase("lava")) {
 				m_staticObjects.add(m_staticObjectFactory.createLava(objectPosition));
 			}
+			else if(mapObject.getName().equalsIgnoreCase("finish_text_1")) {
+				m_staticObjects.add(m_staticObjectFactory.createFinishText(1, objectPosition));
+			}
+			else if(mapObject.getName().equalsIgnoreCase("finish_text_2")) {
+				m_staticObjects.add(m_staticObjectFactory.createFinishText(2, objectPosition));
+			}
 			else if(mapObject.getName().equalsIgnoreCase("coin")) {
 				m_powerups.add(m_powerupsFactory.createCoin(objectPosition));
 			}

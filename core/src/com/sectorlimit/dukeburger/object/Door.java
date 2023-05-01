@@ -28,7 +28,7 @@ public class Door extends StaticObject {
 	private static final Vector2 DOOR_SIZE = new Vector2(16, 32);
 
 	public Door(Vector2 position, TextureRegion doorClosedTextureRegion, TextureRegion doorOpenTextureRegion, Sound doorSound) {
-		super(position, null);
+		super(position);
 
 		m_open = false;
 

@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.sectorlimit.dukeburger.object.Door;
+import com.sectorlimit.dukeburger.object.FinishText;
 import com.sectorlimit.dukeburger.object.Lava;
 import com.sectorlimit.dukeburger.object.Restaurant;
 
@@ -16,6 +17,7 @@ public class StaticObjectFactory {
 	private Texture m_restaurantSheetTexture;
 	private Texture m_lavaSheetTexture;
 	private Texture m_doorSheetTexture;
+	private Texture[] m_finishTextTextures;
 	private Animation<TextureRegion> m_restaurantAnimation;
 	private Animation<TextureRegion> m_lavaAnimation;
 	private TextureRegion m_doorClosedTextureRegion;
@@ -28,6 +30,7 @@ public class StaticObjectFactory {
 	private static final int NUMBER_OF_RESTAURANT_FRAMES = 2;
 	private static final int NUMBER_OF_LAVA_FRAMES = 16;
 	private static final int NUMBER_OF_DOOR_FRAMES = 2;
+	private static final int FINISH_TEXT_COUNT = 2;
 
 	public StaticObjectFactory(World world) {
 		m_world = world;
@@ -61,6 +64,12 @@ public class StaticObjectFactory {
 		m_doorClosedTextureRegion = doorTextureRegions[0][0];
 		m_doorOpenTextureRegion = doorTextureRegions[0][1];
 
+		m_finishTextTextures = new Texture[FINISH_TEXT_COUNT];
+
+		for(int i = 0; i < 2; i++) {
+			m_finishTextTextures[i] = new Texture(Gdx.files.internal("sprites/finish_text_" + (i + 1) + ".png"));
+		}
+
 		m_doorSound = Gdx.audio.newSound(Gdx.files.internal("sounds/DoorOpen.wav"));
 	}
 
@@ -76,6 +85,14 @@ public class StaticObjectFactory {
 		Door door = new Door(position, m_doorClosedTextureRegion, m_doorOpenTextureRegion, m_doorSound);
 		door.assignPhysics(m_world, position);
 		return door;
+	}
+
+	public FinishText createFinishText(int type, Vector2 position) {
+		if(type < 1 || type > FINISH_TEXT_COUNT) {
+			return null;
+		}
+
+		return new FinishText(position, m_finishTextTextures[type - 1]);
 	}
 
 	public void dispose() {
