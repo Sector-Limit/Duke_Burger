@@ -289,6 +289,20 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_lives++;
 	}
 
+	public void removeLife() {
+		if(m_lives <= 1) {
+			return;
+		}
+
+		m_lives--;
+
+		// TODO: re-start level
+
+		if(m_lives <= 0) {
+			// TODO: game over
+		}
+	}
+
 	public void addCoin() {
 		m_coins++;
 
@@ -379,6 +393,11 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_pickupEnemy = null;
 
 		m_tossSound.play();
+	}
+
+	public void kill() {
+		removeLife();
+		// TODO: mark as dead, disable interaction, destroy collision body
 	}
 
 	public void render(SpriteBatch spriteBatch) {
@@ -511,6 +530,10 @@ public class Duke implements ContactListener, HUDDataProvider {
 		}
 
 		for(PickupItem pickupItem : pickupItemsToRemove) {
+			if(pickupItem instanceof Burger) {
+				kill();
+			}
+
 			pickupItem.cleanup(m_world);
 			m_pickupItems.remove(pickupItem);
 		}

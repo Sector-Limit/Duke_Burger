@@ -39,7 +39,11 @@ public abstract class PickupItem {
 	public abstract Vector2 getSize();
 
 	public void destroy() {
-		if(!isDestructible()) {
+		destroy(false);
+	}
+
+	public void destroy(boolean force) {
+		if(!isDestructible() && !force) {
 			return;
 		}
 
@@ -117,7 +121,15 @@ public abstract class PickupItem {
 		m_body.setLinearVelocity(new Vector2((tossLeft ? -1.0f : 1.0f) * 85.0f, 60.0f));
 	}
 
+	public void update() {
+		if(m_body.getPosition().y + getSize().y < 0.0f) {
+			destroy(true);
+		}
+	}
+
 	public void render(SpriteBatch spriteBatch) {
+		update();
+
 		Vector2 renderOrigin = new Vector2(getOriginPosition()).sub(new Vector2(getSize()).scl(0.5f));
 		spriteBatch.draw(m_texture, renderOrigin.x, renderOrigin.y, getSize().x / 2, getSize().y / 2, m_texture.getWidth(), m_texture.getHeight(), 1.0f, 1.0f, (float) Math.toDegrees(m_body.getAngle()), 0, 0, m_texture.getWidth(), m_texture.getHeight(), false, false);
 	}
