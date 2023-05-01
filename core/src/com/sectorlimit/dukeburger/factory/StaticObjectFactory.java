@@ -6,17 +6,21 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.sectorlimit.dukeburger.object.Door;
+import com.sectorlimit.dukeburger.object.Lava;
 import com.sectorlimit.dukeburger.object.Restaurant;
 
 public class StaticObjectFactory {
 
 	private Texture m_restaurantSheetTexture;
+	private Texture m_lavaSheetTexture;
 	private Texture m_doorSheetTexture;
 	private Animation<TextureRegion> m_restaurantAnimation;
+	private Animation<TextureRegion> m_lavaAnimation;
 	private TextureRegion m_doorClosedTextureRegion;
 	private TextureRegion m_doorOpenTextureRegion;
 
 	private static final int NUMBER_OF_RESTAURANT_FRAMES = 2;
+	private static final int NUMBER_OF_LAVA_FRAMES = 16;
 	private static final int NUMBER_OF_DOOR_FRAMES = 2;
 
 	public StaticObjectFactory() {
@@ -31,6 +35,17 @@ public class StaticObjectFactory {
 
 		m_restaurantAnimation = new Animation<TextureRegion>(1.0f, restaurantFrames);
 
+		m_lavaSheetTexture = new Texture(Gdx.files.internal("sprites/lava_animation.png"));
+
+		TextureRegion[][] lavaTextureRegion = TextureRegion.split(m_lavaSheetTexture, m_lavaSheetTexture.getWidth() / NUMBER_OF_LAVA_FRAMES, m_lavaSheetTexture.getHeight());
+		TextureRegion[] lavaFrames = new TextureRegion[NUMBER_OF_LAVA_FRAMES];
+
+		for (int i = 0; i < NUMBER_OF_LAVA_FRAMES; i++) {
+			lavaFrames[i] = lavaTextureRegion[0][i];
+		}
+
+		m_lavaAnimation = new Animation<TextureRegion>(0.07f, lavaFrames);
+
 		m_doorSheetTexture = new Texture(Gdx.files.internal("sprites/door.png"));
 
 		TextureRegion[][] doorTextureRegions = TextureRegion.split(m_doorSheetTexture, m_doorSheetTexture.getWidth() / NUMBER_OF_DOOR_FRAMES, m_doorSheetTexture.getHeight());
@@ -41,6 +56,10 @@ public class StaticObjectFactory {
 
 	public Restaurant createRestaurant(Vector2 position) {
 		return new Restaurant(position, m_restaurantAnimation);
+	}
+
+	public Lava createLava(Vector2 position) {
+		return new Lava(position, m_lavaAnimation);
 	}
 
 	public Door createDoor(Vector2 position) {
