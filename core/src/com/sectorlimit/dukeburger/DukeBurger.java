@@ -48,7 +48,9 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	private int m_coins;
 	private String m_currentLevelFileName;
 
-	private Sound m_music;
+	private Sound m_themeMusic;
+	private Sound m_cityMusic;
+	private Sound m_subwayMusic;
 
 	public static final Vector2 VIEWPORT_SIZE = new Vector2(320.0f, 180.0f);
 	private static final float CAMERA_FOLLOW_VERTICAL_OFFSET_PERCENTAGE = 0.5f;
@@ -56,6 +58,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	private static final boolean DEBUG_CAMERA_ENABLED = false;
 	private static final boolean PHYSICS_DEBUGGING_ENABLED = false;
 	private static final boolean MUSIC_ENABLED = true;
+	private static final float MUSIC_VOLUME = 0.35f;
 
 	@Override
 	public void create() {
@@ -73,12 +76,15 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 		m_currentLevelFileName = "mission_1.tmx";
 
-		startNewGame(m_currentLevelFileName);
-
 		if(MUSIC_ENABLED) {
-			m_music = Gdx.audio.newSound(Gdx.files.internal("music/pixelduke.mp3"));
-			m_music.loop();
+			m_themeMusic = Gdx.audio.newSound(Gdx.files.internal("music/pixelduke.mp3"));
+			m_cityMusic = Gdx.audio.newSound(Gdx.files.internal("music/city.mp3"));
+			m_subwayMusic = Gdx.audio.newSound(Gdx.files.internal("music/subway.mp3"));
+
+			m_themeMusic.loop(MUSIC_VOLUME);
 		}
+
+		startNewGame(m_currentLevelFileName);
 	}
 
 	public void startNewGame(String levelFileName) {
@@ -86,6 +92,8 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	}
 
 	public void startNewGame(String levelFileName, int lives, int coins) {
+		stopMusic();
+
 		m_world = new World(new Vector2(0, -220), true);
 
 		if(PHYSICS_DEBUGGING_ENABLED) {
@@ -135,20 +143,55 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 		m_skyTexture = null;
 
-		if(mapProperties != null && mapProperties.containsKey("background")) {
-			Object backgroundTypeObject = mapProperties.get("background");
-
-			if(backgroundTypeObject instanceof String) {
-				String backgroundType = (String) backgroundTypeObject;
-
-				if(backgroundType.equalsIgnoreCase("city")) {
-					m_skyTexture = m_citySkyTexture;
+		if(mapProperties != null) {
+			if(mapProperties.containsKey("background")) {
+				Object backgroundTypeObject = mapProperties.get("background");
+	
+				if(backgroundTypeObject instanceof String) {
+					String backgroundType = (String) backgroundTypeObject;
+	
+					if(backgroundType.equalsIgnoreCase("city")) {
+						m_skyTexture = m_citySkyTexture;
+					}
+					else {
+						System.err.println("Invalid background type: '" + backgroundType + "'.");
+					}
 				}
-				else {
-					System.err.println("Invalid background type: '" + backgroundType + "'.");
+			}
+
+			if(mapProperties.containsKey("music")) {
+				Object musicTypeObject = mapProperties.get("music");
+				
+				if(musicTypeObject instanceof String) {
+					String musicType = (String) musicTypeObject;
+					Sound music = null;
+	
+					if(musicType.equalsIgnoreCase("city")) {
+						music = m_cityMusic;
+					}
+					else if(musicType.equalsIgnoreCase("subway")) {
+						music = m_subwayMusic;
+					}
+					else {
+						System.err.println("Invalid music type: '" + musicType + "'.");
+					}
+
+					if(music != null && MUSIC_ENABLED) {
+						music.loop(MUSIC_VOLUME);
+					}
 				}
 			}
 		}
+	}
+
+	public void stopMusic() {
+		if(!MUSIC_ENABLED) {
+			return;
+		}
+
+		m_themeMusic.stop();
+		m_cityMusic.stop();
+		m_subwayMusic.stop();
 	}
 
 	public void stopGame() {
