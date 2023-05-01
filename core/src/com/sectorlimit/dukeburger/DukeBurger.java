@@ -153,7 +153,11 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	public void stopGame() {
 		m_mapRenderer.dispose();
 		m_map.dispose();
-		m_debugRenderer.dispose();
+		
+		if(m_debugRenderer != null) {
+			m_debugRenderer.dispose();
+		}
+
 		m_world.dispose();
 		m_duke.dispose();
 
