@@ -100,7 +100,6 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private Sound m_squishSound;
 	private Sound m_pickupSound;
 	private Sound m_tossSound;
-	private Sound m_doorSound;
 	private Sound m_extraLifeSound;
 	private Sound m_deathSound;
 	private Sound m_winSound;
@@ -278,7 +277,6 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_squishSound = Gdx.audio.newSound(Gdx.files.internal("sounds/GetHit.wav"));
 		m_pickupSound = Gdx.audio.newSound(Gdx.files.internal("sounds/PickUp.wav"));
 		m_tossSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Toss.wav"));
-		m_doorSound = Gdx.audio.newSound(Gdx.files.internal("sounds/DoorOpen.wav"));
 		m_extraLifeSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Chicken.wav"));
 		m_deathSound = Gdx.audio.newSound(Gdx.files.internal("sounds/DeathSound.wav"));
 		m_winSound = Gdx.audio.newSound(Gdx.files.internal("sounds/WinSound.wav"));

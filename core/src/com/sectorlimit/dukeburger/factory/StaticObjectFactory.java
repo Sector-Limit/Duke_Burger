@@ -1,6 +1,7 @@
 package com.sectorlimit.dukeburger.factory;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -21,6 +22,8 @@ public class StaticObjectFactory {
 	private TextureRegion m_doorOpenTextureRegion;
 
 	private World m_world;
+
+	private Sound m_doorSound;
 
 	private static final int NUMBER_OF_RESTAURANT_FRAMES = 2;
 	private static final int NUMBER_OF_LAVA_FRAMES = 16;
@@ -57,6 +60,8 @@ public class StaticObjectFactory {
 
 		m_doorClosedTextureRegion = doorTextureRegions[0][0];
 		m_doorOpenTextureRegion = doorTextureRegions[0][1];
+
+		m_doorSound = Gdx.audio.newSound(Gdx.files.internal("sounds/DoorOpen.wav"));
 	}
 
 	public Restaurant createRestaurant(Vector2 position) {
@@ -68,7 +73,7 @@ public class StaticObjectFactory {
 	}
 
 	public Door createDoor(Vector2 position) {
-		Door door = new Door(position, m_doorClosedTextureRegion, m_doorOpenTextureRegion);
+		Door door = new Door(position, m_doorClosedTextureRegion, m_doorOpenTextureRegion, m_doorSound);
 		door.assignPhysics(m_world, position);
 		return door;
 	}

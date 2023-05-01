@@ -1,5 +1,6 @@
 package com.sectorlimit.dukeburger.object;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -22,15 +23,19 @@ public class Door extends StaticObject {
 	private TextureRegion m_doorClosedTextureRegion;
 	private TextureRegion m_doorOpenTextureRegion;
 
+	private Sound m_doorSound;
+
 	private static final Vector2 DOOR_SIZE = new Vector2(16, 32);
 
-	public Door(Vector2 position, TextureRegion doorClosedTextureRegion, TextureRegion doorOpenTextureRegion) {
+	public Door(Vector2 position, TextureRegion doorClosedTextureRegion, TextureRegion doorOpenTextureRegion, Sound doorSound) {
 		super(position, null);
 
 		m_open = false;
 
 		m_doorClosedTextureRegion = doorClosedTextureRegion;
 		m_doorOpenTextureRegion = doorOpenTextureRegion;
+
+		m_doorSound = doorSound;
 	}
 
 	public boolean isOpen() {
@@ -52,9 +57,13 @@ public class Door extends StaticObject {
 
 		if(m_open) {
 			firstFixture.setSensor(true);
+
+			m_doorSound.play();
 		}
 		else {
 			firstFixture.setSensor(false);
+
+			m_doorSound.play(1.0f, 0.75f, 0.0f);
 		}
 	}
 
