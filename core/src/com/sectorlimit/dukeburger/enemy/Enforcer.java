@@ -41,6 +41,11 @@ public class Enforcer extends Enemy {
 		return ENFORCER_SIZE;
 	}
 
+    @Override
+    public boolean shouldRandomizeInitialDirection() {
+        return false;
+    }
+
 	public void assignPhysics(World world, Vector2 position) {
 		BodyDef bodyDefinition = new BodyDef();
 		bodyDefinition.type = BodyType.StaticBody;

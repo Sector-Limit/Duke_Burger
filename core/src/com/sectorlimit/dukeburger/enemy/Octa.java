@@ -38,8 +38,14 @@ public class Octa extends Enemy {
 		m_octaDeadTexture = octaDeadTexture;
 	}
 
+	@Override
 	public Vector2 getSize() {
 		return OCTA_SIZE;
+	}
+
+	@Override
+	public boolean shouldRandomizeInitialDirection() {
+		return false;
 	}
 
 	public void assignPhysics(World world, Vector2 position) {
