@@ -579,7 +579,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 			else {
 				m_acceleration.x = 0;
 			}
-	
+
 			Vector2 newVelocity = new Vector2(m_body.getLinearVelocity());
 			
 			if((Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.Z)) && !m_jumping && !m_tossingSomething && m_grounded) {
@@ -621,7 +621,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 			}
 	
 			m_body.setLinearVelocity(newVelocity);
-	
+
 			if(Gdx.input.isKeyPressed(Keys.E) || Gdx.input.isKeyPressed(Keys.F) || Gdx.input.isKeyPressed(Keys.X)) {
 				if(!m_pickupItemButtonPressed) {
 					m_pickupItemButtonPressed = true;
@@ -834,8 +834,6 @@ public class Duke implements ContactListener, HUDDataProvider {
 		}
 
 		m_projectileSystem.render(spriteBatch);
-
-		m_grounded = false;
 	}
 
 	public void renderHUD(SpriteBatch spriteBatch) {
@@ -967,7 +965,35 @@ public class Duke implements ContactListener, HUDDataProvider {
 	}
 
 	@Override
-	public void endContact(Contact contact) { }
+	public void endContact(Contact contact) {
+		Object contactObjectA = contact.getFixtureA().getBody().getUserData();
+		Object contactObjectB = contact.getFixtureB().getBody().getUserData();
+		Fixture contactFixture = null;
+		Object contactObject = null;
+		boolean isPlayerContact = false;
+
+		if(contactObjectA instanceof Duke) {
+			contactFixture = contact.getFixtureB();
+			isPlayerContact = true;
+		}
+		else if(contactObjectB instanceof Duke) {
+			contactFixture = contact.getFixtureA();
+			isPlayerContact = true;
+		}
+
+		if(contactFixture != null) {
+			contactObject = contactFixture.getBody().getUserData();
+		}
+
+		if(isPlayerContact) {
+			if(contactObject == null) {
+				m_grounded = false;
+			}
+			else if(contactObject instanceof PickupItem) {
+				m_grounded = false;
+			}
+		}
+	}
 
 	@Override
 	public void preSolve(Contact contact, Manifold oldManifold) { }
