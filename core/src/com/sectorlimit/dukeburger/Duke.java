@@ -72,6 +72,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private boolean m_levelCompleted;
 	private boolean m_levelEnded;
 	private float m_levelCompletedTimeElapsed;
+	private boolean m_gameOver;
 
 	private World m_world;
 	private Body m_body;
@@ -156,6 +157,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_coins = coins;
 		m_levelCompleted = false;
 		m_levelEnded = false;
+		m_gameOver = false;
 		m_levelCompletedTimeElapsed = 0.0f;
 		m_hud = new HUD(this);
 		m_pickupItemFactory = new PickupItemFactory(m_world);
@@ -359,6 +361,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 	public void removeLife() {
 		if(m_lives <= 0) {
+			m_gameOver = true;
 			return;
 		}
 
@@ -512,6 +515,10 @@ public class Duke implements ContactListener, HUDDataProvider {
 		float deltaTime = Gdx.graphics.getDeltaTime();
 
 		if(m_body.getPosition().y + getSize().y < 0.0f) {
+			if(m_alive) {
+				removeLife();
+			}
+
 			m_dead = true;
 		}
 
@@ -519,7 +526,12 @@ public class Duke implements ContactListener, HUDDataProvider {
 			if(!m_wasDead) {
 				m_wasDead = true;
 
-				m_listener.onDead();
+				if(m_gameOver) {
+					m_listener.onGameOver();
+				}
+				else {
+					m_listener.onDead();
+				}
 			}
 			
 			return;

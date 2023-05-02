@@ -30,6 +30,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.sectorlimit.dukeburger.image.GifDecoder;
 
 public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
@@ -40,11 +41,14 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	private Texture m_skyTexture;
 	private Texture m_titleScreenSheetTexture;
 	private Animation<TextureRegion> m_titleScreenAnimation;
+    private Animation<TextureRegion> m_introAnimation;
 	private TiledMap m_map;
 	private OrthogonalTiledMapRenderer m_mapRenderer;
 
 	private boolean m_showTitleScreen;
 	private float m_elapsedTitleScreenAnimationTime;
+	private boolean m_showIntro;
+	private float m_elapsedIntroAnimationTime;
 	private Stage m_gameStage;
 	private OrthographicCamera m_camera;
 	private Vector2 m_cameraOffset;
@@ -76,6 +80,8 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 		m_showTitleScreen = true;
 		m_elapsedTitleScreenAnimationTime = 0.0f;
+		m_showIntro = false;
+		m_elapsedIntroAnimationTime = 0.0f;
 		m_currentLevel = 1;
 		m_lives = Duke.MAX_LIVES;
 		m_coins = 0;
@@ -94,6 +100,8 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 			m_themeMusic.loop(MUSIC_VOLUME);
 		}
+
+		m_introAnimation = GifDecoder.loadGIFAnimation(Animation.PlayMode.NORMAL, Gdx.files.internal("ui/intro.gif").read());
 
 		m_titleScreenSheetTexture = new Texture(Gdx.files.internal("ui/duke_burger_menu_animation.png"));
 
@@ -149,6 +157,8 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 		m_showTitleScreen = false;
 		m_elapsedTitleScreenAnimationTime = 0.0f;
+		m_showIntro = false;
+		m_elapsedIntroAnimationTime = 0.0f;
 
 		m_world = new World(new Vector2(0, -220), true);
 
@@ -330,10 +340,6 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	}
 
 	public void stopGame() {
-		if(m_duke == null) {
-			return;
-		}
-
 		m_mapRenderer = null;
 		m_map = null;
 		m_debugRenderer = null;
@@ -355,6 +361,14 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	}
 
 	@Override
+	public void onGameOver() {
+		m_showTitleScreen = true;
+		m_elapsedTitleScreenAnimationTime = 0.0f;
+
+		stopGame();
+	}
+
+	@Override
 	public void onLevelCompleted() {
 		stopMusic();
 	}
@@ -371,10 +385,11 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 	@Override
 	public void render() {
-		
-		if(m_showTitleScreen) {
-			float deltaTime = Gdx.graphics.getDeltaTime();
+		ScreenUtils.clear(0, 0, 0, 1);
 
+		float deltaTime = Gdx.graphics.getDeltaTime();
+
+		if(m_showTitleScreen) {
 			m_elapsedTitleScreenAnimationTime += deltaTime;
 			
 			if(m_elapsedTitleScreenAnimationTime >= m_titleScreenAnimation.getAnimationDuration()) {
@@ -383,16 +398,35 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 			m_spriteBatch.begin();
 
-			m_gameStage.getViewport().apply();
-			m_gameStage.draw();
-
-			m_spriteBatch.draw(m_titleScreenAnimation.getKeyFrame(m_elapsedTitleScreenAnimationTime), 0.0f, 0.0f);
+			TextureRegion titleScreenFrameTextureRegion = m_titleScreenAnimation.getKeyFrame(m_elapsedTitleScreenAnimationTime);
+			m_spriteBatch.draw(titleScreenFrameTextureRegion, 0.0f, 0.0f, 0.0f, 0.0f, titleScreenFrameTextureRegion.getRegionWidth(), titleScreenFrameTextureRegion.getRegionHeight(), UI_SCALE_PERCENTAGE, UI_SCALE_PERCENTAGE, 0.0f);
 
 			m_spriteBatch.end();
 
 			if(Gdx.input.isKeyPressed(Keys.ANY_KEY)) {
 				m_showTitleScreen = false;
-				
+				m_elapsedTitleScreenAnimationTime = 0.0f;
+
+				m_showIntro = true;
+			}
+
+			return;
+		}
+
+		if(m_showIntro) {
+			m_elapsedIntroAnimationTime += deltaTime;
+
+			m_spriteBatch.begin();
+
+			TextureRegion introFrameTextureRegion = m_introAnimation.getKeyFrame(m_elapsedIntroAnimationTime);
+			m_spriteBatch.draw(introFrameTextureRegion, 0.0f, 0.0f, 0.0f, 0.0f, introFrameTextureRegion.getRegionWidth(), introFrameTextureRegion.getRegionHeight(), UI_SCALE_PERCENTAGE, UI_SCALE_PERCENTAGE, 0.0f);
+
+			m_spriteBatch.end();
+
+			if(Gdx.input.isKeyPressed(Keys.ESCAPE) || m_elapsedIntroAnimationTime >= m_introAnimation.getAnimationDuration()) {
+				m_showIntro = false;
+				m_elapsedIntroAnimationTime = 0.0f;
+			
 				startBrandNewGame();
 			}
 
@@ -434,7 +468,6 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		m_camera.position.set(newCameraPosition.x, newCameraPosition.y, 0.0f);
 
 		m_world.step(1 / 60f, 6, 2);
-		ScreenUtils.clear(0, 0, 0, 1);
 
 		m_camera.update();
 

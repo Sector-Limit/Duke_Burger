@@ -6,5 +6,6 @@ public interface DukeListener {
 	public abstract void onDead();
 	public abstract void onLevelCompleted();
 	public abstract void onLevelEnded();
+	public abstract void onGameOver();
 
 }
