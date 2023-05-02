@@ -368,6 +368,10 @@ public class Duke implements ContactListener, HUDDataProvider {
 	}
 
 	public void removeHealth() {
+		if(m_levelCompleted) {
+			return;
+		}
+
 		m_health--;
 
 		if(m_health <= 0) {
@@ -380,6 +384,10 @@ public class Duke implements ContactListener, HUDDataProvider {
 	}
 
 	public void removeLife() {
+		if(m_levelCompleted) {
+			return;
+		}
+
 		if(m_lives <= 0) {
 			m_gameOver = true;
 			return;
@@ -485,6 +493,10 @@ public class Duke implements ContactListener, HUDDataProvider {
 	}
 
 	public void kill() {
+		if(m_levelCompleted) {
+			return;
+		}
+
 		removeLife();
 
 		m_alive = false;
