@@ -2,7 +2,7 @@
 <map version="1.10" tiledversion="1.10.1" orientation="orthogonal" renderorder="right-down" width="240" height="32" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="270">
  <properties>
   <property name="background" value="city"/>
-  <property name="music" value="city"/>
+  <property name="music" value="burger_people"/>
  </properties>
  <tileset firstgid="1" source="city.tsx"/>
  <tileset firstgid="97" source="objects.tsx"/>

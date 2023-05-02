@@ -62,6 +62,8 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	private Sound m_themeMusic;
 	private Sound m_cityMusic;
 	private Sound m_subwayMusic;
+	private Sound m_burgerPeopleMusic;
+	private Sound m_astroLoungeMusic;
 
 	public static final Vector2 VIEWPORT_SIZE = new Vector2(320.0f, 180.0f);
 	private static final float UI_SCALE_PERCENTAGE = 4.0f;
@@ -97,6 +99,8 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 			m_themeMusic = Gdx.audio.newSound(Gdx.files.internal("music/pixelduke.mp3"));
 			m_cityMusic = Gdx.audio.newSound(Gdx.files.internal("music/city.mp3"));
 			m_subwayMusic = Gdx.audio.newSound(Gdx.files.internal("music/subway.mp3"));
+			m_burgerPeopleMusic = Gdx.audio.newSound(Gdx.files.internal("music/burger_people.mp3"));
+			m_astroLoungeMusic = Gdx.audio.newSound(Gdx.files.internal("music/subway.mp3"));
 
 			m_themeMusic.loop(MUSIC_VOLUME);
 		}
@@ -316,12 +320,18 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 				if(musicTypeObject instanceof String) {
 					String musicType = (String) musicTypeObject;
 					Sound music = null;
-	
+
 					if(musicType.equalsIgnoreCase("city")) {
 						music = m_cityMusic;
 					}
 					else if(musicType.equalsIgnoreCase("subway")) {
 						music = m_subwayMusic;
+					}
+					else if(musicType.equalsIgnoreCase("burger_people")) {
+						music = m_burgerPeopleMusic;
+					}
+					else if(musicType.equalsIgnoreCase("astro_lounge")) {
+						music = m_astroLoungeMusic;
 					}
 					else {
 						System.err.println("Invalid music type: '" + musicType + "'.");
@@ -343,6 +353,8 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		m_themeMusic.stop();
 		m_cityMusic.stop();
 		m_subwayMusic.stop();
+		m_burgerPeopleMusic.stop();
+		m_astroLoungeMusic.stop();
 	}
 
 	public void stopGame() {
