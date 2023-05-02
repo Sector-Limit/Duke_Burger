@@ -6,7 +6,9 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.MapObject;
@@ -36,9 +38,13 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 	private Texture m_citySkyTexture;
 	private Texture m_skyTexture;
+	private Texture m_titleScreenSheetTexture;
+	private Animation<TextureRegion> m_titleScreenAnimation;
 	private TiledMap m_map;
 	private OrthogonalTiledMapRenderer m_mapRenderer;
 
+	private boolean m_showTitleScreen;
+	private float m_elapsedTitleScreenAnimationTime;
 	private Stage m_gameStage;
 	private OrthographicCamera m_camera;
 	private Vector2 m_cameraOffset;
@@ -54,6 +60,8 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	private Sound m_subwayMusic;
 
 	public static final Vector2 VIEWPORT_SIZE = new Vector2(320.0f, 180.0f);
+	private static final float UI_SCALE_PERCENTAGE = 4.0f;
+	private static final int NUMBER_OF_TITLE_SCREEN_FRAMES = 2;
 	private static final int NUMBER_OF_MISSIONS = 4;
 	private static final float CAMERA_FOLLOW_VERTICAL_OFFSET_PERCENTAGE = 0.5f;
 	private static final float CAMERA_SPEED = 4.0f;
@@ -66,6 +74,8 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	public void create() {
 		Gdx.graphics.setWindowedMode(1280, 720);
 
+		m_showTitleScreen = true;
+		m_elapsedTitleScreenAnimationTime = 0.0f;
 		m_currentLevel = 1;
 		m_lives = Duke.MAX_LIVES;
 		m_coins = 0;
@@ -77,8 +87,6 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		m_spriteBatch = new SpriteBatch();
 		m_citySkyTexture = new Texture(Gdx.files.internal("sprites/city_bg.png"));
 
-		m_currentLevelFileName = "mission_1.tmx";
-
 		if(MUSIC_ENABLED) {
 			m_themeMusic = Gdx.audio.newSound(Gdx.files.internal("music/pixelduke.mp3"));
 			m_cityMusic = Gdx.audio.newSound(Gdx.files.internal("music/city.mp3"));
@@ -87,7 +95,16 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 			m_themeMusic.loop(MUSIC_VOLUME);
 		}
 
-		startNewGame(m_currentLevelFileName);
+		m_titleScreenSheetTexture = new Texture(Gdx.files.internal("ui/duke_burger_menu_animation.png"));
+
+		TextureRegion[][] titleScreenTextureRegion = TextureRegion.split(m_titleScreenSheetTexture, m_titleScreenSheetTexture.getWidth() / NUMBER_OF_TITLE_SCREEN_FRAMES, m_titleScreenSheetTexture.getHeight());
+		TextureRegion[] titleScreenFrames = new TextureRegion[NUMBER_OF_TITLE_SCREEN_FRAMES];
+
+		for (int i = 0; i < NUMBER_OF_TITLE_SCREEN_FRAMES; i++) {
+			titleScreenFrames[i] = titleScreenTextureRegion[0][i];
+		}
+
+		m_titleScreenAnimation = new Animation<TextureRegion>(0.3f, titleScreenFrames);
 	}
 
 	public void nextLevel() {
@@ -97,12 +114,29 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		stopGame();
 
 		if(m_currentLevel == NUMBER_OF_MISSIONS) {
+			m_showTitleScreen = true;
 			return;
 		}
 
 		m_currentLevel++;
-		m_currentLevelFileName = "mission_" + m_currentLevel + ".tmx";
 
+		startNewGame(m_currentLevel);
+	}
+
+	public void startBrandNewGame() {
+		m_coins = 0;
+		m_lives = Duke.MAX_LIVES;
+
+		startNewGame(1);
+	}
+
+	public void startNewGame(int levelNumber) {
+		if(levelNumber < 1 || levelNumber > NUMBER_OF_MISSIONS) {
+			return;
+		}
+
+		m_currentLevelFileName = "mission_" + m_currentLevel + ".tmx";
+	
 		startNewGame(m_currentLevelFileName, m_lives, m_coins);
 	}
 
@@ -112,6 +146,9 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 	public void startNewGame(String levelFileName, int lives, int coins) {
 		stopMusic();
+
+		m_showTitleScreen = false;
+		m_elapsedTitleScreenAnimationTime = 0.0f;
 
 		m_world = new World(new Vector2(0, -220), true);
 
@@ -334,6 +371,34 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 	@Override
 	public void render() {
+		
+		if(m_showTitleScreen) {
+			float deltaTime = Gdx.graphics.getDeltaTime();
+
+			m_elapsedTitleScreenAnimationTime += deltaTime;
+			
+			if(m_elapsedTitleScreenAnimationTime >= m_titleScreenAnimation.getAnimationDuration()) {
+				m_elapsedTitleScreenAnimationTime = m_elapsedTitleScreenAnimationTime % m_titleScreenAnimation.getAnimationDuration();
+			}
+
+			m_spriteBatch.begin();
+
+			m_gameStage.getViewport().apply();
+			m_gameStage.draw();
+
+			m_spriteBatch.draw(m_titleScreenAnimation.getKeyFrame(m_elapsedTitleScreenAnimationTime), 0.0f, 0.0f);
+
+			m_spriteBatch.end();
+
+			if(Gdx.input.isKeyPressed(Keys.ANY_KEY)) {
+				m_showTitleScreen = false;
+				
+				startBrandNewGame();
+			}
+
+			return;
+		}
+
 		if(m_duke == null) {
 			return;
 		}
@@ -375,8 +440,8 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 		if(m_skyTexture != null) {
 			m_spriteBatch.begin();
-	
-			m_spriteBatch.draw(m_skyTexture, 0.0f, 0.0f, 0.0f, 0.0f, m_skyTexture.getWidth(), m_skyTexture.getHeight(), 4.0f, 4.0f, 0.0f, 0, 0, m_skyTexture.getWidth(), m_skyTexture.getHeight(), false, false);
+
+			m_spriteBatch.draw(m_skyTexture, 0.0f, 0.0f, 0.0f, 0.0f, m_skyTexture.getWidth(), m_skyTexture.getHeight(), UI_SCALE_PERCENTAGE, UI_SCALE_PERCENTAGE, 0.0f, 0, 0, m_skyTexture.getWidth(), m_skyTexture.getHeight(), false, false);
 	
 			m_spriteBatch.end();
 		}
