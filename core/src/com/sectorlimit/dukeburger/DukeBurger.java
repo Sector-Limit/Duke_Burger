@@ -56,7 +56,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	private Duke m_duke;
 	private int m_lives;
 	private int m_coins;
-	private int m_currentLevel;
+	private int m_currentLevelNumber;
 	private String m_currentLevelFileName;
 
 	private Sound m_themeMusic;
@@ -82,7 +82,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		m_elapsedTitleScreenAnimationTime = 0.0f;
 		m_showIntro = false;
 		m_elapsedIntroAnimationTime = 0.0f;
-		m_currentLevel = 1;
+		m_currentLevelNumber = 1;
 		m_lives = Duke.MAX_LIVES;
 		m_coins = 0;
 
@@ -113,6 +113,10 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		}
 
 		m_titleScreenAnimation = new Animation<TextureRegion>(0.3f, titleScreenFrames);
+
+		if(m_currentLevelFileName != null) {
+			startNewGame(m_currentLevelFileName);
+		}
 	}
 
 	public void nextLevel() {
@@ -121,19 +125,20 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 		stopGame();
 
-		if(m_currentLevel == NUMBER_OF_MISSIONS) {
+		if(m_currentLevelNumber >= NUMBER_OF_MISSIONS) {
 			m_showTitleScreen = true;
 			return;
 		}
 
-		m_currentLevel++;
+		m_currentLevelNumber++;
 
-		startNewGame(m_currentLevel);
+		startNewGame(m_currentLevelNumber);
 	}
 
 	public void startBrandNewGame() {
 		m_coins = 0;
 		m_lives = Duke.MAX_LIVES;
+		m_currentLevelNumber = 1;
 
 		startNewGame(1);
 	}
@@ -143,9 +148,9 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 			return;
 		}
 
-		m_currentLevelFileName = "mission_" + m_currentLevel + ".tmx";
-	
-		startNewGame(m_currentLevelFileName, m_lives, m_coins);
+		m_currentLevelNumber = levelNumber;
+
+		startNewGame("mission_" + m_currentLevelNumber + ".tmx", m_lives, m_coins);
 	}
 
 	public void startNewGame(String levelFileName) {
@@ -155,6 +160,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	public void startNewGame(String levelFileName, int lives, int coins) {
 		stopMusic();
 
+		m_currentLevelFileName = levelFileName;
 		m_showTitleScreen = false;
 		m_elapsedTitleScreenAnimationTime = 0.0f;
 		m_showIntro = false;
@@ -197,7 +203,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 				collisionObjectPolygonShape.dispose();
 				Filter collisionFilter = new Filter();
 				collisionFilter.categoryBits = CollisionCategories.GROUND;
-				collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.DUKE | CollisionCategories.OBJECT | CollisionCategories.BURGER | CollisionCategories.ENEMY;
+				collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.DUKE | CollisionCategories.DUKE_FEET_SENSOR | CollisionCategories.OBJECT | CollisionCategories.BURGER | CollisionCategories.ENEMY;
 				collisionFixture.setFilterData(collisionFilter);
 			}
 		}

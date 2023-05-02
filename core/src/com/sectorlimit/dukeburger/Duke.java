@@ -269,7 +269,6 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_body.setUserData(this);
 		PolygonShape polygonCollisionShape = new PolygonShape();
 		polygonCollisionShape.setAsBox(getSize().x / 2.0f, getSize().y / 2.0f);
-
 		FixtureDef fixtureDefinition = new FixtureDef();
 		fixtureDefinition.shape = polygonCollisionShape;
 		fixtureDefinition.density = 0.5f;
@@ -281,6 +280,27 @@ public class Duke implements ContactListener, HUDDataProvider {
 		collisionFilter.categoryBits = CollisionCategories.DUKE;
 		collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.OBJECT | CollisionCategories.ENEMY_SENSOR | CollisionCategories.DOOR | CollisionCategories.PROJECTILE;
 		collisionFixture.setFilterData(collisionFilter);
+
+		Vector2 halfSize = new Vector2(getSize()).scl(0.5f);
+		float halfSensorWidth = halfSize.x * 0.8f;
+		BodyDef bottomSensorBodyDefinition = new BodyDef();
+		bottomSensorBodyDefinition.fixedRotation = true;
+		PolygonShape bottomPolygonCollisionShape = new PolygonShape();
+		bottomPolygonCollisionShape.set(new Vector2[] {
+			new Vector2(-halfSensorWidth, -halfSize.y - 1.0f),
+			new Vector2(halfSensorWidth, -halfSize.y - 1.0f),
+			new Vector2(halfSensorWidth, -halfSize.y),
+			new Vector2(-halfSensorWidth, -halfSize.y)
+		});
+		FixtureDef bottomFixtureDefinition = new FixtureDef();
+		bottomFixtureDefinition.shape = bottomPolygonCollisionShape;
+		bottomFixtureDefinition.isSensor = true;
+		Fixture bottomCollisionFixture = m_body.createFixture(bottomFixtureDefinition);
+		bottomPolygonCollisionShape.dispose();
+		Filter bottomCollisionFilter = new Filter();
+		bottomCollisionFilter.categoryBits = CollisionCategories.DUKE_FEET_SENSOR;
+		bottomCollisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.OBJECT;
+		bottomCollisionFixture.setFilterData(bottomCollisionFilter);
 
 		m_acceleration = new Vector2(0.0f, 0.0f);
 		m_facingLeft = false;
@@ -872,14 +892,17 @@ public class Duke implements ContactListener, HUDDataProvider {
 		Fixture contactFixture = null;
 		Object contactObject = null;
 		boolean isPlayerContact = false;
+		boolean isPlayerFeetContact = false;
 
 		if(contactObjectA instanceof Duke) {
 			contactFixture = contact.getFixtureB();
 			isPlayerContact = true;
+			isPlayerFeetContact = contact.getFixtureA().isSensor();
 		}
 		else if(contactObjectB instanceof Duke) {
 			contactFixture = contact.getFixtureA();
 			isPlayerContact = true;
+			isPlayerFeetContact = contact.getFixtureB().isSensor();
 		}
 
 		if(contactFixture != null) {
@@ -888,14 +911,18 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 		if(isPlayerContact) {
 			if(contactObject == null) {
-				m_jumping = false;
-				m_tossingSomething = false;
-				m_grounded = true;
+				if(isPlayerFeetContact) {
+					m_jumping = false;
+					m_tossingSomething = false;
+					m_grounded = true;
+				}
 			}
 			else if(contactObject instanceof PickupItem) {
-				m_jumping = false;
-				m_tossingSomething = false;
-				m_grounded = true;
+				if(isPlayerFeetContact) {
+					m_jumping = false;
+					m_tossingSomething = false;
+					m_grounded = true;
+				}
 			}
 			else if(contactObject instanceof Enemy) {
 				Enemy enemy = (Enemy) contactObject;
@@ -995,22 +1022,22 @@ public class Duke implements ContactListener, HUDDataProvider {
 		Object contactObjectB = contact.getFixtureB().getBody().getUserData();
 		Fixture contactFixture = null;
 		Object contactObject = null;
-		boolean isPlayerContact = false;
+		boolean isPlayerFeetContact = false;
 
 		if(contactObjectA instanceof Duke) {
 			contactFixture = contact.getFixtureB();
-			isPlayerContact = true;
+			isPlayerFeetContact = contact.getFixtureA().isSensor();
 		}
 		else if(contactObjectB instanceof Duke) {
 			contactFixture = contact.getFixtureA();
-			isPlayerContact = true;
+			isPlayerFeetContact = contact.getFixtureB().isSensor();
 		}
 
 		if(contactFixture != null) {
 			contactObject = contactFixture.getBody().getUserData();
 		}
 
-		if(isPlayerContact) {
+		if(isPlayerFeetContact) {
 			if(contactObject == null) {
 				m_grounded = false;
 			}
