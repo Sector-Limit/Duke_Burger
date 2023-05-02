@@ -86,6 +86,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 	private boolean m_tossingSomething;
 	private boolean m_pickupItemButtonPressed;
+	private boolean m_pickupCooldown;
+	private float m_pickupCooldownTimeElapsed;
 	private PickupItem m_pickupItem;
 	private Enemy m_pickupEnemy;
 	private Door m_door;
@@ -132,6 +134,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private static final float RECENTLY_ATTACKED_DURATION = 1.0f;
 	private static final float DOOR_OPEN_DISTANCE = DUKE_SIZE.y + (16.0f * 1.5f);
 	private static final float LEVEL_COMPLETED_DELAY = 3.0f;
+	private static final float PICKUP_COOLDOWN_DURATION = 0.5f;
 
 	public Duke(World world, TiledMap map) {
 		this(world, map, MAX_LIVES, 0);
@@ -395,7 +398,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	}
 
 	public void pickupItem(PickupItem pickupItem) {
-		if(isHoldingSomething()) {
+		if(isHoldingSomething() || (m_pickupCooldown && m_pickupCooldownTimeElapsed < PICKUP_COOLDOWN_DURATION)) {
 			return;
 		}
 
@@ -418,6 +421,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_tossingSomething = true;
 		m_pickupItem.toss(m_facingLeft);
 		m_pickupItem = null;
+		m_pickupCooldown = true;
+		m_pickupCooldownTimeElapsed = 0.0f;
 
 		m_tossSound.play();
 	}
@@ -621,6 +626,14 @@ public class Duke implements ContactListener, HUDDataProvider {
 			}
 	
 			m_body.setLinearVelocity(newVelocity);
+
+			if(m_pickupCooldown) {
+				m_pickupCooldownTimeElapsed += deltaTime;
+
+				if(m_pickupCooldownTimeElapsed >= PICKUP_COOLDOWN_DURATION) {
+					m_pickupCooldown = false;
+				}
+			}
 
 			if(Gdx.input.isKeyPressed(Keys.E) || Gdx.input.isKeyPressed(Keys.F) || Gdx.input.isKeyPressed(Keys.X)) {
 				if(!m_pickupItemButtonPressed) {
