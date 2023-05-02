@@ -930,7 +930,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 				if(enemy instanceof OctaBaby) {
 					OctaBaby octaBaby = (OctaBaby) enemy;
 
-					if(m_jumping && !m_recentlyAttacked && contactFixture.isSensor()) {
+					if((!m_grounded && m_body.getLinearVelocity().y < 0.0f) && !m_recentlyAttacked && contactFixture.isSensor()) {
 						m_squishSound.play();
 						octaBaby.squish();
 					}
