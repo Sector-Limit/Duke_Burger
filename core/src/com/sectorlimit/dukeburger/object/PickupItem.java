@@ -156,7 +156,7 @@ public abstract class PickupItem {
 			m_body.setAngularVelocity((float) ((Math.random() * 20.0) - 10.0));
 		}
 
-		m_body.setLinearVelocity(new Vector2((tossLeft ? -1.0f : 1.0f) * 85.0f, 60.0f));
+		m_body.setLinearVelocity(new Vector2((tossLeft ? -1.0f : 1.0f) * 185.0f, 5.0f));
 	}
 
 	public void update() {
