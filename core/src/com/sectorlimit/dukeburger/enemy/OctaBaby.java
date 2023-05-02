@@ -54,8 +54,6 @@ public class OctaBaby extends BasicEnemy {
 
 		Vector2 halfSize = new Vector2(getSize()).scl(0.5f);
 		float halfSensorWidth = halfSize.x * 0.8f;
-		BodyDef topSensorBodyDefinition = new BodyDef();
-		topSensorBodyDefinition.fixedRotation = true;
 		PolygonShape polygonCollisionShape = new PolygonShape();
 		polygonCollisionShape.set(new Vector2[] {
 			new Vector2(-halfSensorWidth, halfSize.y + 1.0f),
@@ -70,7 +68,7 @@ public class OctaBaby extends BasicEnemy {
 		polygonCollisionShape.dispose();
 		Filter collisionFilter = new Filter();
 		collisionFilter.categoryBits = CollisionCategories.ENEMY;
-		collisionFilter.maskBits = CollisionCategories.DUKE;
+		collisionFilter.maskBits = CollisionCategories.DUKE | CollisionCategories.OBJECT;
 		collisionFixture.setFilterData(collisionFilter);
 	}
 
