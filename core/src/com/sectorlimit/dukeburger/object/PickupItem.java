@@ -109,7 +109,7 @@ public abstract class PickupItem {
 	}
 
 	public short getCollisionMask() {
-		return CollisionCategories.GROUND | CollisionCategories.DUKE | CollisionCategories.DUKE_FEET_SENSOR | CollisionCategories.OBJECT | CollisionCategories.ENEMY | CollisionCategories.ENEMY_SENSOR;
+		return CollisionCategories.GROUND | CollisionCategories.OBJECT | CollisionCategories.ENEMY | CollisionCategories.ENEMY_SENSOR;
 	}
 
 	public void assignPhysics(World world, Vector2 position) {

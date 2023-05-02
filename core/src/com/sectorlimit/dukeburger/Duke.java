@@ -278,7 +278,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		polygonCollisionShape.dispose();
 		Filter collisionFilter = new Filter();
 		collisionFilter.categoryBits = CollisionCategories.DUKE;
-		collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.OBJECT | CollisionCategories.ENEMY_SENSOR | CollisionCategories.DOOR | CollisionCategories.PROJECTILE;
+		collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.ENEMY_SENSOR | CollisionCategories.DOOR | CollisionCategories.PROJECTILE;
 		collisionFixture.setFilterData(collisionFilter);
 
 		Vector2 halfSize = new Vector2(getSize()).scl(0.5f);
@@ -299,7 +299,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		bottomPolygonCollisionShape.dispose();
 		Filter bottomCollisionFilter = new Filter();
 		bottomCollisionFilter.categoryBits = CollisionCategories.DUKE_FEET_SENSOR;
-		bottomCollisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.OBJECT;
+		bottomCollisionFilter.maskBits = CollisionCategories.GROUND;
 		bottomCollisionFixture.setFilterData(bottomCollisionFilter);
 
 		m_acceleration = new Vector2(0.0f, 0.0f);
