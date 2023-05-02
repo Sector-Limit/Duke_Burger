@@ -60,7 +60,7 @@ public abstract class Projectile {
 		Fixture sensorCollisionFixture = m_body.createFixture(sensorFixtureDefinition);
 		Filter sensorCollisionFilter = new Filter();
 		sensorCollisionFilter.categoryBits = CollisionCategories.PROJECTILE;
-		sensorCollisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.DUKE;
+		sensorCollisionFilter.maskBits = CollisionCategories.DUKE;
 		sensorCollisionFixture.setFilterData(sensorCollisionFilter);
 		collisionCircleShape.dispose();
 	}
