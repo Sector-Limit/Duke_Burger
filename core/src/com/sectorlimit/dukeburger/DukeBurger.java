@@ -60,7 +60,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	private static final boolean DEBUG_CAMERA_ENABLED = false;
 	private static final boolean PHYSICS_DEBUGGING_ENABLED = false;
 	private static final boolean MUSIC_ENABLED = true;
-	private static final float MUSIC_VOLUME = 0.35f;
+	private static final float MUSIC_VOLUME = 0.25f;
 
 	@Override
 	public void create() {
