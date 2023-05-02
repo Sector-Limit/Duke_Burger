@@ -64,6 +64,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private float m_attackCooldownTimeElapsed;
 	private boolean m_alive;
 	private boolean m_wasAlive;
+	private boolean m_dead;
+	private boolean m_wasDead;
 	private int m_health;
 	private int m_lives;
 	private int m_coins;
@@ -99,6 +101,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private Texture m_jumpTexture;
 	private Texture m_jumpHoldTexture;
 	private Texture m_tossItemTexture;
+	private Texture m_deadTexture;
 	private Texture m_walkSpriteSheetTexture;
 	private Texture m_walkHoldSpriteSheetTexture;
 	private Animation<TextureRegion> m_walkAnimation;
@@ -143,6 +146,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_attackCooldownTimeElapsed = 0.0f;
 		m_alive = true;
 		m_wasAlive = true;
+		m_dead = false;
+		m_wasDead = false;
 		m_health = MAX_HEALTH;
 		m_lives = lives;
 		m_coins = coins;
@@ -284,6 +289,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_jumpTexture = new Texture(Gdx.files.internal("sprites/duke_jump.png"));
 		m_jumpHoldTexture = new Texture(Gdx.files.internal("sprites/duke_holds_jump.png"));
 		m_tossItemTexture = new Texture(Gdx.files.internal("sprites/duke_toss.png"));
+		m_deadTexture = new Texture(Gdx.files.internal("sprites/duke_dead.png"));
 		m_walkSpriteSheetTexture = new Texture(Gdx.files.internal("sprites/duke_walk.png"));
 		m_walkHoldSpriteSheetTexture = new Texture(Gdx.files.internal("sprites/duke_holds_walk.png"));
 
@@ -500,151 +506,169 @@ public class Duke implements ContactListener, HUDDataProvider {
 	public void render(SpriteBatch spriteBatch) {
 		float deltaTime = Gdx.graphics.getDeltaTime();
 
-		if(m_levelCompleted) {
-			if(m_levelCompletedTimeElapsed == 0.0f) {
-				m_listener.onLevelCompleted();
-			}
+		if(m_body.getPosition().y + getSize().y < 0.0f) {
+			m_dead = true;
+		}
 
-			if(!m_levelEnded) {
-				m_levelCompletedTimeElapsed += deltaTime;
-	
-				if(m_levelCompletedTimeElapsed >= LEVEL_COMPLETED_DELAY) {
-					m_levelEnded = true;
+		if(m_dead) {
+			if(!m_wasDead) {
+				m_wasDead = true;
 
-					m_listener.onLevelEnded();
-				}
+				m_listener.onDead();
 			}
+			
+			return;
 		}
 
 		if(!m_alive) {
 			if(m_wasAlive) {
 				m_wasAlive = false;
+
+				Fixture firstFixture = m_body.getFixtureList().first();
+				Filter disabledFilter = new Filter();
+				disabledFilter.maskBits = 0x0000;
+				firstFixture.setFilterData(disabledFilter);
+				m_body.setLinearVelocity(new Vector2(((((int) (Math.random() * 2.0)) == 0) ? -1.0f : 1.0f) * ((float) (Math.random() * 30.0) + 30.0f), ((float) (Math.random() * 50.0) + 100.0f)));
+				m_body.setActive(true);
+
 				m_listener.onKilled();
 			}
-
-			return;
 		}
 
-		if(m_underAttack) {
-			m_attackCooldownTimeElapsed += deltaTime;
-			
-			m_recentlyAttacked = m_attackCooldownTimeElapsed < RECENTLY_ATTACKED_DURATION;
+		if(m_alive) {
+			if(m_levelCompleted) {
+				if(m_levelCompletedTimeElapsed == 0.0f) {
+					m_listener.onLevelCompleted();
+				}
 
-			if(m_attackCooldownTimeElapsed > ATTACK_COOLDOWN) {
-				m_underAttack = false;
-				m_recentlyAttacked = false;
-				m_attackCooldownTimeElapsed = 0.0f;
-			}
-		}
-
-		m_walking = false;
-
-		if(Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.LEFT)) {
-			m_facingLeft = true;
-			m_walking = true;
-			m_acceleration.x = -ACCELERATION;
-		}
-		else if(Gdx.input.isKeyPressed(Keys.D) || Gdx.input.isKeyPressed(Keys.RIGHT)) {
-			m_facingLeft = false;
-			m_walking = true;
-			m_acceleration.x = ACCELERATION;
-		}
-		else {
-			m_acceleration.x = 0;
-		}
-
-		Vector2 newVelocity = new Vector2(m_body.getLinearVelocity());
+				if(!m_levelEnded) {
+					m_levelCompletedTimeElapsed += deltaTime;
 		
-		if((Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.Z)) && !m_jumping && !m_tossingSomething && m_grounded) {
-			m_jumping = true;
-			m_jumpTimeElapsed = 0.0f;
+					if(m_levelCompletedTimeElapsed >= LEVEL_COMPLETED_DELAY) {
+						m_levelEnded = true;
 
-			newVelocity.add(new Vector2(0.0f, JUMP_VELOCITY));
-			m_acceleration.x = 0;
-		}
-
-		if(m_jumping) {
-			m_jumpTimeElapsed += deltaTime;
-	
-			if(m_jumpTimeElapsed < (isHoldingSomething() ? JUMP_HOLDING_DURATION : JUMP_DURATION)) {
-				newVelocity.add(new Vector2(0.0f, JUMP_VELOCITY));
-			}
-		}
-
-		if(m_walking) {
-			m_walkDuration += deltaTime;
-
-			if(m_walkDuration >= m_walkAnimation.getAnimationDuration()) {
-				m_walkDuration = m_walkDuration % m_walkAnimation.getAnimationDuration();
-			}
-		}
-
-		m_acceleration.scl(deltaTime);
-		newVelocity.add(m_acceleration);
-
-		if(m_acceleration.x == 0.0f) {
-			newVelocity.x *= 0.8f;
-		}
-
-		if(newVelocity.x > MAX_HORIZONTAL_VELOCITY) {
-			newVelocity.x = MAX_HORIZONTAL_VELOCITY;
-		}
-		else if(newVelocity.x < -MAX_HORIZONTAL_VELOCITY) {
-			newVelocity.x = -MAX_HORIZONTAL_VELOCITY;
-		}
-
-		m_body.setLinearVelocity(newVelocity);
-
-		if(m_body.getPosition().y + getSize().y < 0.0f) {
-			kill();
-		}
-
-		if(Gdx.input.isKeyPressed(Keys.E) || Gdx.input.isKeyPressed(Keys.F) || Gdx.input.isKeyPressed(Keys.X)) {
-			if(!m_pickupItemButtonPressed) {
-				m_pickupItemButtonPressed = true;
-
-				if(!isHoldingSomething()) {
-					for(Enemy enemy : m_enemies) {
-						if(enemy.isPickupable() && getOriginPosition().dst(enemy.getOriginPosition()) <= (getSize().x / 2.0f) + (enemy.getSize().x / 2.0f)) {
-							pickupEnemy(enemy);
-							break;
-						}
+						m_listener.onLevelEnded();
 					}
+				}
+			}
 
+			if(m_underAttack) {
+				m_attackCooldownTimeElapsed += deltaTime;
+				
+				m_recentlyAttacked = m_attackCooldownTimeElapsed < RECENTLY_ATTACKED_DURATION;
+	
+				if(m_attackCooldownTimeElapsed > ATTACK_COOLDOWN) {
+					m_underAttack = false;
+					m_recentlyAttacked = false;
+					m_attackCooldownTimeElapsed = 0.0f;
+				}
+			}
+	
+			m_walking = false;
+	
+			if(Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.LEFT)) {
+				m_facingLeft = true;
+				m_walking = true;
+				m_acceleration.x = -ACCELERATION;
+			}
+			else if(Gdx.input.isKeyPressed(Keys.D) || Gdx.input.isKeyPressed(Keys.RIGHT)) {
+				m_facingLeft = false;
+				m_walking = true;
+				m_acceleration.x = ACCELERATION;
+			}
+			else {
+				m_acceleration.x = 0;
+			}
+	
+			Vector2 newVelocity = new Vector2(m_body.getLinearVelocity());
+			
+			if((Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.Z)) && !m_jumping && !m_tossingSomething && m_grounded) {
+				m_jumping = true;
+				m_jumpTimeElapsed = 0.0f;
+	
+				newVelocity.add(new Vector2(0.0f, JUMP_VELOCITY));
+				m_acceleration.x = 0;
+			}
+	
+			if(m_jumping) {
+				m_jumpTimeElapsed += deltaTime;
+		
+				if(m_jumpTimeElapsed < (isHoldingSomething() ? JUMP_HOLDING_DURATION : JUMP_DURATION)) {
+					newVelocity.add(new Vector2(0.0f, JUMP_VELOCITY));
+				}
+			}
+	
+			if(m_walking) {
+				m_walkDuration += deltaTime;
+	
+				if(m_walkDuration >= m_walkAnimation.getAnimationDuration()) {
+					m_walkDuration = m_walkDuration % m_walkAnimation.getAnimationDuration();
+				}
+			}
+	
+			m_acceleration.scl(deltaTime);
+			newVelocity.add(m_acceleration);
+	
+			if(m_acceleration.x == 0.0f) {
+				newVelocity.x *= 0.8f;
+			}
+	
+			if(newVelocity.x > MAX_HORIZONTAL_VELOCITY) {
+				newVelocity.x = MAX_HORIZONTAL_VELOCITY;
+			}
+			else if(newVelocity.x < -MAX_HORIZONTAL_VELOCITY) {
+				newVelocity.x = -MAX_HORIZONTAL_VELOCITY;
+			}
+	
+			m_body.setLinearVelocity(newVelocity);
+	
+			if(Gdx.input.isKeyPressed(Keys.E) || Gdx.input.isKeyPressed(Keys.F) || Gdx.input.isKeyPressed(Keys.X)) {
+				if(!m_pickupItemButtonPressed) {
+					m_pickupItemButtonPressed = true;
+	
 					if(!isHoldingSomething()) {
-						for(PickupItem pickupItem : m_pickupItems) {
-							if(getOriginPosition().dst(pickupItem.getOriginPosition()) <= (getSize().x / 2.0f) + pickupItem.getSize().x) {
-								pickupItem(pickupItem);
+						for(Enemy enemy : m_enemies) {
+							if(enemy.isPickupable() && getOriginPosition().dst(enemy.getOriginPosition()) <= (getSize().x / 2.0f) + (enemy.getSize().x / 2.0f)) {
+								pickupEnemy(enemy);
 								break;
 							}
 						}
+	
+						if(!isHoldingSomething()) {
+							for(PickupItem pickupItem : m_pickupItems) {
+								if(getOriginPosition().dst(pickupItem.getOriginPosition()) <= (getSize().x / 2.0f) + pickupItem.getSize().x) {
+									pickupItem(pickupItem);
+									break;
+								}
+							}
+						}
 					}
-				}
-				else {
-					if(m_pickupItem != null) {
-						tossItem();
-					}
-					else if(m_pickupEnemy != null) {
-						tossEnemy();
+					else {
+						if(m_pickupItem != null) {
+							tossItem();
+						}
+						else if(m_pickupEnemy != null) {
+							tossEnemy();
+						}
 					}
 				}
 			}
-		}
-		else {
-			m_pickupItemButtonPressed = false;
-		}
-
-		float pickupObjectVerticalOffset = -1.0f;
-
-		if(m_pickupItem != null) {
-			if(m_pickupItem instanceof Burger) {
-				pickupObjectVerticalOffset = -2.0f;
+			else {
+				m_pickupItemButtonPressed = false;
 			}
-
-			m_pickupItem.setPosition(getOriginPosition().add(new Vector2(1.0f, getSize().y + pickupObjectVerticalOffset)));
-		}
-		else if(m_pickupEnemy != null) {
-			m_pickupEnemy.setPosition(getOriginPosition().add(new Vector2(1.0f, getSize().y + pickupObjectVerticalOffset)));
+	
+			float pickupObjectVerticalOffset = -1.0f;
+	
+			if(m_pickupItem != null) {
+				if(m_pickupItem instanceof Burger) {
+					pickupObjectVerticalOffset = -2.0f;
+				}
+	
+				m_pickupItem.setPosition(getOriginPosition().add(new Vector2(1.0f, getSize().y + pickupObjectVerticalOffset)));
+			}
+			else if(m_pickupEnemy != null) {
+				m_pickupEnemy.setPosition(getOriginPosition().add(new Vector2(1.0f, getSize().y + pickupObjectVerticalOffset)));
+			}
 		}
 
 		for(StaticObject staticObject : m_staticObjects) {
@@ -678,7 +702,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 				continue;
 			}
 
-			if(getCenterPosition().dst(powerup.getCenterPosition()) <= getSize().x) {
+			if(m_alive && getCenterPosition().dst(powerup.getCenterPosition()) <= getSize().x) {
 				boolean consume = true;
 
 				if(powerup instanceof Cola) {
@@ -747,7 +771,10 @@ public class Duke implements ContactListener, HUDDataProvider {
 		Texture currentTexture = null;
 		TextureRegion currentTextureRegion = null;
 
-		if(m_tossingSomething) {
+		if(!m_alive) {
+			currentTexture = m_deadTexture;
+		}
+		else if(m_tossingSomething) {
 			currentTexture = m_tossItemTexture;
 		}
 		else if(m_jumping) {
@@ -775,22 +802,24 @@ public class Duke implements ContactListener, HUDDataProvider {
 			}
 		}
 
-		if(m_pickupItem instanceof Burger) {
-			if(getOriginPosition().dst(m_door.getOriginPosition()) <= DOOR_OPEN_DISTANCE) {
-				m_door.open();
+		if(m_alive) {
+			if(m_pickupItem instanceof Burger) {
+				if(getOriginPosition().dst(m_door.getOriginPosition()) <= DOOR_OPEN_DISTANCE) {
+					m_door.open();
+				}
+				else {
+					m_door.close();
+				}
 			}
 			else {
 				m_door.close();
 			}
 		}
-		else {
-			m_door.close();
-		}
 
 		Vector2 renderOrigin = new Vector2(getOriginPosition()).sub(new Vector2(getSize()).scl(0.5f));
 
 		if(currentTexture != null) {
-			spriteBatch.draw(currentTexture, renderOrigin.x, renderOrigin.y, 0.0f, 0.0f, currentTexture.getWidth(), currentTexture.getHeight(), 1.0f, 1.0f, 0.0f, 0, 0, currentTexture.getWidth(), currentTexture.getHeight(), m_facingLeft, false);
+			spriteBatch.draw(currentTexture, renderOrigin.x, renderOrigin.y, getSize().x * 0.5f, getSize().y * 0.5f, currentTexture.getWidth(), currentTexture.getHeight(), 1.0f, 1.0f, (float) Math.toDegrees(m_body.getAngle()), 0, 0, currentTexture.getWidth(), currentTexture.getHeight(), m_facingLeft, false);
 		}
 		else if(currentTextureRegion != null) {
 			if(m_facingLeft) {

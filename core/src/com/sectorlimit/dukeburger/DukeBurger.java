@@ -306,7 +306,10 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	}
 
 	@Override
-	public void onKilled() {
+	public void onKilled() { }
+
+	@Override
+	public void onDead() {
 		m_lives = m_duke.getLives();
 		m_coins = m_duke.getCoins();
 
