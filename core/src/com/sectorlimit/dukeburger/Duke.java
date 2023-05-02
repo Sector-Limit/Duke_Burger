@@ -599,7 +599,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 			Vector2 newVelocity = new Vector2(m_body.getLinearVelocity());
 			
-			if((Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.Z)) && !m_jumping && !m_tossingSomething && m_grounded) {
+			if((Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.Z)) && !m_jumping && !m_tossingSomething && m_grounded) {
 				m_jumping = true;
 				m_jumpTimeElapsed = 0.0f;
 	
