@@ -60,6 +60,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private float m_jumpTimeElapsed;
 	private float m_walkDuration;
 	private boolean m_underAttack;
+	private boolean m_recentlyAttacked;
 	private float m_attackCooldownTimeElapsed;
 	private boolean m_alive;
 	private boolean m_wasAlive;
@@ -125,6 +126,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private static final int NUMBER_OF_WALKING_FRAMES = 4;
 	private static final float WALK_ANIMATION_SPEED = 0.07f;
 	private static final float ATTACK_COOLDOWN = 3.0f;
+	private static final float RECENTLY_ATTACKED_DURATION = 1.0f;
 	private static final float DOOR_OPEN_DISTANCE = DUKE_SIZE.y + (16.0f * 1.5f);
 	private static final float LEVEL_COMPLETED_DELAY = 3.0f;
 
@@ -137,6 +139,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_world.setContactListener(this);
 
 		m_underAttack = false;
+		m_recentlyAttacked = false;
 		m_attackCooldownTimeElapsed = 0.0f;
 		m_alive = true;
 		m_wasAlive = true;
@@ -524,9 +527,12 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 		if(m_underAttack) {
 			m_attackCooldownTimeElapsed += deltaTime;
+			
+			m_recentlyAttacked = m_attackCooldownTimeElapsed < RECENTLY_ATTACKED_DURATION;
 
 			if(m_attackCooldownTimeElapsed > ATTACK_COOLDOWN) {
 				m_underAttack = false;
+				m_recentlyAttacked = false;
 				m_attackCooldownTimeElapsed = 0.0f;
 			}
 		}
@@ -845,7 +851,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 				if(enemy instanceof OctaBaby) {
 					OctaBaby octaBaby = (OctaBaby) enemy;
 
-					if(m_jumping && contactFixture.isSensor()) {
+					if(m_jumping && !m_recentlyAttacked && contactFixture.isSensor()) {
 						m_squishSound.play();
 						octaBaby.squish();
 					}
