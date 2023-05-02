@@ -10,5 +10,6 @@ public class CollisionCategories {
 	public static final short ENEMY_BOUNDARY = 1 << 5;
 	public static final short BURGER         = 1 << 6;
 	public static final short DOOR           = 1 << 7;
+	public static final short PROJECTILE     = 1 << 8;
 
 }

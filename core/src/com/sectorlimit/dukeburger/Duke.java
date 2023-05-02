@@ -34,7 +34,6 @@ import com.sectorlimit.dukeburger.factory.EnemyFactory;
 import com.sectorlimit.dukeburger.factory.ExplosionFactory;
 import com.sectorlimit.dukeburger.factory.PickupItemFactory;
 import com.sectorlimit.dukeburger.factory.PowerupsFactory;
-import com.sectorlimit.dukeburger.factory.ProjectileFactory;
 import com.sectorlimit.dukeburger.factory.StaticObjectFactory;
 import com.sectorlimit.dukeburger.object.Barrel;
 import com.sectorlimit.dukeburger.object.Box;
@@ -48,6 +47,7 @@ import com.sectorlimit.dukeburger.powerup.Chicken;
 import com.sectorlimit.dukeburger.powerup.Coin;
 import com.sectorlimit.dukeburger.powerup.Cola;
 import com.sectorlimit.dukeburger.powerup.Powerup;
+import com.sectorlimit.dukeburger.projectile.Projectile;
 
 public class Duke implements ContactListener, HUDDataProvider {
 
@@ -76,7 +76,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private EnemyFactory m_enemyFactory;
 	private PowerupsFactory m_powerupsFactory;
 	private PickupItemFactory m_pickupItemFactory;
-	private ProjectileFactory m_projectileFactory;
+	private ProjectileSystem m_projectileSystem;
 	private StaticObjectFactory m_staticObjectFactory;
 
 	private boolean m_tossingSomething;
@@ -145,9 +145,9 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_levelCompletedTimeElapsed = 0.0f;
 		m_hud = new HUD(this);
 		m_pickupItemFactory = new PickupItemFactory(m_world);
-		m_enemyFactory = new EnemyFactory(m_world);
+		m_projectileSystem = new ProjectileSystem(m_world);
+		m_enemyFactory = new EnemyFactory(m_projectileSystem, m_world);
 		m_powerupsFactory = new PowerupsFactory();
-		m_projectileFactory = new ProjectileFactory();
 		m_explosionFactory = new ExplosionFactory();
 		m_staticObjectFactory = new StaticObjectFactory(m_world);
 
@@ -263,7 +263,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		polygonCollisionShape.dispose();
 		Filter collisionFilter = new Filter();
 		collisionFilter.categoryBits = CollisionCategories.DUKE;
-		collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.OBJECT | CollisionCategories.ENEMY_SENSOR | CollisionCategories.DOOR;
+		collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.OBJECT | CollisionCategories.ENEMY_SENSOR | CollisionCategories.DOOR | CollisionCategories.PROJECTILE;
 		collisionFixture.setFilterData(collisionFilter);
 
 		m_acceleration = new Vector2(0.0f, 0.0f);
@@ -469,7 +469,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		return true;
 	}
 
-	public boolean onAttacked(Enemy enemy) {
+	public boolean onAttackedBy(Enemy enemy) {
 		if(m_underAttack) {
 			return false;
 		}
@@ -781,6 +781,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 			}
 		}
 
+		m_projectileSystem.render(spriteBatch);
+
 		m_grounded = false;
 	}
 
@@ -831,12 +833,19 @@ public class Duke implements ContactListener, HUDDataProvider {
 						octaBaby.squish();
 					}
 					else if(!octaBaby.isSquished()) {
-						onAttacked(enemy);
+						onAttackedBy(enemy);
 					}
 				}
 				else {
-					onAttacked(enemy);
+					onAttackedBy(enemy);
 				}
+			}
+			else if(contactObject instanceof Projectile) {
+				Projectile projectile = (Projectile) contactObject;
+
+				onAttackedBy(projectile.getSource());
+
+				projectile.destroy();
 			}
 			else if(contactObject instanceof String) {
 				String colliderName = (String) contactObject;
@@ -847,39 +856,58 @@ public class Duke implements ContactListener, HUDDataProvider {
 			}
 		}
 		else {
-			PickupItem tossedPickupItem = null;
-			Object otherContactObject = null;
+			Projectile contactProjectile = null;
+			Object projectileTarget = null;
 
-			if(contactObjectA instanceof PickupItem && ((PickupItem) contactObjectA).isTossed()) {
-				tossedPickupItem = (PickupItem) contactObjectA;
-				otherContactObject = contactObjectB;
+			if(contactObjectA instanceof Projectile) {
+				contactProjectile = (Projectile) contactObjectA;
+				projectileTarget = contactObjectB;
 			}
-			else if(contactObjectB instanceof PickupItem && ((PickupItem) contactObjectB).isTossed()) {
-				tossedPickupItem = (PickupItem) contactObjectB;
-				otherContactObject = contactObjectA;
+			else if(contactObjectB instanceof Projectile) {
+				contactProjectile = (Projectile) contactObjectB;
+				projectileTarget = contactObjectA;
 			}
 
-			if(tossedPickupItem != null) {
-				if(tossedPickupItem instanceof Barrel) {
-					m_explosions.add(m_explosionFactory.createExplosion(new Vector2(tossedPickupItem.getOriginPosition())));
+			if(contactProjectile != null) {
+				if(projectileTarget == null) {
+					contactProjectile.destroy();
 				}
-
-				tossedPickupItem.onImpact();
-				tossedPickupItem.destroy();
-
-				if(otherContactObject instanceof Enemy) {
-					Enemy enemy = (Enemy) otherContactObject;
-					enemy.kill();
+			}
+			else {
+				PickupItem tossedPickupItem = null;
+				Object otherContactObject = null;
+	
+				if(contactObjectA instanceof PickupItem && ((PickupItem) contactObjectA).isTossed()) {
+					tossedPickupItem = (PickupItem) contactObjectA;
+					otherContactObject = contactObjectB;
 				}
-				else if(tossedPickupItem instanceof Box) {
-					int randomNumber = (int) (Math.random() * 100.0);
-					Vector2 newItemPosition = new Vector2(tossedPickupItem.getOriginPosition());
-
-					if(randomNumber < 10) {
-						m_powerups.add(m_powerupsFactory.createChicken(newItemPosition));
+				else if(contactObjectB instanceof PickupItem && ((PickupItem) contactObjectB).isTossed()) {
+					tossedPickupItem = (PickupItem) contactObjectB;
+					otherContactObject = contactObjectA;
+				}
+	
+				if(tossedPickupItem != null) {
+					if(tossedPickupItem instanceof Barrel) {
+						m_explosions.add(m_explosionFactory.createExplosion(new Vector2(tossedPickupItem.getOriginPosition())));
 					}
-					else if(randomNumber < 30) {
-						m_powerups.add(m_powerupsFactory.createCola(newItemPosition));
+	
+					tossedPickupItem.onImpact();
+					tossedPickupItem.destroy();
+	
+					if(otherContactObject instanceof Enemy) {
+						Enemy enemy = (Enemy) otherContactObject;
+						enemy.kill();
+					}
+					else if(tossedPickupItem instanceof Box) {
+						int randomNumber = (int) (Math.random() * 100.0);
+						Vector2 newItemPosition = new Vector2(tossedPickupItem.getOriginPosition());
+	
+						if(randomNumber < 10) {
+							m_powerups.add(m_powerupsFactory.createChicken(newItemPosition));
+						}
+						else if(randomNumber < 30) {
+							m_powerups.add(m_powerupsFactory.createCola(newItemPosition));
+						}
 					}
 				}
 			}
@@ -897,7 +925,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 	public void dispose() {
 		m_pickupItemFactory.dispose();
-		m_projectileFactory.dispose();
+		m_projectileSystem.dispose();
 		m_explosionFactory.dispose();
 
 		m_idleTexture.dispose();

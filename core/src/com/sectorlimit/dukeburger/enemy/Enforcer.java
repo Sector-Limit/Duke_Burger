@@ -14,16 +14,24 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.sectorlimit.dukeburger.CollisionCategories;
+import com.sectorlimit.dukeburger.ProjectileSystem;
 
 public class Enforcer extends Enemy {
+
+	private ProjectileSystem m_projectileSystem;
+	private float m_fireballCooldownTimeElapsed;
 
 	private float m_elapsedAnimationTime;
 	private Animation<TextureRegion> m_enforcerAnimation;
 	private Texture m_enforcerDeadTexture;
 
+	private static final float FIREBALL_COOLDOWN = 2.0f;
 	private static final Vector2 ENFORCER_SIZE = new Vector2(22, 22);
 
-	public Enforcer(Animation<TextureRegion> enforcerAnimation, Texture enforcerDeadTexture) {
+	public Enforcer(ProjectileSystem projectileSystem, Animation<TextureRegion> enforcerAnimation, Texture enforcerDeadTexture) {
+		m_fireballCooldownTimeElapsed = 0.0f;
+		m_projectileSystem = projectileSystem;
+
 		m_elapsedAnimationTime = 0.0f;
 		m_enforcerAnimation = enforcerAnimation;
 		m_enforcerDeadTexture = enforcerDeadTexture;
@@ -55,6 +63,10 @@ public class Enforcer extends Enemy {
 	@Override
 	public void attack() { }
 
+	public void shootFireball() {
+		m_projectileSystem.spawnFireball(this, new Vector2(getOriginPosition()).add(new Vector2(0.0f, getSize().y * 0.5f)), new Vector2(1.0f, 0.0f));
+	}
+
 	@Override
 	public void kill() {
 		super.kill();
@@ -68,6 +80,14 @@ public class Enforcer extends Enemy {
 		if(isAlive()) {
 			if(!m_body.isActive()) {
 				m_body.setActive(true);
+			}
+
+			m_fireballCooldownTimeElapsed += deltaTime;
+
+			if(m_fireballCooldownTimeElapsed >= FIREBALL_COOLDOWN) {
+				m_fireballCooldownTimeElapsed = 0.0f;
+
+				shootFireball();
 			}
 		}
 

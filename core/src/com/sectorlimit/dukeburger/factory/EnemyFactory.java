@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
+import com.sectorlimit.dukeburger.ProjectileSystem;
 import com.sectorlimit.dukeburger.enemy.Enforcer;
 import com.sectorlimit.dukeburger.enemy.Octa;
 import com.sectorlimit.dukeburger.enemy.OctaBaby;
@@ -26,14 +27,16 @@ public class EnemyFactory {
 	private Texture m_enforcerSheetTexture;
 	private Animation<TextureRegion> m_enforcerAnimation;
 
+	private ProjectileSystem m_projectileSystem;
 	private World m_world;
 
 	private static final int NUMBER_OF_OCTA_BABY_WALK_FRAMES = 2;
 	private static final int NUMBER_OF_OCTA_SPRITES = 2;
 	private static final int NUMBER_OF_ENFORCER_FRAMES = 2;
 
-	public EnemyFactory(World world) {
+	public EnemyFactory(ProjectileSystem projectileSystem, World world) {
 		m_world = world;
+		m_projectileSystem = projectileSystem;
 
 		m_octaBabyWalkSheetTextures = new Texture[] {
 			new Texture(Gdx.files.internal("sprites/octababy_walk.png")),
@@ -91,7 +94,7 @@ public class EnemyFactory {
 	}
 
 	public Enforcer createEnforcer(Vector2 position) {
-		Enforcer enforcer = new Enforcer(m_enforcerAnimation, m_enforcerDeadTexture);
+		Enforcer enforcer = new Enforcer(m_projectileSystem, m_enforcerAnimation, m_enforcerDeadTexture);
 		enforcer.assignPhysics(m_world, position);
 		return enforcer;
 	}

@@ -150,7 +150,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 				collisionObjectPolygonShape.dispose();
 				Filter collisionFilter = new Filter();
 				collisionFilter.categoryBits = CollisionCategories.GROUND;
-				collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.DUKE | CollisionCategories.OBJECT | CollisionCategories.BURGER | CollisionCategories.ENEMY;
+				collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.DUKE | CollisionCategories.OBJECT | CollisionCategories.BURGER | CollisionCategories.ENEMY | CollisionCategories.PROJECTILE;
 				collisionFixture.setFilterData(collisionFilter);
 			}
 		}
@@ -221,7 +221,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 						finishCollisionObjectPolygonShape.dispose();
 						Filter finishfinishCollisionFixture = new Filter();
 						finishfinishCollisionFixture.categoryBits = CollisionCategories.GROUND;
-						finishfinishCollisionFixture.maskBits = CollisionCategories.GROUND | CollisionCategories.DUKE | CollisionCategories.OBJECT | CollisionCategories.BURGER | CollisionCategories.ENEMY;
+						finishfinishCollisionFixture.maskBits = CollisionCategories.DUKE;
 						collisionFixture.setFilterData(finishfinishCollisionFixture);
 					}
 				}

@@ -2,48 +2,45 @@ package com.sectorlimit.dukeburger.factory;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.sectorlimit.dukeburger.projectile.BurgerProjectile;
+import com.badlogic.gdx.physics.box2d.World;
+import com.sectorlimit.dukeburger.enemy.Enemy;
+import com.sectorlimit.dukeburger.projectile.Fireball;
 
 public class ProjectileFactory {
 
-	private Texture m_cheeseBurgerTexture;
-	private Texture m_lettuceBurgerTexture;
-	private Texture m_tomatoBurgerTexture;
+	private World m_world;
 
-	public ProjectileFactory() {
-		m_cheeseBurgerTexture = new Texture(Gdx.files.internal("sprites/burger_cheese.png"));
-		m_lettuceBurgerTexture = new Texture(Gdx.files.internal("sprites/burger_salad.png"));
-		m_tomatoBurgerTexture = new Texture(Gdx.files.internal("sprites/burger_salad.png"));
-	}
+	private Texture m_fireballSheetTexture;
+	private Animation<TextureRegion> m_fireballAnimation;
 
-	public BurgerProjectile createBurger(Vector2 position, BurgerProjectile.Type burgerType) {
-		Texture burgerTexture = null;
+	private final static int NUMBER_OF_FIREBALL_FRAMES = 4;
 
-		switch(burgerType) {
-			case Cheese: {
-				burgerTexture = m_cheeseBurgerTexture;
-				break;
-			}
+	public ProjectileFactory(World world) {
+		m_world = world;
 
-			case Lettuce: {
-				burgerTexture = m_lettuceBurgerTexture;
-				break;
-			}
+		m_fireballSheetTexture = new Texture(Gdx.files.internal("sprites/fireball.png"));
 
-			case Tomato: {
-				burgerTexture = m_tomatoBurgerTexture;
-				break;
-			}
+		TextureRegion[][] fireballTextureRegions = TextureRegion.split(m_fireballSheetTexture, m_fireballSheetTexture.getWidth() / NUMBER_OF_FIREBALL_FRAMES, m_fireballSheetTexture.getHeight());
+		TextureRegion[] fireballFrames = new TextureRegion[NUMBER_OF_FIREBALL_FRAMES];
+
+		for (int i = 0; i < NUMBER_OF_FIREBALL_FRAMES; i++) {
+			fireballFrames[i] = fireballTextureRegions[0][i];
 		}
 
-		return new BurgerProjectile(position, burgerType, burgerTexture);
+		m_fireballAnimation = new Animation<TextureRegion>(0.15f, fireballFrames);
+	}
+
+	public Fireball createFireball(Enemy source, Vector2 position, Vector2 direction) {
+		Fireball fireball = new Fireball(source, m_fireballAnimation);
+		fireball.assignPhysics(m_world, position, direction);
+		return fireball;
 	}
 
 	public void dispose() {
-		m_cheeseBurgerTexture.dispose();
-		m_lettuceBurgerTexture.dispose();
-		m_tomatoBurgerTexture.dispose();
+		m_fireballSheetTexture.dispose();
 	}
 
 }
