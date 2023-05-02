@@ -69,7 +69,7 @@ public class Enforcer extends Enemy {
 	public void attack() { }
 
 	public void shootFireball() {
-		m_projectileSystem.spawnFireball(this, new Vector2(getOriginPosition()).add(new Vector2(0.0f, getSize().y * 0.5f)), new Vector2(1.0f, 0.0f));
+		m_projectileSystem.spawnFireball(this, new Vector2(getOriginPosition()).add(new Vector2(0.0f, getSize().y * 0.5f)), new Vector2(m_facingLeft ? -1.0f : 1.0f, 0.1f));
 	}
 
 	@Override

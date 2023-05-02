@@ -28,6 +28,7 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.sectorlimit.dukeburger.enemy.Enemy;
+import com.sectorlimit.dukeburger.enemy.Enforcer;
 import com.sectorlimit.dukeburger.enemy.OctaBaby;
 import com.sectorlimit.dukeburger.enemy.OctaBaby.Type;
 import com.sectorlimit.dukeburger.factory.EnemyFactory;
@@ -700,6 +701,11 @@ public class Duke implements ContactListener, HUDDataProvider {
 			if(enemy.isDestroyed()) {
 				enemiesToRemove.add(enemy);
 				continue;
+			}
+
+			if(enemy instanceof Enforcer) {
+				Enforcer enforcer = (Enforcer) enemy;
+				enforcer.setFacingLeft(enforcer.getOriginPosition().x > getOriginPosition().x);
 			}
 
 			enemy.render(spriteBatch);

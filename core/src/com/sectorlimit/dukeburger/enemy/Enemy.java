@@ -86,6 +86,18 @@ public abstract class Enemy {
 		return m_facingLeft;
 	}
 
+	public void setFacingLeft(boolean faceLeft) {
+		m_facingLeft = faceLeft;
+	}
+
+	public void faceLeft() {
+		setFacingLeft(true);
+	}
+
+	public void faceRight() {
+		setFacingLeft(false);
+	}
+
 	public boolean isPickupable() {
 		return false;
 	}
