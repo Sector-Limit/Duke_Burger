@@ -57,6 +57,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private boolean m_grounded;
 	private boolean m_walking;
 	private boolean m_jumping;
+	private float m_jumpTimeElapsed;
 	private float m_walkDuration;
 	private boolean m_underAttack;
 	private float m_attackCooldownTimeElapsed;
@@ -116,8 +117,9 @@ public class Duke implements ContactListener, HUDDataProvider {
 	public static final int MAX_LIVES = 3;
 	private static final Vector2 DUKE_SIZE = new Vector2(16, 16);
 	private static final float ACCELERATION = 150.0f;
-	private static final float JUMP_VELOCITY = 200.0f;
-	private static final float JUMP_HOLD_VELOCITY = 100.0f;
+	private static final float JUMP_VELOCITY = 220.0f;
+	private static final float JUMP_DURATION = 0.3f;
+	private static final float JUMP_HOLDING_DURATION = 0.125f;
 	private static final float TOSS_VELOCITY = 75.0f;
 	private static final float MAX_HORIZONTAL_VELOCITY = 80.0f;
 	private static final int NUMBER_OF_WALKING_FRAMES = 4;
@@ -271,6 +273,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_facingLeft = false;
 		m_walking = false;
 		m_jumping = false;
+		m_jumpTimeElapsed = 0.0f;
 		m_walkDuration = 0.0f;
 
 		m_idleTexture = new Texture(Gdx.files.internal("sprites/duke_idle.png"));
@@ -548,14 +551,18 @@ public class Duke implements ContactListener, HUDDataProvider {
 		
 		if((Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.Z)) && !m_jumping && !m_tossingSomething && m_grounded) {
 			m_jumping = true;
-			float jumpVelocity = JUMP_VELOCITY;
+			m_jumpTimeElapsed = 0.0f;
 
-			if(isHoldingSomething()) {
-				jumpVelocity = JUMP_HOLD_VELOCITY;
-			}
-
-			newVelocity.add(new Vector2(0.0f, jumpVelocity));
+			newVelocity.add(new Vector2(0.0f, JUMP_VELOCITY));
 			m_acceleration.x = 0;
+		}
+
+		if(m_jumping) {
+			m_jumpTimeElapsed += deltaTime;
+	
+			if(m_jumpTimeElapsed < (isHoldingSomething() ? JUMP_HOLDING_DURATION : JUMP_DURATION)) {
+				newVelocity.add(new Vector2(0.0f, JUMP_VELOCITY));
+			}
 		}
 
 		if(m_walking) {
