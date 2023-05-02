@@ -494,13 +494,17 @@ public class Duke implements ContactListener, HUDDataProvider {
 		float deltaTime = Gdx.graphics.getDeltaTime();
 
 		if(m_levelCompleted) {
+			if(m_levelCompletedTimeElapsed == 0.0f) {
+				m_listener.onLevelCompleted();
+			}
+
 			if(!m_levelEnded) {
 				m_levelCompletedTimeElapsed += deltaTime;
 	
 				if(m_levelCompletedTimeElapsed >= LEVEL_COMPLETED_DELAY) {
 					m_levelEnded = true;
 
-					m_listener.onCompleteLevel();
+					m_listener.onLevelEnded();
 				}
 			}
 		}

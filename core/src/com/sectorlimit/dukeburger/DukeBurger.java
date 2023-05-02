@@ -315,7 +315,12 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	}
 
 	@Override
-	public void onCompleteLevel() {
+	public void onLevelCompleted() {
+		stopMusic();
+	}
+
+	@Override
+	public void onLevelEnded() {
 		nextLevel();
 	}
 
