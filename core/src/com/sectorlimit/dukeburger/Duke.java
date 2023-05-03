@@ -57,7 +57,9 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private boolean m_walking;
 	private boolean m_jumping;
 	private float m_jumpTimeElapsed;
-	private Vector<Fixture> m_groundContactFixtures;
+	private Vector<Fixture> m_feetGroundContactFixtures;
+	private Vector<Fixture> m_leftSideGroundContactFixtures;
+	private Vector<Fixture> m_rightSideGroundContactFixtures;
 	private Vector<Enemy> m_collidedEnemies;
 	private float m_walkDuration;
 	private boolean m_underAttack;
@@ -155,7 +157,9 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_world = world;
 		m_world.setContactListener(this);
 
-		m_groundContactFixtures = new Vector<Fixture>();
+		m_feetGroundContactFixtures = new Vector<Fixture>();
+		m_leftSideGroundContactFixtures = new Vector<Fixture>();
+		m_rightSideGroundContactFixtures = new Vector<Fixture>();
 		m_collidedEnemies = new Vector<Enemy>();
 		m_underAttack = false;
 		m_recentlyAttacked = false;
@@ -302,9 +306,11 @@ public class Duke implements ContactListener, HUDDataProvider {
 		collisionFilter.categoryBits = CollisionCategories.DUKE;
 		collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.ENEMY_SENSOR | CollisionCategories.DOOR | CollisionCategories.PROJECTILE;
 		collisionFixture.setFilterData(collisionFilter);
+		collisionFixture.setUserData("body");
 
 		Vector2 halfSize = new Vector2(getSize()).scl(0.5f);
 		float halfSensorWidth = halfSize.x * 0.8f;
+		float halfSensorHeight = halfSize.y * 0.8f;
 		BodyDef bottomSensorBodyDefinition = new BodyDef();
 		bottomSensorBodyDefinition.fixedRotation = true;
 		PolygonShape bottomPolygonCollisionShape = new PolygonShape();
@@ -323,6 +329,47 @@ public class Duke implements ContactListener, HUDDataProvider {
 		bottomCollisionFilter.categoryBits = CollisionCategories.DUKE_FEET_SENSOR;
 		bottomCollisionFilter.maskBits = CollisionCategories.GROUND;
 		bottomCollisionFixture.setFilterData(bottomCollisionFilter);
+		bottomCollisionFixture.setUserData("feet");
+
+		BodyDef leftSensorBodyDefinition = new BodyDef();
+		leftSensorBodyDefinition.fixedRotation = true;
+		PolygonShape leftPolygonCollisionShape = new PolygonShape();
+		leftPolygonCollisionShape.set(new Vector2[] {
+			new Vector2(-halfSize.x - 1.0f, -halfSensorHeight),
+			new Vector2(-halfSize.x - 1.0f, halfSensorHeight),
+			new Vector2(-halfSize.x, halfSensorHeight),
+			new Vector2(-halfSize.x, -halfSensorHeight)
+		});
+		FixtureDef leftFixtureDefinition = new FixtureDef();
+		leftFixtureDefinition.shape = leftPolygonCollisionShape;
+		leftFixtureDefinition.isSensor = true;
+		Fixture leftCollisionFixture = m_body.createFixture(leftFixtureDefinition);
+		leftPolygonCollisionShape.dispose();
+		Filter leftCollisionFilter = new Filter();
+		leftCollisionFilter.categoryBits = CollisionCategories.DUKE_SIDE_SENSOR;
+		leftCollisionFilter.maskBits = CollisionCategories.GROUND;
+		leftCollisionFixture.setFilterData(leftCollisionFilter);
+		leftCollisionFixture.setUserData("left");
+
+		BodyDef rightSensorBodyDefinition = new BodyDef();
+		rightSensorBodyDefinition.fixedRotation = true;
+		PolygonShape rightPolygonCollisionShape = new PolygonShape();
+		rightPolygonCollisionShape.set(new Vector2[] {
+			new Vector2(halfSize.x + 1.0f, -halfSensorHeight),
+			new Vector2(halfSize.x + 1.0f, halfSensorHeight),
+			new Vector2(halfSize.x, halfSensorHeight),
+			new Vector2(halfSize.x, -halfSensorHeight)
+		});
+		FixtureDef rightFixtureDefinition = new FixtureDef();
+		rightFixtureDefinition.shape = rightPolygonCollisionShape;
+		rightFixtureDefinition.isSensor = true;
+		Fixture rightCollisionFixture = m_body.createFixture(rightFixtureDefinition);
+		rightPolygonCollisionShape.dispose();
+		Filter rightCollisionFilter = new Filter();
+		rightCollisionFilter.categoryBits = CollisionCategories.DUKE_SIDE_SENSOR;
+		rightCollisionFilter.maskBits = CollisionCategories.GROUND;
+		rightCollisionFixture.setFilterData(rightCollisionFilter);
+		rightCollisionFixture.setUserData("right");
 
 		m_acceleration = new Vector2(0.0f, 0.0f);
 		m_facingLeft = false;
@@ -757,7 +804,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 			Vector2 newVelocity = new Vector2(m_body.getLinearVelocity());
 
 			if(!enteringCheatCode && (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.Z))) {
-				if(!m_jumping && !m_tossingSomething && !m_groundContactFixtures.isEmpty()) {
+				if(!m_jumping && !m_tossingSomething && !m_feetGroundContactFixtures.isEmpty()) {
 					m_jumping = true;
 					m_jumpTimeElapsed = 0.0f;
 				}
@@ -779,6 +826,13 @@ public class Duke implements ContactListener, HUDDataProvider {
 	
 				if(m_walkDuration >= m_walkAnimation.getAnimationDuration()) {
 					m_walkDuration = m_walkDuration % m_walkAnimation.getAnimationDuration();
+				}
+			}
+
+			if(m_feetGroundContactFixtures.isEmpty()) {
+				if((!m_leftSideGroundContactFixtures.isEmpty() && m_acceleration.x < 0.0f) ||
+				   (!m_rightSideGroundContactFixtures.isEmpty() && m_acceleration.x > 0.0f)) {
+					m_acceleration.x = 0.0f;
 				}
 			}
 
@@ -1047,18 +1101,33 @@ public class Duke implements ContactListener, HUDDataProvider {
 		Object contactObjectB = contact.getFixtureB().getBody().getUserData();
 		Fixture contactFixture = null;
 		Object contactObject = null;
+		String playerContactType = null;
 		boolean isPlayerContact = false;
 		boolean isPlayerFeetContact = false;
+		boolean isPlayerLeftSideContact = false;
+		boolean isPlayerRightSideContact = false;
 
 		if(contactObjectA instanceof Duke) {
 			contactFixture = contact.getFixtureB();
 			isPlayerContact = true;
-			isPlayerFeetContact = contact.getFixtureA().isSensor();
+			playerContactType = (String) contact.getFixtureA().getUserData();
+
+			if(playerContactType != null && contact.getFixtureA().isSensor()) {
+				isPlayerFeetContact = playerContactType.equalsIgnoreCase("feet");
+				isPlayerLeftSideContact = playerContactType.equalsIgnoreCase("left");
+				isPlayerRightSideContact = playerContactType.equalsIgnoreCase("right");
+			}
 		}
 		else if(contactObjectB instanceof Duke) {
 			contactFixture = contact.getFixtureA();
 			isPlayerContact = true;
-			isPlayerFeetContact = contact.getFixtureB().isSensor();
+			playerContactType = (String) contact.getFixtureB().getUserData();
+
+			if(playerContactType != null && contact.getFixtureB().isSensor()) {
+				isPlayerFeetContact = playerContactType.equalsIgnoreCase("feet");
+				isPlayerLeftSideContact = playerContactType.equalsIgnoreCase("left");
+				isPlayerRightSideContact = playerContactType.equalsIgnoreCase("right");
+			}
 		}
 
 		if(contactFixture != null) {
@@ -1068,10 +1137,16 @@ public class Duke implements ContactListener, HUDDataProvider {
 		if(isPlayerContact) {
 			if(contactObject == null) {
 				if(isPlayerFeetContact) {
-					m_groundContactFixtures.add(contactFixture);
+					m_feetGroundContactFixtures.add(contactFixture);
 
 					m_jumping = false;
 					m_tossingSomething = false;
+				}
+				else if(isPlayerLeftSideContact) {
+					m_leftSideGroundContactFixtures.add(contactFixture);
+				}
+				else if(isPlayerRightSideContact) {
+					m_rightSideGroundContactFixtures.add(contactFixture);
 				}
 			}
 			else if(contactObject instanceof Enemy) {
@@ -1081,7 +1156,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 				if(enemy instanceof OctaBaby) {
 					OctaBaby octaBaby = (OctaBaby) enemy;
 
-					if((m_groundContactFixtures.isEmpty() && m_body.getLinearVelocity().y < 0.0f) && !m_recentlyAttacked && contactFixture.isSensor()) {
+					if((m_feetGroundContactFixtures.isEmpty() && m_body.getLinearVelocity().y < 0.0f) && !m_recentlyAttacked && contactFixture.isSensor()) {
 						m_squishSound.play();
 						octaBaby.squish();
 					}
@@ -1173,18 +1248,33 @@ public class Duke implements ContactListener, HUDDataProvider {
 		Object contactObjectB = contact.getFixtureB().getBody().getUserData();
 		Fixture contactFixture = null;
 		Object contactObject = null;
+		String playerContactType = null;
 		boolean isPlayerContact = false;
 		boolean isPlayerFeetContact = false;
+		boolean isPlayerLeftSideContact = false;
+		boolean isPlayerRightSideContact = false;
 
 		if(contactObjectA instanceof Duke) {
 			contactFixture = contact.getFixtureB();
 			isPlayerContact = true;
-			isPlayerFeetContact = contact.getFixtureA().isSensor();
+			playerContactType = (String) contact.getFixtureA().getUserData();
+
+			if(playerContactType != null && contact.getFixtureA().isSensor()) {
+				isPlayerFeetContact = playerContactType.equalsIgnoreCase("feet");
+				isPlayerLeftSideContact = playerContactType.equalsIgnoreCase("left");
+				isPlayerRightSideContact = playerContactType.equalsIgnoreCase("right");
+			}
 		}
 		else if(contactObjectB instanceof Duke) {
 			contactFixture = contact.getFixtureA();
 			isPlayerContact = true;
-			isPlayerFeetContact = contact.getFixtureB().isSensor();
+			playerContactType = (String) contact.getFixtureB().getUserData();
+
+			if(playerContactType != null && contact.getFixtureB().isSensor()) {
+				isPlayerFeetContact = playerContactType.equalsIgnoreCase("feet");
+				isPlayerLeftSideContact = playerContactType.equalsIgnoreCase("left");
+				isPlayerRightSideContact = playerContactType.equalsIgnoreCase("right");
+			}
 		}
 
 		if(contactFixture != null) {
@@ -1193,7 +1283,17 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 		if(isPlayerFeetContact) {
 			if(contactObject == null) {
-				m_groundContactFixtures.remove(contactFixture);
+				m_feetGroundContactFixtures.remove(contactFixture);
+			}
+		}
+		else if(isPlayerLeftSideContact || isPlayerRightSideContact) {
+			if(contactObject == null) {
+				if(isPlayerLeftSideContact) {
+					m_leftSideGroundContactFixtures.remove(contactFixture);
+				}
+				else if(isPlayerRightSideContact) {
+					m_rightSideGroundContactFixtures.remove(contactFixture);
+				}
 			}
 		}
 
