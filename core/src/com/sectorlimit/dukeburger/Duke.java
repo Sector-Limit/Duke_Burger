@@ -681,6 +681,12 @@ public class Duke implements ContactListener, HUDDataProvider {
 				}
 			}
 
+			if(Gdx.input.isKeyPressed(Keys.G)) {
+				if(m_pickupItem != null) {
+					dropItem();
+				}
+			}
+
 			if(Gdx.input.isKeyPressed(Keys.E) || Gdx.input.isKeyPressed(Keys.F) || Gdx.input.isKeyPressed(Keys.X)) {
 				if(!m_pickupItemButtonPressed) {
 					m_pickupItemButtonPressed = true;
