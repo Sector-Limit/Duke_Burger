@@ -457,26 +457,6 @@
    <polygon points="0,0 32,0 32,16 0,16"/>
   </object>
  </objectgroup>
- <objectgroup id="4" name="death_collision">
-  <object id="262" x="912" y="432">
-   <polygon points="0,0 64,0 64,80 0,80"/>
-  </object>
-  <object id="263" x="1664" y="384">
-   <polygon points="0,0 64,0 64,128 0,128"/>
-  </object>
-  <object id="264" x="1792" y="384">
-   <polygon points="0,0 64,0 64,128 0,128"/>
-  </object>
-  <object id="265" x="1920" y="384">
-   <polygon points="0,0 64,0 64,128 0,128"/>
-  </object>
-  <object id="266" x="2720" y="496">
-   <polygon points="0,0 48,0 48,16 0,16"/>
-  </object>
-  <object id="267" x="3216" y="496">
-   <polygon points="0,0 -80,0 -80,16 0,16"/>
-  </object>
- </objectgroup>
  <objectgroup id="5" name="finish_collision">
   <object id="269" x="3680" y="368">
    <polygon points="0,0 64,0 64,48 0,48"/>

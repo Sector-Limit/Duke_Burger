@@ -241,10 +241,10 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 						enemyBoundaryCollisionObjectPolygonShape.set(enemyBoundaryPolygonCollisionVertices);
 						Fixture collisionFixture = enemyBoundaryCollisionObjectBody.createFixture(enemyBoundaryCollisionObjectPolygonShape, 0.0f);
 						enemyBoundaryCollisionObjectPolygonShape.dispose();
-						Filter enemyBoundaryenemyBoundaryCollisionFixture = new Filter();
-						enemyBoundaryenemyBoundaryCollisionFixture.categoryBits = CollisionCategories.ENEMY_BOUNDARY;
-						enemyBoundaryenemyBoundaryCollisionFixture.maskBits = CollisionCategories.ENEMY;
-						collisionFixture.setFilterData(enemyBoundaryenemyBoundaryCollisionFixture);
+						Filter enemyBoundaryCollisionFixture = new Filter();
+						enemyBoundaryCollisionFixture.categoryBits = CollisionCategories.ENEMY_BOUNDARY;
+						enemyBoundaryCollisionFixture.maskBits = CollisionCategories.ENEMY;
+						collisionFixture.setFilterData(enemyBoundaryCollisionFixture);
 					}
 				}
 			}
@@ -278,10 +278,10 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 						Fixture collisionFixture = finishCollisionObjectBody.createFixture(finishCollisionObjectPolygonShape, 0.0f);
 						collisionFixture.setSensor(true);
 						finishCollisionObjectPolygonShape.dispose();
-						Filter finishfinishCollisionFixture = new Filter();
-						finishfinishCollisionFixture.categoryBits = CollisionCategories.GROUND;
-						finishfinishCollisionFixture.maskBits = CollisionCategories.DUKE;
-						collisionFixture.setFilterData(finishfinishCollisionFixture);
+						Filter finishCollisionFixture = new Filter();
+						finishCollisionFixture.categoryBits = CollisionCategories.GROUND;
+						finishCollisionFixture.maskBits = CollisionCategories.DUKE;
+						collisionFixture.setFilterData(finishCollisionFixture);
 					}
 				}
 			}
@@ -291,6 +291,43 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		}
 		else {
 			System.err.println("Map is missing 'finish_collision' layer.");
+		}
+
+		MapLayer deathBoundaryCollisionMapLayer = mapLayers.get("death_collision");
+
+		if(deathBoundaryCollisionMapLayer != null) {
+			MapObjects deathBoundaryCollisionObjects = deathBoundaryCollisionMapLayer.getObjects();
+
+			if(deathBoundaryCollisionObjects.getCount() != 0) {
+				for(int i = 0; i < deathBoundaryCollisionObjects.getCount(); i++) {
+					MapObject deathBoundaryCollisionObject = deathBoundaryCollisionObjects.get(i);
+
+					if(deathBoundaryCollisionObject instanceof PolygonMapObject) {
+						PolygonMapObject deathBoundaryPolygonCollisionObject = (PolygonMapObject) deathBoundaryCollisionObject;
+						Polygon deathBoundaryPolygonCollision = deathBoundaryPolygonCollisionObject.getPolygon();
+						float[] deathBoundaryPolygonCollisionVertices = deathBoundaryPolygonCollision.getVertices();
+
+						if(deathBoundaryPolygonCollisionVertices.length < 3 || deathBoundaryPolygonCollisionVertices.length > 8) {
+							System.err.println("Map has death boundary polygon collision with invalid number of vertices: " + deathBoundaryPolygonCollisionVertices.length + ". Expected between 3 and 8 vertices.");
+							continue;
+						}
+
+						BodyDef deathBoundaryBodyDefinition = new BodyDef();
+						deathBoundaryBodyDefinition.position.set(new Vector2(deathBoundaryPolygonCollision.getX(), deathBoundaryPolygonCollision.getY()));
+						Body deathBoundaryCollisionObjectBody = m_world.createBody(deathBoundaryBodyDefinition);
+						deathBoundaryCollisionObjectBody.setUserData("death");
+						PolygonShape deathBoundaryCollisionObjectPolygonShape = new PolygonShape();
+						deathBoundaryCollisionObjectPolygonShape.set(deathBoundaryPolygonCollisionVertices);
+						Fixture deathCollisionFixture = deathBoundaryCollisionObjectBody.createFixture(deathBoundaryCollisionObjectPolygonShape, 0.0f);
+						deathCollisionFixture.setSensor(true);
+						deathBoundaryCollisionObjectPolygonShape.dispose();
+						Filter deathBoundarydeathBoundaryCollisionFixture = new Filter();
+						deathBoundarydeathBoundaryCollisionFixture.categoryBits = CollisionCategories.DEATH;
+						deathBoundarydeathBoundaryCollisionFixture.maskBits = CollisionCategories.DUKE;
+						deathCollisionFixture.setFilterData(deathBoundarydeathBoundaryCollisionFixture);
+					}
+				}
+			}
 		}
 
 		m_duke = new Duke(m_world, m_map, lives, coins);

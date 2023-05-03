@@ -273,11 +273,6 @@
    <polygon points="0,0 48,0 48,192 0,192"/>
   </object>
  </objectgroup>
- <objectgroup id="4" name="death_collision">
-  <object id="159" x="784" y="352">
-   <polygon points="0,0 64,0 64,32 0,32"/>
-  </object>
- </objectgroup>
  <objectgroup id="5" name="finish_collision">
   <object id="160" x="2112" y="256">
    <polygon points="0,0 64,0 64,48 0,48"/>
