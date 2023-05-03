@@ -626,11 +626,11 @@ public class Duke implements ContactListener, HUDDataProvider {
 				m_acceleration.x = ACCELERATION;
 			}
 			else {
-				m_acceleration.x = 0;
+				m_acceleration.x = 0.0f;
 			}
 
 			Vector2 newVelocity = new Vector2(m_body.getLinearVelocity());
-			
+
 			if((Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.Z))) {
 				if(!m_jumping && !m_tossingSomething && !m_groundContactFixtures.isEmpty()) {
 					m_jumping = true;
@@ -656,12 +656,11 @@ public class Duke implements ContactListener, HUDDataProvider {
 					m_walkDuration = m_walkDuration % m_walkAnimation.getAnimationDuration();
 				}
 			}
-	
-			m_acceleration.scl(deltaTime);
+
 			newVelocity.add(m_acceleration);
-	
+
 			if(m_acceleration.x == 0.0f) {
-				newVelocity.x *= 0.8f;
+				newVelocity.x *= 0.5f;
 			}
 	
 			if(newVelocity.x > MAX_HORIZONTAL_VELOCITY) {
@@ -670,7 +669,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 			else if(newVelocity.x < -MAX_HORIZONTAL_VELOCITY) {
 				newVelocity.x = -MAX_HORIZONTAL_VELOCITY;
 			}
-	
+
 			m_body.setLinearVelocity(newVelocity);
 
 			if(m_pickupCooldown) {
