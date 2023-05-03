@@ -58,6 +58,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private boolean m_jumping;
 	private float m_jumpTimeElapsed;
 	private Vector<Fixture> m_groundContactFixtures;
+	private Vector<Enemy> m_collidedEnemies;
 	private float m_walkDuration;
 	private boolean m_underAttack;
 	private boolean m_recentlyAttacked;
@@ -155,6 +156,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_world.setContactListener(this);
 
 		m_groundContactFixtures = new Vector<Fixture>();
+		m_collidedEnemies = new Vector<Enemy>();
 		m_underAttack = false;
 		m_recentlyAttacked = false;
 		m_attackCooldownTimeElapsed = 0.0f;
@@ -716,6 +718,23 @@ public class Duke implements ContactListener, HUDDataProvider {
 					m_underAttack = false;
 					m_recentlyAttacked = false;
 					m_attackCooldownTimeElapsed = 0.0f;
+
+					if(!m_collidedEnemies.isEmpty()) {
+						for(Enemy enemy : m_collidedEnemies) {
+							if(enemy instanceof OctaBaby) {
+								OctaBaby octaBaby = (OctaBaby) enemy;
+
+								if(!octaBaby.isSquished()) {
+									onAttackedBy(enemy);
+
+									break;
+								}
+							}
+							else {
+								onAttackedBy(enemy);
+							}
+						}
+					}
 				}
 			}
 	
@@ -1057,6 +1076,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 			}
 			else if(contactObject instanceof Enemy) {
 				Enemy enemy = (Enemy) contactObject;
+				m_collidedEnemies.add(enemy);
 
 				if(enemy instanceof OctaBaby) {
 					OctaBaby octaBaby = (OctaBaby) enemy;
@@ -1153,14 +1173,17 @@ public class Duke implements ContactListener, HUDDataProvider {
 		Object contactObjectB = contact.getFixtureB().getBody().getUserData();
 		Fixture contactFixture = null;
 		Object contactObject = null;
+		boolean isPlayerContact = false;
 		boolean isPlayerFeetContact = false;
 
 		if(contactObjectA instanceof Duke) {
 			contactFixture = contact.getFixtureB();
+			isPlayerContact = true;
 			isPlayerFeetContact = contact.getFixtureA().isSensor();
 		}
 		else if(contactObjectB instanceof Duke) {
 			contactFixture = contact.getFixtureA();
+			isPlayerContact = true;
 			isPlayerFeetContact = contact.getFixtureB().isSensor();
 		}
 
@@ -1171,6 +1194,12 @@ public class Duke implements ContactListener, HUDDataProvider {
 		if(isPlayerFeetContact) {
 			if(contactObject == null) {
 				m_groundContactFixtures.remove(contactFixture);
+			}
+		}
+
+		if(isPlayerContact) {
+			if(contactObject instanceof Enemy) {
+				m_collidedEnemies.remove((Enemy) contactObject);
 			}
 		}
 	}
