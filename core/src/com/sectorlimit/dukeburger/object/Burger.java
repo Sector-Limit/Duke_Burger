@@ -28,6 +28,11 @@ public class Burger extends PickupItem {
 	}
 
 	@Override
+	public float getFriction() {
+		return 0.9f;
+	}
+
+	@Override
 	public boolean isDestructible() {
 		return false;
 	}

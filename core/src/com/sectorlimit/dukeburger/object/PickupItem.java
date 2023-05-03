@@ -112,6 +112,10 @@ public abstract class PickupItem {
 		return CollisionCategories.GROUND | CollisionCategories.OBJECT | CollisionCategories.ENEMY | CollisionCategories.ENEMY_SENSOR;
 	}
 
+	public float getFriction() {
+		return 0.2f;
+	}
+
 	public void assignPhysics(World world, Vector2 position) {
 		BodyDef bodyDefinition = new BodyDef();
 		bodyDefinition.type = BodyType.DynamicBody;
@@ -128,7 +132,7 @@ public abstract class PickupItem {
 		FixtureDef fixtureDefinition = new FixtureDef();
 		fixtureDefinition.shape = polygonCollisionShape;
 		fixtureDefinition.density = 0.5f;
-		fixtureDefinition.friction = 0.2f;
+		fixtureDefinition.friction = getFriction();
 		fixtureDefinition.restitution = 0.1f;
 		Fixture collisionFixture = m_body.createFixture(fixtureDefinition);
 		polygonCollisionShape.dispose();
