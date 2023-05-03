@@ -132,6 +132,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private static final int NUMBER_OF_WALKING_FRAMES = 4;
 	private static final float WALK_ANIMATION_SPEED = 0.07f;
 	private static final float ATTACK_COOLDOWN = 3.0f;
+	private static final float DAMAGED_FLICKER_SPEED = 0.15f;
+	private static final float DAMAGED_OPACITYT = 0.65f;
 	private static final float RECENTLY_ATTACKED_DURATION = 1.0f;
 	private static final float DOOR_OPEN_DISTANCE = DUKE_SIZE.y + (16.0f * 1.5f);
 	private static final float LEVEL_COMPLETED_DELAY = 3.0f;
@@ -882,6 +884,10 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 		Vector2 renderOrigin = new Vector2(getOriginPosition()).sub(new Vector2(getSize()).scl(0.5f));
 
+		if(m_underAttack) {
+			spriteBatch.setColor(1.0f, 1.0f, 1.0f, m_attackCooldownTimeElapsed % DAMAGED_FLICKER_SPEED > DAMAGED_FLICKER_SPEED * 0.5f ? 1.0f : DAMAGED_OPACITYT);
+		}
+
 		if(currentTexture != null) {
 			spriteBatch.draw(currentTexture, renderOrigin.x, renderOrigin.y, getSize().x * 0.5f, getSize().y * 0.5f, currentTexture.getWidth(), currentTexture.getHeight(), 1.0f, 1.0f, (float) Math.toDegrees(m_body.getAngle()), 0, 0, currentTexture.getWidth(), currentTexture.getHeight(), m_facingLeft, false);
 		}
@@ -896,6 +902,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 				currentTextureRegion.flip(true, false);
 			}
 		}
+
+		spriteBatch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 		m_projectileSystem.render(spriteBatch);
 	}
