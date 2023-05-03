@@ -791,13 +791,13 @@ public class Duke implements ContactListener, HUDDataProvider {
 			}
 	
 			m_walking = false;
-	
-			if(!enteringCheatCode && (Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.LEFT))) {
+
+			if(!enteringCheatCode && (Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.LEFT) || Gdx.input.isKeyPressed(Keys.DPAD_LEFT) || Gdx.input.isKeyPressed(Keys.BUTTON_THUMBL))) {
 				m_facingLeft = true;
 				m_walking = true;
 				m_acceleration.x = -ACCELERATION;
 			}
-			else if(!enteringCheatCode && (Gdx.input.isKeyPressed(Keys.D) || Gdx.input.isKeyPressed(Keys.RIGHT))) {
+			else if(!enteringCheatCode && (Gdx.input.isKeyPressed(Keys.D) || Gdx.input.isKeyPressed(Keys.RIGHT) || Gdx.input.isKeyPressed(Keys.DPAD_RIGHT) || Gdx.input.isKeyPressed(Keys.BUTTON_THUMBR))) {
 				m_facingLeft = false;
 				m_walking = true;
 				m_acceleration.x = ACCELERATION;
@@ -808,7 +808,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 			Vector2 newVelocity = new Vector2(m_body.getLinearVelocity());
 
-			if(!enteringCheatCode && (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.Z))) {
+			if(!enteringCheatCode && (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.Z) || Gdx.input.isKeyPressed(Keys.DPAD_UP) || Gdx.input.isKeyPressed(Keys.BUTTON_A))) {
 				if(!m_jumping && !m_tossingSomething && !m_feetGroundContactFixtures.isEmpty()) {
 					m_jumping = true;
 					m_jumpTimeElapsed = 0.0f;
@@ -864,13 +864,13 @@ public class Duke implements ContactListener, HUDDataProvider {
 				}
 			}
 
-			if(!enteringCheatCode && Gdx.input.isKeyPressed(Keys.G)) {
+			if(!enteringCheatCode && (Gdx.input.isKeyPressed(Keys.G) || Gdx.input.isKeyPressed(Keys.BUTTON_B))) {
 				if(m_pickupItem != null) {
 					dropItem();
 				}
 			}
 
-			if(!enteringCheatCode && (Gdx.input.isKeyPressed(Keys.E) || Gdx.input.isKeyPressed(Keys.F) || Gdx.input.isKeyPressed(Keys.X))) {
+			if(!enteringCheatCode && (Gdx.input.isKeyPressed(Keys.E) || Gdx.input.isKeyPressed(Keys.F) || Gdx.input.isKeyPressed(Keys.X) || Gdx.input.isKeyPressed(Keys.BUTTON_X))) {
 				if(!m_pickupItemButtonPressed) {
 					m_pickupItemButtonPressed = true;
 	

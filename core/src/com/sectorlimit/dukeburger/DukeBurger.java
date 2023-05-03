@@ -502,7 +502,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 			m_spriteBatch.end();
 
-			if(Gdx.input.isKeyPressed(Keys.ESCAPE) || m_elapsedIntroAnimationTime >= m_introAnimation.getAnimationDuration()) {
+			if((Gdx.input.isKeyPressed(Keys.ESCAPE) || Gdx.input.isKeyPressed(Keys.BUTTON_START) || Gdx.input.isKeyPressed(Keys.BUTTON_SELECT) || Gdx.input.isKeyPressed(Keys.BUTTON_A)) || m_elapsedIntroAnimationTime >= m_introAnimation.getAnimationDuration()) {
 				m_showIntro = false;
 				m_elapsedIntroAnimationTime = 0.0f;
 			
