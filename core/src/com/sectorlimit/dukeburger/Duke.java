@@ -966,7 +966,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 		Vector2 renderOrigin = new Vector2(getOriginPosition()).sub(new Vector2(getSize()).scl(0.5f));
 
-		if(m_underAttack) {
+		if(m_underAttack && m_alive) {
 			spriteBatch.setColor(1.0f, 1.0f, 1.0f, m_attackCooldownTimeElapsed % DAMAGED_FLICKER_SPEED > DAMAGED_FLICKER_SPEED * 0.5f ? 1.0f : DAMAGED_OPACITYT);
 		}
 
