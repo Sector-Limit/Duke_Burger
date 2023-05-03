@@ -586,7 +586,11 @@ public class Duke implements ContactListener, HUDDataProvider {
 	}
 
 	public void kill() {
-		if(m_godMode || m_levelCompleted) {
+		kill(false);
+	}
+
+	private void kill(boolean force) {
+		if(!m_alive || m_levelCompleted || (m_godMode && !force)) {
 			return;
 		}
 
@@ -701,12 +705,13 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 		float deltaTime = Gdx.graphics.getDeltaTime();
 
-		if(m_body.getPosition().y + getSize().y < 0.0f) {
+		if(m_body.getPosition().y < 0.0f) {
 			if(m_alive) {
-				removeLife();
+				kill(true);
 			}
-
-			m_dead = true;
+			else {
+				m_dead = true;
+			}
 		}
 
 		if(m_dead) {
