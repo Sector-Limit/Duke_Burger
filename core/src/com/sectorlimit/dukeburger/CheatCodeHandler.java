@@ -19,7 +19,10 @@ public class CheatCodeHandler implements InputProcessor {
 		"CASHMAN", // 99 coins
 		"BURGER",  // teleport burger
 		"DEBUG",   // enable debug camera
-		"BRULLOV"  // teleport to exit door
+		"BRULLOV", // teleport to exit door
+		"NITRO",   // toggle player flipped upside down
+		"HYPER",   // toggle steroids
+		"GRAV"     // toggle low gravity
 	};
 
 	public CheatCodeHandler(Duke duke) {
@@ -92,6 +95,21 @@ public class CheatCodeHandler implements InputProcessor {
 			System.out.println("Teleporting to exit door.");
 
 			m_duke.teleportToDoor();
+		}
+		else if(cheatCode == 7) {
+			System.out.println("Toggling player flipped state.");
+
+			m_duke.toggleFlipped();
+		}
+		else if(cheatCode == 8) {
+			System.out.println("Toggling steroids.");
+
+			m_duke.toggleSteroids();
+		}
+		else if(cheatCode == 9) {
+			System.out.println("Toggling low gravity.");
+
+			m_duke.toggleLowGravity();
 		}
 	}
 

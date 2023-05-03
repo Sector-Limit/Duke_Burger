@@ -67,6 +67,10 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private boolean m_dead;
 	private boolean m_wasDead;
 	private boolean m_godMode;
+	private boolean m_flipped;
+	private boolean m_steroids;
+	private boolean m_lowGravity;
+	private Vector2 m_normalGravity;
 	private int m_health;
 	private int m_lives;
 	private int m_coins;
@@ -159,6 +163,10 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_dead = false;
 		m_wasDead = false;
 		m_godMode = false;
+		m_flipped = false;
+		m_steroids = false;
+		m_lowGravity = false;
+		m_normalGravity = new Vector2(m_world.getGravity());
 		m_health = MAX_HEALTH;
 		m_lives = lives;
 		m_coins = coins;
@@ -620,6 +628,25 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_body.setTransform(new Vector2(m_door.getOriginPosition()).sub(16.0f * 2.0f, 0.0f), 0.0f);
 	}
 
+	public void toggleFlipped() {
+		m_flipped = !m_flipped;
+	}
+
+	public void toggleSteroids() {
+		m_steroids = !m_steroids;
+	}
+
+	public void toggleLowGravity() {
+		m_lowGravity = !m_lowGravity;
+
+		if(m_lowGravity) {
+			m_world.setGravity(new Vector2(m_normalGravity).scl(0.25f));
+		}
+		else {
+			m_world.setGravity(m_normalGravity);
+		}
+	}
+
 	public void render(SpriteBatch spriteBatch) {
 		boolean enteringCheatCode = m_cheatCodeHandler.handleCheatCodeInput();
 
@@ -965,23 +992,24 @@ public class Duke implements ContactListener, HUDDataProvider {
 		}
 
 		Vector2 renderOrigin = new Vector2(getOriginPosition()).sub(new Vector2(getSize()).scl(0.5f));
+		float scale = m_steroids ? 4.0f : 1.0f;
 
 		if(m_underAttack && m_alive) {
 			spriteBatch.setColor(1.0f, 1.0f, 1.0f, m_attackCooldownTimeElapsed % DAMAGED_FLICKER_SPEED > DAMAGED_FLICKER_SPEED * 0.5f ? 1.0f : DAMAGED_OPACITYT);
 		}
 
 		if(currentTexture != null) {
-			spriteBatch.draw(currentTexture, renderOrigin.x, renderOrigin.y, getSize().x * 0.5f, getSize().y * 0.5f, currentTexture.getWidth(), currentTexture.getHeight(), 1.0f, 1.0f, (float) Math.toDegrees(m_body.getAngle()), 0, 0, currentTexture.getWidth(), currentTexture.getHeight(), m_facingLeft, false);
+			spriteBatch.draw(currentTexture, renderOrigin.x, renderOrigin.y, getSize().x * 0.5f, getSize().y * 0.5f, currentTexture.getWidth(), currentTexture.getHeight(), scale, scale, (float) Math.toDegrees(m_body.getAngle()), 0, 0, currentTexture.getWidth(), currentTexture.getHeight(), m_facingLeft, m_flipped);
 		}
 		else if(currentTextureRegion != null) {
-			if(m_facingLeft) {
-				currentTextureRegion.flip(true, false);
+			if(m_facingLeft || m_flipped) {
+				currentTextureRegion.flip(true, m_flipped);
 			}
 
-			spriteBatch.draw(currentTextureRegion, renderOrigin.x, renderOrigin.y);
+			spriteBatch.draw(currentTextureRegion, renderOrigin.x, renderOrigin.y, getSize().x * 0.5f, getSize().y * 0.5f, currentTextureRegion.getRegionWidth(), currentTextureRegion.getRegionHeight(), scale, scale, (float) Math.toDegrees(m_body.getAngle()));
 
-			if(m_facingLeft) {
-				currentTextureRegion.flip(true, false);
+			if(m_facingLeft || m_flipped) {
+				currentTextureRegion.flip(true, m_flipped);
 			}
 		}
 
