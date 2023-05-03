@@ -37,4 +37,9 @@ public class Burger extends PickupItem {
 		return false;
 	}
 
+	@Override
+	public void toss(boolean tossLeft) {
+		toss(tossLeft, new Vector2(140.0f, 160.0f));
+	}
+
 }

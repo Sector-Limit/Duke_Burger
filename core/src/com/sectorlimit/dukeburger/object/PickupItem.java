@@ -153,6 +153,10 @@ public abstract class PickupItem {
 	}
 
 	public void toss(boolean tossLeft) {
+		toss(tossLeft, new Vector2(185.0f, 5.0f));
+	}
+
+	protected void toss(boolean tossLeft, Vector2 velocity) {
 		m_tossed = true;
 		m_body.setActive(true);
 
@@ -160,7 +164,14 @@ public abstract class PickupItem {
 			m_body.setAngularVelocity((float) ((Math.random() * 20.0) - 10.0));
 		}
 
-		m_body.setLinearVelocity(new Vector2((tossLeft ? -1.0f : 1.0f) * 185.0f, 5.0f));
+		if(tossLeft) {
+			velocity.x *= velocity.x > 0.0f ? -1.0f : 1.0f;
+		}
+		else {
+			velocity.x *= velocity.x < 0.0f ? -1.0f : 1.0f;
+		}
+
+		m_body.setLinearVelocity(velocity);
 	}
 
 	public void update() {
