@@ -74,7 +74,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	private static final boolean DEBUG_CAMERA_ENABLED = false;
 	private static final boolean PHYSICS_DEBUGGING_ENABLED = false;
 	private static final boolean MUSIC_ENABLED = true;
-	private static final float MUSIC_VOLUME = 0.25f;
+	private static final float MUSIC_VOLUME = 0.15f;
 
 	@Override
 	public void create() {
@@ -426,6 +426,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 				m_elapsedTitleScreenAnimationTime = 0.0f;
 
 				m_showIntro = true;
+				m_elapsedIntroAnimationTime = 0.0f;
 			}
 
 			return;
