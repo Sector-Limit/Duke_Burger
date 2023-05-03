@@ -739,7 +739,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 			newVelocity.add(m_acceleration);
 
 			if(m_acceleration.x == 0.0f) {
-				newVelocity.x *= 0.5f;
+				newVelocity.x *= 0.75f;
 			}
 	
 			if(newVelocity.x > MAX_HORIZONTAL_VELOCITY) {
