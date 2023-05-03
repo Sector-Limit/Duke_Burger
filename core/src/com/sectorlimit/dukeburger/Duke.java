@@ -126,7 +126,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private static final float ACCELERATION = 150.0f;
 	private static final float JUMP_VELOCITY = 220.0f;
 	private static final float JUMP_DURATION = 0.3f;
-	private static final float JUMP_HOLDING_DURATION = 0.125f;
+	private static final float JUMP_HOLDING_DURATION = 0.175f;
 	private static final float TOSS_VELOCITY = 75.0f;
 	private static final float MAX_HORIZONTAL_VELOCITY = 80.0f;
 	private static final int NUMBER_OF_WALKING_FRAMES = 4;
