@@ -631,20 +631,22 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 			Vector2 newVelocity = new Vector2(m_body.getLinearVelocity());
 			
-			if((Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.Z)) && !m_jumping && !m_tossingSomething && m_grounded) {
-				m_jumping = true;
-				m_jumpTimeElapsed = 0.0f;
-	
-				newVelocity.add(new Vector2(0.0f, JUMP_VELOCITY));
-				m_acceleration.x = 0;
-			}
-	
-			if(m_jumping) {
-				m_jumpTimeElapsed += deltaTime;
-		
-				if(m_jumpTimeElapsed < (isHoldingSomething() ? JUMP_HOLDING_DURATION : JUMP_DURATION)) {
-					newVelocity.add(new Vector2(0.0f, JUMP_VELOCITY));
+			if((Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.Z))) {
+				if(!m_jumping && !m_tossingSomething && m_grounded) {
+					m_jumping = true;
+					m_jumpTimeElapsed = 0.0f;
 				}
+
+				if(m_jumping) {
+					m_jumpTimeElapsed += deltaTime;
+
+					if(m_jumpTimeElapsed < (isHoldingSomething() ? JUMP_HOLDING_DURATION : JUMP_DURATION)) {
+						newVelocity.add(new Vector2(0.0f, JUMP_VELOCITY));
+					}
+				}
+			}
+			else {
+				m_jumpTimeElapsed = JUMP_DURATION;
 			}
 	
 			if(m_walking) {
