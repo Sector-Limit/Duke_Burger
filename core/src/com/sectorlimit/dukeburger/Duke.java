@@ -804,7 +804,12 @@ public class Duke implements ContactListener, HUDDataProvider {
 	
 			if(m_pickupItem != null) {
 				if(m_pickupItem instanceof Burger) {
-					pickupObjectVerticalOffset = -2.0f;
+					if(m_jumping) {
+						pickupObjectVerticalOffset = -1.5f;
+					}
+					else {
+						pickupObjectVerticalOffset = -2.5f;
+					}
 				}
 	
 				m_pickupItem.setPosition(getOriginPosition().add(new Vector2(1.0f, getSize().y + pickupObjectVerticalOffset)));
