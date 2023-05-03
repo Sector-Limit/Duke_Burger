@@ -147,7 +147,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private static final float RECENTLY_ATTACKED_DURATION = 1.0f;
 	private static final float DOOR_OPEN_DISTANCE = DUKE_SIZE.y + (16.0f * 1.5f);
 	private static final float LEVEL_COMPLETED_DELAY = 3.0f;
-	private static final float PICKUP_COOLDOWN_DURATION = 0.5f;
+	private static final float PICKUP_COOLDOWN_DURATION = 0.35f;
 
 	public Duke(World world, TiledMap map) {
 		this(world, map, MAX_LIVES, 0);
@@ -883,11 +883,20 @@ public class Duke implements ContactListener, HUDDataProvider {
 						}
 	
 						if(!isHoldingSomething()) {
+							PickupItem closestPickupItem = null;
+
 							for(PickupItem pickupItem : m_pickupItems) {
-								if(getOriginPosition().dst(pickupItem.getOriginPosition()) <= (getSize().x / 2.0f) + pickupItem.getSize().x) {
-									pickupItem(pickupItem);
+								if(closestPickupItem == null) {
+									closestPickupItem = pickupItem;
+								}
+								else if(getOriginPosition().dst(pickupItem.getOriginPosition()) < getOriginPosition().dst(closestPickupItem.getOriginPosition())) {
+									closestPickupItem = pickupItem;
 									break;
 								}
+							}
+							
+							if(closestPickupItem != null && getOriginPosition().dst(closestPickupItem.getOriginPosition()) <= (getSize().x / 2.0f) + closestPickupItem.getSize().x) {
+								pickupItem(closestPickupItem);
 							}
 						}
 					}
