@@ -7,5 +7,7 @@ public interface DukeListener {
 	public abstract void onLevelCompleted();
 	public abstract void onLevelEnded();
 	public abstract void onGameOver();
+	public abstract void onLevelWarpRequested(int levelNumber);
+	public abstract void onDebugCameraEnableRequested();
 
 }

@@ -50,6 +50,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	private boolean m_showIntro;
 	private float m_elapsedIntroAnimationTime;
 	private Stage m_gameStage;
+	private boolean m_debugCameraEnabled;
 	private OrthographicCamera m_camera;
 	private Vector2 m_cameraOffset;
 	private SpriteBatch m_spriteBatch;
@@ -89,6 +90,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		m_coins = 0;
 
 		m_camera = new OrthographicCamera(VIEWPORT_SIZE.x, VIEWPORT_SIZE.y);
+		m_debugCameraEnabled = DEBUG_CAMERA_ENABLED;
 		m_gameStage = new Stage(new StretchViewport(VIEWPORT_SIZE.x, VIEWPORT_SIZE.y));
 		m_gameStage.getViewport().setCamera(m_camera);
 
@@ -129,7 +131,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 		stopGame();
 
-		if(m_currentLevelNumber >= NUMBER_OF_MISSIONS) {
+		if(m_currentLevelNumber <= 0 || m_currentLevelNumber >= NUMBER_OF_MISSIONS) {
 			m_showTitleScreen = true;
 			return;
 		}
@@ -397,6 +399,27 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	}
 
 	@Override
+	public void onLevelWarpRequested(int levelNumber) {
+		if(levelNumber <= 0 || levelNumber > NUMBER_OF_MISSIONS) {
+			return;
+		}
+
+		m_lives = m_duke.getLives();
+		m_coins = m_duke.getCoins();
+
+		stopGame();
+
+		m_currentLevelNumber = levelNumber;
+
+		startNewGame(m_currentLevelNumber);
+	}
+
+	@Override
+	public void onDebugCameraEnableRequested() {
+		m_debugCameraEnabled = true;
+	}
+
+	@Override
 	public void resize (int width, int height) {
 		m_gameStage.getViewport().update(width, height, true);
 	}
@@ -456,7 +479,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 			return;
 		}
 
-		if(DEBUG_CAMERA_ENABLED) {
+		if(m_debugCameraEnabled) {
 			if(Gdx.input.isKeyPressed(Keys.NUMPAD_4)) {
 				m_cameraOffset.add(-CAMERA_SPEED, 0);
 			}

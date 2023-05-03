@@ -66,6 +66,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private boolean m_wasAlive;
 	private boolean m_dead;
 	private boolean m_wasDead;
+	private boolean m_godMode;
 	private int m_health;
 	private int m_lives;
 	private int m_coins;
@@ -84,6 +85,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private PickupItemFactory m_pickupItemFactory;
 	private ProjectileSystem m_projectileSystem;
 	private StaticObjectFactory m_staticObjectFactory;
+	private CheatCodeHandler m_cheatCodeHandler;
 
 	private boolean m_tossingSomething;
 	private boolean m_pickupItemButtonPressed;
@@ -91,6 +93,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private float m_pickupCooldownTimeElapsed;
 	private PickupItem m_pickupItem;
 	private Enemy m_pickupEnemy;
+	private Burger m_burger;
 	private Door m_door;
 	private PigCop m_pigCop;
 	private Vector<Powerup> m_powerups;
@@ -155,6 +158,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_wasAlive = true;
 		m_dead = false;
 		m_wasDead = false;
+		m_godMode = false;
 		m_health = MAX_HEALTH;
 		m_lives = lives;
 		m_coins = coins;
@@ -169,6 +173,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_powerupsFactory = new PowerupsFactory();
 		m_explosionFactory = new ExplosionFactory();
 		m_staticObjectFactory = new StaticObjectFactory(m_world);
+		m_cheatCodeHandler = new CheatCodeHandler(this);
 
 		m_tossingSomething = false;
 		m_pickupItemButtonPressed = false;
@@ -197,7 +202,12 @@ public class Duke implements ContactListener, HUDDataProvider {
 				m_pickupItems.add(m_pickupItemFactory.createBarrel(objectPosition));
 			}
 			else if(mapObject.getName().equalsIgnoreCase("burger")) {
-				m_pickupItems.add(m_pickupItemFactory.createBurger(objectPosition));
+				if(m_burger != null) {
+					System.err.println("Level has more than one burger.");
+				}
+
+				m_burger = m_pickupItemFactory.createBurger(objectPosition);
+				m_pickupItems.add(m_burger);
 			}
 			else if(mapObject.getName().equalsIgnoreCase("cola")) {
 				m_powerups.add(m_powerupsFactory.createCola(objectPosition));
@@ -370,7 +380,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	}
 
 	public void removeHealth() {
-		if(m_levelCompleted) {
+		if(m_godMode || m_levelCompleted) {
 			return;
 		}
 
@@ -381,12 +391,24 @@ public class Duke implements ContactListener, HUDDataProvider {
 		}
 	}
 
+	public void setHealth(int health) {
+		if(health <= 0) {
+			m_health = 0;
+
+			kill();
+
+			return;
+		}
+
+		m_health = health;
+	}
+
 	public void addLife() {
 		m_lives++;
 	}
 
 	public void removeLife() {
-		if(m_levelCompleted) {
+		if(m_godMode || m_levelCompleted) {
 			return;
 		}
 
@@ -396,6 +418,14 @@ public class Duke implements ContactListener, HUDDataProvider {
 		}
 
 		m_lives--;
+	}
+
+	public void setLives(int lives) {
+		if(lives < 0) {
+			return;
+		}
+
+		m_lives = lives;
 	}
 
 	public void addCoin() {
@@ -408,6 +438,10 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 			addLife();
 		}
+	}
+
+	public void setCoins(int coins) {
+		m_coins = coins;
 	}
 
 	public Vector2 getOriginPosition() {
@@ -495,7 +529,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	}
 
 	public void kill() {
-		if(m_levelCompleted) {
+		if(m_godMode || m_levelCompleted) {
 			return;
 		}
 
@@ -545,7 +579,50 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_listener = listener;
 	}
 
+	public boolean isGodModeEnabled() {
+		return m_godMode;
+	}
+
+	public void setGodModeEnabled(boolean godModeEnabled) {
+		m_godMode = godModeEnabled;
+	}
+
+	public void toggleGodMode() {
+		setGodModeEnabled(!m_godMode);
+	}
+
+	public void warpLevel(int levelNumber) {
+		m_listener.onLevelWarpRequested(levelNumber);
+	}
+
+	public void pickupBurger() {
+		if(m_pickupItem != null) {
+			dropItem();
+		}
+		else if(m_pickupEnemy != null) {
+			tossEnemy();
+		}
+
+		pickupItem(m_burger);
+	}
+
+	public void enableDebugCamera() {
+		m_listener.onDebugCameraEnableRequested();
+	}
+
+	public void teleportToDoor() {
+		m_jumping = false;
+		m_tossingSomething = false;
+		m_acceleration.x = 0.0f;
+		m_acceleration.y = 0.0f;
+
+		m_body.setLinearVelocity(0.0f, 0.0f);
+		m_body.setTransform(new Vector2(m_door.getOriginPosition()).sub(16.0f * 2.0f, 0.0f), 0.0f);
+	}
+
 	public void render(SpriteBatch spriteBatch) {
+		boolean enteringCheatCode = m_cheatCodeHandler.handleCheatCodeInput();
+
 		float deltaTime = Gdx.graphics.getDeltaTime();
 
 		if(m_body.getPosition().y + getSize().y < 0.0f) {
@@ -617,12 +694,12 @@ public class Duke implements ContactListener, HUDDataProvider {
 	
 			m_walking = false;
 	
-			if(Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.LEFT)) {
+			if(!enteringCheatCode && (Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.LEFT))) {
 				m_facingLeft = true;
 				m_walking = true;
 				m_acceleration.x = -ACCELERATION;
 			}
-			else if(Gdx.input.isKeyPressed(Keys.D) || Gdx.input.isKeyPressed(Keys.RIGHT)) {
+			else if(!enteringCheatCode && (Gdx.input.isKeyPressed(Keys.D) || Gdx.input.isKeyPressed(Keys.RIGHT))) {
 				m_facingLeft = false;
 				m_walking = true;
 				m_acceleration.x = ACCELERATION;
@@ -633,7 +710,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 			Vector2 newVelocity = new Vector2(m_body.getLinearVelocity());
 
-			if((Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.Z))) {
+			if(!enteringCheatCode && (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.Z))) {
 				if(!m_jumping && !m_tossingSomething && !m_groundContactFixtures.isEmpty()) {
 					m_jumping = true;
 					m_jumpTimeElapsed = 0.0f;
@@ -682,13 +759,13 @@ public class Duke implements ContactListener, HUDDataProvider {
 				}
 			}
 
-			if(Gdx.input.isKeyPressed(Keys.G)) {
+			if(!enteringCheatCode && Gdx.input.isKeyPressed(Keys.G)) {
 				if(m_pickupItem != null) {
 					dropItem();
 				}
 			}
 
-			if(Gdx.input.isKeyPressed(Keys.E) || Gdx.input.isKeyPressed(Keys.F) || Gdx.input.isKeyPressed(Keys.X)) {
+			if(!enteringCheatCode && (Gdx.input.isKeyPressed(Keys.E) || Gdx.input.isKeyPressed(Keys.F) || Gdx.input.isKeyPressed(Keys.X))) {
 				if(!m_pickupItemButtonPressed) {
 					m_pickupItemButtonPressed = true;
 	
