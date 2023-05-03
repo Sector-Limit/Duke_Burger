@@ -54,10 +54,10 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 	private Vector2 m_acceleration;
 	private boolean m_facingLeft;
-	private boolean m_grounded;
 	private boolean m_walking;
 	private boolean m_jumping;
 	private float m_jumpTimeElapsed;
+	private Vector<Fixture> m_groundContactFixtures;
 	private float m_walkDuration;
 	private boolean m_underAttack;
 	private boolean m_recentlyAttacked;
@@ -145,6 +145,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_world = world;
 		m_world.setContactListener(this);
 
+		m_groundContactFixtures = new Vector<Fixture>();
 		m_underAttack = false;
 		m_recentlyAttacked = false;
 		m_attackCooldownTimeElapsed = 0.0f;
@@ -167,7 +168,6 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_explosionFactory = new ExplosionFactory();
 		m_staticObjectFactory = new StaticObjectFactory(m_world);
 
-		m_grounded = false;
 		m_tossingSomething = false;
 		m_pickupItemButtonPressed = false;
 		m_pickupItems = new Vector<PickupItem>();
@@ -632,7 +632,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 			Vector2 newVelocity = new Vector2(m_body.getLinearVelocity());
 			
 			if((Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.Z))) {
-				if(!m_jumping && !m_tossingSomething && m_grounded) {
+				if(!m_jumping && !m_tossingSomething && !m_groundContactFixtures.isEmpty()) {
 					m_jumping = true;
 					m_jumpTimeElapsed = 0.0f;
 				}
@@ -926,16 +926,10 @@ public class Duke implements ContactListener, HUDDataProvider {
 		if(isPlayerContact) {
 			if(contactObject == null) {
 				if(isPlayerFeetContact) {
+					m_groundContactFixtures.add(contactFixture);
+
 					m_jumping = false;
 					m_tossingSomething = false;
-					m_grounded = true;
-				}
-			}
-			else if(contactObject instanceof PickupItem) {
-				if(isPlayerFeetContact) {
-					m_jumping = false;
-					m_tossingSomething = false;
-					m_grounded = true;
 				}
 			}
 			else if(contactObject instanceof Enemy) {
@@ -944,7 +938,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 				if(enemy instanceof OctaBaby) {
 					OctaBaby octaBaby = (OctaBaby) enemy;
 
-					if((!m_grounded && m_body.getLinearVelocity().y < 0.0f) && !m_recentlyAttacked && contactFixture.isSensor()) {
+					if((m_groundContactFixtures.isEmpty() && m_body.getLinearVelocity().y < 0.0f) && !m_recentlyAttacked && contactFixture.isSensor()) {
 						m_squishSound.play();
 						octaBaby.squish();
 					}
@@ -1053,10 +1047,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 		if(isPlayerFeetContact) {
 			if(contactObject == null) {
-				m_grounded = false;
-			}
-			else if(contactObject instanceof PickupItem) {
-				m_grounded = false;
+				m_groundContactFixtures.remove(contactFixture);
 			}
 		}
 	}
