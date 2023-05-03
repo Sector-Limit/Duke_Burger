@@ -309,8 +309,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 		collisionFixture.setUserData("body");
 
 		Vector2 halfSize = new Vector2(getSize()).scl(0.5f);
-		float halfSensorWidth = halfSize.x * 0.8f;
-		float halfSensorHeight = halfSize.y * 0.8f;
+		float halfSensorWidth = halfSize.x * 0.99f;
+		float halfSensorHeight = halfSize.y * 0.99f;
 		BodyDef bottomSensorBodyDefinition = new BodyDef();
 		bottomSensorBodyDefinition.fixedRotation = true;
 		PolygonShape bottomPolygonCollisionShape = new PolygonShape();
