@@ -688,23 +688,24 @@ public class GifDecoder {
     }
 
     public Animation<TextureRegion> getAnimation(PlayMode playMode) {
-        int nrFrames = getFrameCount();
+        int numberOfFrames = getFrameCount();
         Pixmap frame = getFrame(0);
         int width = frame.getWidth();
         int height = frame.getHeight();
-        int vzones = (int)Math.sqrt((double)nrFrames);
+        int vzones = (int) Math.sqrt((double) numberOfFrames);
         int hzones = vzones;
 
-        while(vzones * hzones < nrFrames) vzones++;
-
-        int v, h;
+        while(vzones * hzones < numberOfFrames) {
+        	vzones++;
+        }
 
         Pixmap target = new Pixmap(width * hzones, height * vzones, Pixmap.Format.RGBA8888);
 
-        for(h = 0; h < hzones; h++) {
-            for(v = 0; v < vzones; v++) {
+        for(int h = 0; h < hzones; h++) {
+            for(int v = 0; v < vzones; v++) {
                 int frameID = v + h * vzones;
-                if(frameID < nrFrames) {
+
+                if(frameID < numberOfFrames) {
                     frame = getFrame(frameID);
                     target.drawPixmap(frame, h * width, v * height);
                 }
@@ -712,27 +713,32 @@ public class GifDecoder {
         }
 
         Texture texture = new Texture(target);
-        Array<TextureRegion> texReg = new Array<TextureRegion>();
+        Array<TextureRegion> textureRegions = new Array<TextureRegion>();
+        int frameNumber = 0;
+        int textureRegionCount = 0;
+        TextureRegion textureRegion = null;
 
-        for(h = 0; h < hzones; h++) {
-            for(v = 0; v < vzones; v++) {
+        for(int h = 0; h < hzones; h++) {
+            for(int v = 0; v < vzones; v++) {
                 int frameID = v + h * vzones;
-                if(frameID < nrFrames) {
-                    TextureRegion tr = new TextureRegion(texture, h * width, v * height, width, height);
-                    texReg.add(tr);
+
+                if(frameID < numberOfFrames) {
+                	textureRegionCount = getDelay(frameNumber++) / 100;
+                	textureRegion = new TextureRegion(texture, h * width, v * height, width, height);
+
+                	for(int i = 0; i < textureRegionCount; i++) {
+                		textureRegions.add(textureRegion);
+                	}
                 }
             }
         }
-        float frameDuration = (float)getDelay(0);
-        frameDuration /= 1000; // convert milliseconds into seconds
-        Animation<TextureRegion> result = new Animation<TextureRegion>(frameDuration, texReg, playMode);
 
-        return result;
+        return new Animation<TextureRegion>(0.1f, textureRegions, playMode);
     }
 
     public static Animation<TextureRegion> loadGIFAnimation(Animation.PlayMode playMode, InputStream is) {
-        GifDecoder gdec = new GifDecoder();
-        gdec.read(is);
-        return gdec.getAnimation(playMode);
+        GifDecoder gifDecoder = new GifDecoder();
+        gifDecoder.read(is);
+        return gifDecoder.getAnimation(playMode);
     }
 } 
