@@ -891,7 +891,6 @@ public class Duke implements ContactListener, HUDDataProvider {
 								}
 								else if(getOriginPosition().dst(pickupItem.getOriginPosition()) < getOriginPosition().dst(closestPickupItem.getOriginPosition())) {
 									closestPickupItem = pickupItem;
-									break;
 								}
 							}
 							
