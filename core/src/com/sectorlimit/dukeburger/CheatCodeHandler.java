@@ -65,13 +65,14 @@ public class CheatCodeHandler implements InputProcessor {
 			System.out.println("God mode " + (m_duke.isGodModeEnabled() ? "enabled" : "disabled") + ".");
 		}
 		else if(cheatCode == 1) {
-			System.out.println("Giving max lives and health.");
+			System.out.println("Giving max lives, health, and a barrel.");
 
 			if(m_duke.getLives() < Duke.MAX_LIVES) {
 				m_duke.setLives(Duke.MAX_LIVES);
 			}
 
 			m_duke.setHealth(Duke.MAX_HEALTH);
+			m_duke.giveBarrel();
 		}
 		else if(cheatCode == 2) {
 			System.out.println("Warping to level " + special + ".");

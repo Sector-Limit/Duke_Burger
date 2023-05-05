@@ -585,6 +585,10 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_tossSound.play();
 	}
 
+	public void giveBarrel() {
+		m_pickupItems.add(m_pickupItemFactory.createBarrel(getOriginPosition()));
+	}
+
 	public void kill() {
 		kill(false);
 	}
