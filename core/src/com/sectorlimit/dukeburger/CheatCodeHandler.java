@@ -22,7 +22,8 @@ public class CheatCodeHandler implements InputProcessor {
 		"BRULLOV", // teleport to exit door
 		"NITRO",   // toggle player flipped upside down
 		"HYPER",   // toggle steroids
-		"GRAV"     // toggle low gravity
+		"GRAV",    // toggle low gravity
+		"KILL"     // suicide
 	};
 
 	public CheatCodeHandler(Duke duke) {
@@ -110,6 +111,11 @@ public class CheatCodeHandler implements InputProcessor {
 			System.out.println("Toggling low gravity.");
 
 			m_duke.toggleLowGravity();
+		}
+		else if(cheatCode == 10) {
+			System.out.println("Suicided.");
+
+			m_duke.kill();
 		}
 	}
 
