@@ -23,7 +23,8 @@ public class CheatCodeHandler implements InputProcessor {
 		"NITRO",   // toggle player flipped upside down
 		"HYPER",   // toggle steroids
 		"GRAV",    // toggle low gravity
-		"KILL"     // suicide
+		"KILL",    // suicide
+		"THANOS"   // kill all enemies
 	};
 
 	public CheatCodeHandler(Duke duke) {
@@ -116,6 +117,11 @@ public class CheatCodeHandler implements InputProcessor {
 			System.out.println("Suicided.");
 
 			m_duke.kill();
+		}
+		else if(cheatCode == 11) {
+			System.out.println("Killing all enemies.");
+
+			m_duke.killAllEnemies();
 		}
 	}
 

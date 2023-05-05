@@ -640,6 +640,12 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_listener = listener;
 	}
 
+	public void killAllEnemies() {
+		for(Enemy enemy : m_enemies) {
+			enemy.kill();
+		}
+	}
+
 	public boolean isGodModeEnabled() {
 		return m_godMode;
 	}
