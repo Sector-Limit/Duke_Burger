@@ -70,6 +70,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private boolean m_wasAlive;
 	private boolean m_dead;
 	private boolean m_wasDead;
+	private float m_timeElapsedSinceKilled;
 	private boolean m_godMode;
 	private boolean m_flipped;
 	private boolean m_steroids;
@@ -170,6 +171,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_wasAlive = true;
 		m_dead = false;
 		m_wasDead = false;
+		m_timeElapsedSinceKilled = 0.0f;
 		m_godMode = false;
 		m_flipped = false;
 		m_steroids = false;
@@ -730,7 +732,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 			if(m_alive) {
 				kill(true);
 			}
-			else {
+			else if(m_timeElapsedSinceKilled > 0.25f) {
 				m_dead = true;
 			}
 		}
@@ -760,9 +762,12 @@ public class Duke implements ContactListener, HUDDataProvider {
 				firstFixture.setFilterData(disabledFilter);
 				m_body.setLinearVelocity(new Vector2(((((int) (Math.random() * 2.0)) == 0) ? -1.0f : 1.0f) * ((float) (Math.random() * 30.0) + 30.0f), ((float) (Math.random() * 50.0) + 100.0f)));
 				m_body.setActive(true);
+				m_timeElapsedSinceKilled = 0.0f;
 
 				m_listener.onKilled();
 			}
+
+			m_timeElapsedSinceKilled += deltaTime;
 		}
 
 		if(m_alive) {
