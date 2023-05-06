@@ -68,6 +68,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	private Sound m_subwayMusic;
 	private Sound m_burgerPeopleMusic;
 	private Sound m_astroLoungeMusic;
+	private boolean m_musicPlaying;
 
 	public static final Vector2 VIEWPORT_SIZE = new Vector2(320.0f, 180.0f);
 	private static final float PHYSICS_TIME_STEMP = 1 / 60.f;
@@ -93,6 +94,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		m_currentLevelNumber = 1;
 		m_lives = Duke.MAX_LIVES;
 		m_coins = 0;
+		m_musicPlaying = false;
 
 		m_camera = new OrthographicCamera(VIEWPORT_SIZE.x, VIEWPORT_SIZE.y);
 		m_debugCameraEnabled = DEBUG_CAMERA_ENABLED;
@@ -109,12 +111,15 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 			m_subwayMusic = Gdx.audio.newSound(Gdx.files.internal("music/subway.mp3"));
 			m_burgerPeopleMusic = Gdx.audio.newSound(Gdx.files.internal("music/burger_people.mp3"));
 			m_astroLoungeMusic = Gdx.audio.newSound(Gdx.files.internal("music/subway.mp3"));
-
-			m_themeMusic.loop(MUSIC_VOLUME);
 		}
 
 		if(Gdx.app.getType() == Application.ApplicationType.Desktop) {
 			m_introAnimation = GifDecoder.loadGIFAnimation(Animation.PlayMode.NORMAL, Gdx.files.internal("ui/intro.gif").read());
+
+			if(MUSIC_ENABLED) {
+				m_themeMusic.loop(MUSIC_VOLUME);
+				m_musicPlaying = true;
+			}
 		}
 
 		m_titleScreenSheetTexture = new Texture(Gdx.files.internal("ui/duke_burger_menu_animation.png"));
@@ -387,6 +392,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 					if(music != null && MUSIC_ENABLED) {
 						music.loop(MUSIC_VOLUME);
+						m_musicPlaying = true;
 					}
 				}
 			}
@@ -508,6 +514,11 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 				m_showIntro = true;
 				m_elapsedIntroAnimationTime = 0.0f;
+
+				if(!m_musicPlaying && MUSIC_ENABLED) {
+					m_themeMusic.loop(MUSIC_VOLUME);
+					m_musicPlaying = true;
+				}
 			}
 
 			return;
