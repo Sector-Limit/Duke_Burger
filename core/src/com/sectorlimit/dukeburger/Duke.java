@@ -469,12 +469,12 @@ public class Duke implements ContactListener, HUDDataProvider {
 			return;
 		}
 
+		m_lives--;
+
 		if(m_lives <= 0) {
 			m_gameOver = true;
 			return;
 		}
-
-		m_lives--;
 	}
 
 	public void setLives(int lives) {
