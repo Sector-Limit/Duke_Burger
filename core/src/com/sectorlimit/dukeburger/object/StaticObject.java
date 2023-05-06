@@ -52,13 +52,13 @@ public abstract class StaticObject {
 
 		if(m_animation != null) {
 			float deltaTime = Gdx.graphics.getDeltaTime();
-	
+
 			m_elapsedAnimationTime += deltaTime;
-	
+
 			if(m_elapsedAnimationTime >= m_animation.getAnimationDuration()) {
 				m_elapsedAnimationTime = m_elapsedAnimationTime % m_animation.getAnimationDuration();
 			}
-	
+
 			TextureRegion currentAnimationTextureRegion = m_animation.getKeyFrame(m_elapsedAnimationTime, true);
 			spriteBatch.draw(currentAnimationTextureRegion, renderOrigin.x, renderOrigin.y);
 		}

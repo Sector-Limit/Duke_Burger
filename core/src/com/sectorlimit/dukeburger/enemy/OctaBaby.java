@@ -129,9 +129,9 @@ public class OctaBaby extends BasicEnemy {
 					if(m_body.isActive()) {
 						m_body.setActive(false);
 					}
-		
+
 					m_squishedTimeElapsed += deltaTime;
-		
+
 					if(m_squishedTimeElapsed >= MAX_SQUISHED_DURATION) {
 						unsquish();
 					}
@@ -146,13 +146,13 @@ public class OctaBaby extends BasicEnemy {
 
 		Texture currentTexture = null;
 		TextureRegion currentTextureRegion = null;
-	
+
 		if(m_squished) {
 			currentTexture = m_octaBabySquishedTexture;
 		}
 		else {
 			m_elapsedAnimationTime += deltaTime;
-			
+
 			if(m_elapsedAnimationTime >= m_octaBabyWalkAnimation.getAnimationDuration()) {
 				m_elapsedAnimationTime = m_elapsedAnimationTime % m_octaBabyWalkAnimation.getAnimationDuration();
 			}
@@ -173,9 +173,9 @@ public class OctaBaby extends BasicEnemy {
 			if(!m_facingLeft) {
 				currentTextureRegion.flip(true, false);
 			}
-	
+
 			spriteBatch.draw(currentTextureRegion, renderOrigin.x, renderOrigin.y);
-	
+
 			if(!m_facingLeft) {
 				currentTextureRegion.flip(true, false);
 			}

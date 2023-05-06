@@ -81,5 +81,5 @@ public abstract class BasicEnemy extends Enemy {
 
 		m_body.setLinearVelocity(new Vector2((m_facingLeft ? -1.0f : 1.0f) * HORIZONTAL_VELOCITY, 0.0f));
 	}
-	
+
 }

@@ -87,7 +87,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 			texture = t;
 			delay = d;
 		}
-		
+
 	}
 
 	@Override
@@ -210,7 +210,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 					System.err.println("Map has polygon collision with invalid number of vertices: " + polygonCollisionVertices.length + ". Expected between 3 and 8 vertices.");
 					continue;
 				}
-				
+
 				BodyDef groundTileBodyDefinition = new BodyDef();
 				groundTileBodyDefinition.position.set(new Vector2(polygonCollision.getX(), polygonCollision.getY()));
 				Body collisionObjectBody = m_world.createBody(groundTileBodyDefinition);
@@ -351,10 +351,10 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		if(mapProperties != null) {
 			if(mapProperties.containsKey("background")) {
 				Object backgroundTypeObject = mapProperties.get("background");
-	
+
 				if(backgroundTypeObject instanceof String) {
 					String backgroundType = (String) backgroundTypeObject;
-	
+
 					if(backgroundType.equalsIgnoreCase("city")) {
 						m_skyTexture = m_citySkyTexture;
 					}
@@ -366,7 +366,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 			if(mapProperties.containsKey("music")) {
 				Object musicTypeObject = mapProperties.get("music");
-				
+
 				if(musicTypeObject instanceof String) {
 					String musicType = (String) musicTypeObject;
 
@@ -461,7 +461,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 		if(m_showTitleScreen) {
 			m_elapsedTitleScreenAnimationTime += deltaTime;
-			
+
 			if(m_elapsedTitleScreenAnimationTime >= m_titleScreenAnimation.getAnimationDuration()) {
 				m_elapsedTitleScreenAnimationTime = m_elapsedTitleScreenAnimationTime % m_titleScreenAnimation.getAnimationDuration();
 			}
@@ -494,24 +494,24 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		if(m_showIntro) {
 			if(m_introAnimation != null) {
 				m_elapsedIntroAnimationTime += deltaTime;
-	
+
 				m_spriteBatch.begin();
-	
+
 				m_uiStage.getViewport().apply();
 				m_uiStage.draw();
-	
+
 				Texture introFrameTexture = m_introAnimation.getKeyFrame(m_elapsedIntroAnimationTime);
 				m_spriteBatch.draw(introFrameTexture, 0.0f, 0.0f, 0.0f, 0.0f, introFrameTexture.getWidth(), introFrameTexture.getHeight(), 1.0f, 1.0f, 0.0f, 0, 0, introFrameTexture.getWidth(), introFrameTexture.getHeight(), false, false);
 
 				m_spriteBatch.end();
-	
+
 				if((Gdx.input.isKeyPressed(Keys.ESCAPE) || Gdx.input.isKeyPressed(Keys.BUTTON_START) || Gdx.input.isKeyPressed(Keys.BUTTON_SELECT) || Gdx.input.isKeyPressed(Keys.BUTTON_A)) || m_elapsedIntroAnimationTime >= m_introAnimation.getAnimationDuration()) {
 					m_showIntro = false;
 					m_elapsedIntroAnimationTime = 0.0f;
-				
+
 					startBrandNewGame();
 				}
-	
+
 				return;
 			}
 			else {
@@ -529,19 +529,19 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 			if(Gdx.input.isKeyPressed(Keys.NUMPAD_4)) {
 				m_cameraOffset.add(-CAMERA_SPEED, 0);
 			}
-	
+
 			if(Gdx.input.isKeyPressed(Keys.NUMPAD_6)) {
 				m_cameraOffset.add(CAMERA_SPEED, 0);
 			}
-	
+
 			if(Gdx.input.isKeyPressed(Keys.NUMPAD_8)) {
 				m_cameraOffset.add(0, CAMERA_SPEED);
 			}
-	
+
 			if(Gdx.input.isKeyPressed(Keys.NUMPAD_2)) {
 				m_cameraOffset.add(0, -CAMERA_SPEED);
 			}
-	
+
 			if(Gdx.input.isKeyPressed(Keys.NUMPAD_5)) {
 				m_cameraOffset.set(0.0f, 0.0f);
 			}
@@ -549,10 +549,10 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 		m_physicsTimeAccumulator += deltaTime;
 
-	    while(m_physicsTimeAccumulator >= PHYSICS_TIME_STEMP) {
-	    	m_world.step(PHYSICS_TIME_STEMP, PHYSICS_VELOCITY_ITERATIONS, PHYSICS_POSITION_ITERATIONS);
-	    	m_physicsTimeAccumulator -= PHYSICS_TIME_STEMP;
-	    }
+		while(m_physicsTimeAccumulator >= PHYSICS_TIME_STEMP) {
+			m_world.step(PHYSICS_TIME_STEMP, PHYSICS_VELOCITY_ITERATIONS, PHYSICS_POSITION_ITERATIONS);
+			m_physicsTimeAccumulator -= PHYSICS_TIME_STEMP;
+		}
 
 		Vector2 newCameraPosition = new Vector2(m_duke.getCenterPosition().x, VIEWPORT_SIZE.y / 2.0f).add(m_cameraOffset);
 
@@ -570,7 +570,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 			m_uiStage.draw();
 
 			m_spriteBatch.draw(m_skyTexture, 0.0f, 0.0f, 0.0f, 0.0f, m_skyTexture.getWidth(), m_skyTexture.getHeight(), 1.0f, 1.0f, 0.0f, 0, 0, m_skyTexture.getWidth(), m_skyTexture.getHeight(), false, false);
-	
+
 			m_spriteBatch.end();
 		}
 

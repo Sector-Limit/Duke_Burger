@@ -616,7 +616,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		if(m_levelCompleted) {
 			return false;
 		}
-		
+
 		m_levelCompleted = true;
 		m_levelEnded = false;
 		m_levelCompletedTimeElapsed = 0.0f;
@@ -742,7 +742,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 					m_listener.onDead();
 				}
 			}
-			
+
 			return;
 		}
 
@@ -769,7 +769,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 				if(!m_levelEnded) {
 					m_levelCompletedTimeElapsed += deltaTime;
-		
+
 					if(m_levelCompletedTimeElapsed >= LEVEL_COMPLETED_DELAY) {
 						m_levelEnded = true;
 
@@ -780,9 +780,9 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 			if(m_underAttack) {
 				m_attackCooldownTimeElapsed += deltaTime;
-				
+
 				m_recentlyAttacked = m_attackCooldownTimeElapsed < RECENTLY_ATTACKED_DURATION;
-	
+
 				if(m_attackCooldownTimeElapsed > ATTACK_COOLDOWN) {
 					m_underAttack = false;
 					m_recentlyAttacked = false;
@@ -806,7 +806,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 					}
 				}
 			}
-	
+
 			m_walking = false;
 
 			if(!enteringCheatCode && (Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.LEFT) || Gdx.input.isKeyPressed(Keys.DPAD_LEFT) || Gdx.input.isKeyPressed(Keys.BUTTON_THUMBL))) {
@@ -844,10 +844,10 @@ public class Duke implements ContactListener, HUDDataProvider {
 			else {
 				m_jumpTimeElapsed = JUMP_DURATION;
 			}
-	
+
 			if(m_walking) {
 				m_walkDuration += deltaTime;
-	
+
 				if(m_walkDuration >= m_walkAnimation.getAnimationDuration()) {
 					m_walkDuration = m_walkDuration % m_walkAnimation.getAnimationDuration();
 				}
@@ -865,7 +865,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 			if(m_acceleration.x == 0.0f) {
 				newVelocity.x *= 0.75f;
 			}
-	
+
 			if(newVelocity.x > MAX_HORIZONTAL_VELOCITY) {
 				newVelocity.x = MAX_HORIZONTAL_VELOCITY;
 			}
@@ -892,7 +892,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 			if(!enteringCheatCode && (Gdx.input.isKeyPressed(Keys.E) || Gdx.input.isKeyPressed(Keys.F) || Gdx.input.isKeyPressed(Keys.X) || Gdx.input.isKeyPressed(Keys.BUTTON_X))) {
 				if(!m_pickupItemButtonPressed) {
 					m_pickupItemButtonPressed = true;
-	
+
 					if(!isHoldingSomething()) {
 						for(Enemy enemy : m_enemies) {
 							if(enemy.isPickupable() && getOriginPosition().dst(enemy.getOriginPosition()) <= (getSize().x / 2.0f) + (enemy.getSize().x / 2.0f)) {
@@ -900,7 +900,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 								break;
 							}
 						}
-	
+
 						if(!isHoldingSomething()) {
 							PickupItem closestPickupItem = null;
 
@@ -912,7 +912,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 									closestPickupItem = pickupItem;
 								}
 							}
-							
+
 							if(closestPickupItem != null && getOriginPosition().dst(closestPickupItem.getOriginPosition()) <= (getSize().x / 2.0f) + closestPickupItem.getSize().x) {
 								pickupItem(closestPickupItem);
 							}
@@ -931,9 +931,9 @@ public class Duke implements ContactListener, HUDDataProvider {
 			else {
 				m_pickupItemButtonPressed = false;
 			}
-	
+
 			float pickupObjectVerticalOffset = -1.0f;
-	
+
 			if(m_pickupItem != null) {
 				if(m_pickupItem instanceof Burger) {
 					if(m_jumping) {
@@ -943,7 +943,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 						pickupObjectVerticalOffset = -2.5f;
 					}
 				}
-	
+
 				m_pickupItem.setPosition(getOriginPosition().add(new Vector2(1.0f, getSize().y + pickupObjectVerticalOffset)));
 			}
 			else if(m_pickupEnemy != null) {
@@ -1239,7 +1239,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 			else {
 				PickupItem tossedPickupItem = null;
 				Object otherContactObject = null;
-	
+
 				if(contactObjectA instanceof PickupItem && ((PickupItem) contactObjectA).isTossed()) {
 					tossedPickupItem = (PickupItem) contactObjectA;
 					otherContactObject = contactObjectB;
@@ -1248,15 +1248,15 @@ public class Duke implements ContactListener, HUDDataProvider {
 					tossedPickupItem = (PickupItem) contactObjectB;
 					otherContactObject = contactObjectA;
 				}
-	
+
 				if(tossedPickupItem != null) {
 					if(tossedPickupItem instanceof Barrel) {
 						m_explosions.add(m_explosionFactory.createExplosion(new Vector2(tossedPickupItem.getOriginPosition())));
 					}
-	
+
 					tossedPickupItem.onImpact();
 					tossedPickupItem.destroy();
-	
+
 					if(otherContactObject instanceof Enemy) {
 						Enemy enemy = (Enemy) otherContactObject;
 						enemy.kill();
@@ -1264,7 +1264,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 					else if(tossedPickupItem instanceof Box) {
 						int randomNumber = (int) (Math.random() * 100.0);
 						Vector2 newItemPosition = new Vector2(tossedPickupItem.getOriginPosition());
-	
+
 						if(randomNumber < 10) {
 							m_powerups.add(m_powerupsFactory.createChicken(newItemPosition));
 						}
@@ -1288,10 +1288,10 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 					if(enemy != null) {
 						Object enemyFixtureTypeObject = enemyFixture.getUserData();
-	
+
 						if(enemyFixtureTypeObject instanceof String) {
 							String enemyFixtureType = (String) enemyFixtureTypeObject;
-	
+
 							if(enemyFixtureType.equalsIgnoreCase("left")) {
 								enemy.onCollideWithWall(true);
 							}

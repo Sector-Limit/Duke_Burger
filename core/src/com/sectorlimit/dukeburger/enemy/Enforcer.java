@@ -41,10 +41,10 @@ public class Enforcer extends Enemy {
 		return ENFORCER_SIZE;
 	}
 
-    @Override
-    public boolean shouldRandomizeInitialDirection() {
-        return false;
-    }
+	@Override
+	public boolean shouldRandomizeInitialDirection() {
+		return false;
+	}
 
 	public void assignPhysics(World world, Vector2 position) {
 		BodyDef bodyDefinition = new BodyDef();
@@ -98,10 +98,10 @@ public class Enforcer extends Enemy {
 
 		Texture currentTexture = null;
 		TextureRegion currentTextureRegion = null;
-	
+
 		if(m_alive) {
 			m_elapsedAnimationTime += deltaTime;
-			
+
 			if(m_elapsedAnimationTime >= m_enforcerAnimation.getAnimationDuration()) {
 				m_elapsedAnimationTime = m_elapsedAnimationTime % m_enforcerAnimation.getAnimationDuration();
 			}
@@ -121,9 +121,9 @@ public class Enforcer extends Enemy {
 			if(!m_facingLeft) {
 				currentTextureRegion.flip(true, false);
 			}
-	
+
 			spriteBatch.draw(currentTextureRegion, renderOrigin.x, renderOrigin.y);
-	
+
 			if(!m_facingLeft) {
 				currentTextureRegion.flip(true, false);
 			}

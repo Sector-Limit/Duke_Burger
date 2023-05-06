@@ -107,7 +107,7 @@ public class Octa extends Enemy {
 
 		Texture currentTexture = null;
 		TextureRegion currentTextureRegion = null;
-	
+
 		if(m_alive) {
 			if(m_rising) {
 				currentTextureRegion = m_octaRisingTextureRegion;
@@ -129,9 +129,9 @@ public class Octa extends Enemy {
 			if(!m_facingLeft) {
 				currentTextureRegion.flip(true, false);
 			}
-	
+
 			spriteBatch.draw(currentTextureRegion, renderOrigin.x, renderOrigin.y);
-	
+
 			if(!m_facingLeft) {
 				currentTextureRegion.flip(true, false);
 			}

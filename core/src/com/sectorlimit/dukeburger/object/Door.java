@@ -105,5 +105,5 @@ public class Door extends StaticObject {
 		Vector2 renderOrigin = new Vector2(getOriginPosition()).sub(new Vector2(getSize()).scl(0.5f));
 		spriteBatch.draw(doorTextureRegion, renderOrigin.x, renderOrigin.y);
 	}
-		
+
 }

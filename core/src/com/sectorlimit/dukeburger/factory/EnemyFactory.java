@@ -53,11 +53,11 @@ public class EnemyFactory {
 		for(Type type : OctaBaby.Type.values()) {
 			TextureRegion[][] octaBabyWalkTextureRegion = TextureRegion.split(m_octaBabyWalkSheetTextures[type.ordinal()], m_octaBabyWalkSheetTextures[type.ordinal()].getWidth() / NUMBER_OF_OCTA_BABY_WALK_FRAMES, m_octaBabyWalkSheetTextures[type.ordinal()].getHeight());
 			TextureRegion[] octaBabyWalkFrames = new TextureRegion[NUMBER_OF_OCTA_BABY_WALK_FRAMES];
-	
+
 			for(int i = 0; i < NUMBER_OF_OCTA_BABY_WALK_FRAMES; i++) {
 				octaBabyWalkFrames[i] = octaBabyWalkTextureRegion[0][i];
 			}
-	
+
 			m_octaBabyWalkAnimations.add(new Animation<TextureRegion>(0.2f, octaBabyWalkFrames));
 		}
 
