@@ -7,10 +7,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.sectorlimit.dukeburger.CollisionCategories;
@@ -52,17 +52,18 @@ public class Enforcer extends Enemy {
 		bodyDefinition.position.set(position);
 		m_body = world.createBody(bodyDefinition);
 		m_body.setUserData(this);
-		PolygonShape polygonCollisionShape = new PolygonShape();
-		polygonCollisionShape.setAsBox(getSize().x / 2.0f, getSize().y / 2.0f);
+		CircleShape circleCollisionShape = new CircleShape();
+		circleCollisionShape.setRadius(getSize().y * 0.5f);
+		circleCollisionShape.setPosition(new Vector2(0.0f, 0.5f));
 		FixtureDef sensorFixtureDefinition = new FixtureDef();
-		sensorFixtureDefinition.shape = polygonCollisionShape;
+		sensorFixtureDefinition.shape = circleCollisionShape;
 		sensorFixtureDefinition.isSensor = true;
 		Fixture sensorCollisionFixture = m_body.createFixture(sensorFixtureDefinition);
 		Filter sensorCollisionFilter = new Filter();
 		sensorCollisionFilter.categoryBits = CollisionCategories.ENEMY_SENSOR;
 		sensorCollisionFilter.maskBits = CollisionCategories.OBJECT | CollisionCategories.DUKE;
 		sensorCollisionFixture.setFilterData(sensorCollisionFilter);
-		polygonCollisionShape.dispose();
+		circleCollisionShape.dispose();
 	}
 
 	@Override
