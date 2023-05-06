@@ -1074,6 +1074,9 @@ public class Duke implements ContactListener, HUDDataProvider {
 				currentTexture = m_jumpTexture;
 			}
 		}
+		else if(!m_jumping && !m_tossingSomething && m_feetGroundContactFixtures.isEmpty()) {
+			currentTexture = m_jumpTexture;
+		}
 		else if(m_walking) {
 			if(isHoldingSomething()) {
 				currentTextureRegion = m_walkHoldAnimation.getKeyFrame(m_walkDuration, true);
