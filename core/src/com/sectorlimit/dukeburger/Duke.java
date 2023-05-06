@@ -673,6 +673,10 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_listener.onLevelWarpRequested(levelNumber);
 	}
 
+	public void warpTestLevel(int levelNumber) {
+		m_listener.onTestLevelWarpRequested(levelNumber);
+	}
+
 	public void pickupBurger() {
 		if(m_pickupItem != null) {
 			dropItem();

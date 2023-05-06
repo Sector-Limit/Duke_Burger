@@ -2,12 +2,13 @@ package com.sectorlimit.dukeburger;
 
 public interface DukeListener {
 
-	public abstract void onKilled();
-	public abstract void onDead();
-	public abstract void onLevelCompleted();
-	public abstract void onLevelEnded();
-	public abstract void onGameOver();
-	public abstract void onLevelWarpRequested(int levelNumber);
-	public abstract void onDebugCameraEnableRequested();
+	public void onKilled();
+	public void onDead();
+	public void onLevelCompleted();
+	public void onLevelEnded();
+	public void onGameOver();
+	public void onLevelWarpRequested(int levelNumber);
+	public void onTestLevelWarpRequested(int levelNumber);
+	public void onDebugCameraEnableRequested();
 
 }

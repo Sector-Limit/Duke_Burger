@@ -24,7 +24,8 @@ public class CheatCodeHandler implements InputProcessor {
 		"HYPER",   // toggle steroids
 		"GRAV",    // toggle low gravity
 		"KILL",    // suicide
-		"THANOS"   // kill all enemies
+		"THANOS",  // kill all enemies
+		"TEST"     // warp to test level
 	};
 
 	public CheatCodeHandler(Duke duke) {
@@ -124,6 +125,11 @@ public class CheatCodeHandler implements InputProcessor {
 
 			m_duke.killAllEnemies();
 		}
+		else if(cheatCode == 12) {
+			System.out.println("Warping to test level " + special + ".");
+
+			m_duke.warpTestLevel(special);
+		}
 	}
 
 	@Override
@@ -150,9 +156,12 @@ public class CheatCodeHandler implements InputProcessor {
 			return false;
 		}
 
-		if(m_currentCheatCode.equals(CHEAT_CODES[2])) {
+		boolean isMissionWarp = m_currentCheatCode.equals(CHEAT_CODES[2]);
+		boolean isTestLevelWarp = m_currentCheatCode.equals(CHEAT_CODES[12]);
+
+		if(isMissionWarp || isTestLevelWarp) {
 			if(character >= '0' && character <= '9') {
-				handleCheatCode(2, (int) (character - '0'));
+				handleCheatCode(isMissionWarp ? 2 : 12, (int) (character - '0'));
 			}
 			else {
 				m_currentCheatCode = "";
@@ -185,7 +194,7 @@ public class CheatCodeHandler implements InputProcessor {
 		}
 
 		for(int i = 0; i < CHEAT_CODES.length; i++) {
-			if(i == 2) {
+			if(i == 2 || i == 12) {
 				continue;
 			}
 

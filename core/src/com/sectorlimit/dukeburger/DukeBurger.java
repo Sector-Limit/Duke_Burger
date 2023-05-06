@@ -444,6 +444,22 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	}
 
 	@Override
+	public void onTestLevelWarpRequested(int levelNumber) {
+		if(levelNumber <= 0 || levelNumber > NUMBER_OF_MISSIONS) {
+			return;
+		}
+
+		m_lives = m_duke.getLives();
+		m_coins = m_duke.getCoins();
+
+		stopGame();
+
+		m_currentLevelNumber = 1;
+
+		startNewGame("test_level" + (levelNumber == 1 ? "" : "_" + levelNumber) + ".tmx", m_lives, m_coins);
+	}
+
+	@Override
 	public void onDebugCameraEnableRequested() {
 		m_debugCameraEnabled = true;
 	}
