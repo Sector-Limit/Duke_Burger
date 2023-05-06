@@ -33,6 +33,7 @@ import com.sectorlimit.dukeburger.enemy.Enemy;
 import com.sectorlimit.dukeburger.enemy.Enforcer;
 import com.sectorlimit.dukeburger.enemy.OctaBaby;
 import com.sectorlimit.dukeburger.enemy.OctaBaby.Type;
+import com.sectorlimit.dukeburger.factory.DynamicObjectFactory;
 import com.sectorlimit.dukeburger.factory.EnemyFactory;
 import com.sectorlimit.dukeburger.factory.ExplosionFactory;
 import com.sectorlimit.dukeburger.factory.PickupItemFactory;
@@ -40,8 +41,10 @@ import com.sectorlimit.dukeburger.factory.PowerupsFactory;
 import com.sectorlimit.dukeburger.factory.StaticObjectFactory;
 import com.sectorlimit.dukeburger.object.Barrel;
 import com.sectorlimit.dukeburger.object.Box;
+import com.sectorlimit.dukeburger.object.BoxDebris;
 import com.sectorlimit.dukeburger.object.Burger;
 import com.sectorlimit.dukeburger.object.Door;
+import com.sectorlimit.dukeburger.object.DynamicObject;
 import com.sectorlimit.dukeburger.object.Explosion;
 import com.sectorlimit.dukeburger.object.FinishText;
 import com.sectorlimit.dukeburger.object.PickupItem;
@@ -97,6 +100,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private PowerupsFactory m_powerupsFactory;
 	private PickupItemFactory m_pickupItemFactory;
 	private ProjectileSystem m_projectileSystem;
+	private DynamicObjectFactory m_dynamicObjectFactory;
 	private StaticObjectFactory m_staticObjectFactory;
 	private CheatCodeHandler m_cheatCodeHandler;
 
@@ -114,6 +118,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private Vector<PickupItem> m_pickupItems;
 	private Vector<Enemy> m_enemies;
 	private Vector<Explosion> m_explosions;
+	private Vector<Vector2> m_boxDebrisToCreate;
+	private Vector<DynamicObject> m_dynamicObjects;
 	private Vector<StaticObject> m_staticObjects;
 
 	private Texture m_idleTexture;
@@ -198,6 +204,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_powerupsFactory = new PowerupsFactory();
 		m_explosionFactory = new ExplosionFactory();
 		m_staticObjectFactory = new StaticObjectFactory(m_world);
+		m_dynamicObjectFactory = new DynamicObjectFactory(m_world);
 		m_cheatCodeHandler = new CheatCodeHandler(this);
 
 		m_tossingSomething = false;
@@ -206,6 +213,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_powerups = new Vector<Powerup>();
 		m_enemies = new Vector<Enemy>();
 		m_explosions = new Vector<Explosion>();
+		m_boxDebrisToCreate = new Vector<Vector2>();
+		m_dynamicObjects = new Vector<DynamicObject>();
 		m_staticObjects = new Vector<StaticObject>();
 		m_finishText = new Vector<FinishText>();
 
@@ -1018,6 +1027,32 @@ public class Duke implements ContactListener, HUDDataProvider {
 			}
 		}
 
+		for(Vector2 boxDebrisPosition : m_boxDebrisToCreate) {
+			Vector<BoxDebris> boxDebrisCollection = m_dynamicObjectFactory.createBoxDebris(boxDebrisPosition);
+	
+			for(BoxDebris boxDebris : boxDebrisCollection) {
+				m_dynamicObjects.add(boxDebris);
+			}
+		}
+
+		m_boxDebrisToCreate.clear();
+
+		Vector<DynamicObject> dynamicObjectsToRemove = new Vector<DynamicObject>();
+
+		for(DynamicObject dynamicObject : m_dynamicObjects) {
+			if(dynamicObject.isDestroyed()) {
+				dynamicObjectsToRemove.add(dynamicObject);
+				continue;
+			}
+
+			dynamicObject.render(spriteBatch);
+		}
+
+		for(DynamicObject dynamicObject : dynamicObjectsToRemove) {
+			dynamicObject.cleanup(m_world);
+			m_dynamicObjects.remove(dynamicObject);
+		}
+
 		for(StaticObject staticObject : m_staticObjects) {
 			staticObject.render(spriteBatch);
 		}
@@ -1330,6 +1365,9 @@ public class Duke implements ContactListener, HUDDataProvider {
 				if(tossedPickupItem != null) {
 					if(tossedPickupItem instanceof Barrel) {
 						m_explosions.add(m_explosionFactory.createExplosion(new Vector2(tossedPickupItem.getOriginPosition())));
+					}
+					else if(tossedPickupItem instanceof Box) {
+						m_boxDebrisToCreate.add(new Vector2(tossedPickupItem.getOriginPosition()));
 					}
 
 					tossedPickupItem.onImpact();
