@@ -16,8 +16,10 @@ import com.sectorlimit.dukeburger.CollisionCategories;
 
 public class Octa extends Enemy {
 
+	private int m_initialRiseOffset;
+	private int m_maxRiseHeight;
 	private Vector2 m_startingPosition;
-	private float m_verticalRiseOffset;
+	private float m_riseOffsetDistance;
 	private boolean m_rising;
 
 	private TextureRegion m_octaRisingTextureRegion;
@@ -25,13 +27,24 @@ public class Octa extends Enemy {
 	private Texture m_octaDeadTexture;
 
 	private static final Vector2 OCTA_SIZE = new Vector2(27, 22);
-	private static final float MAX_OCTA_RISE_DISTANCE = 5.0f * 16.0f;
+	private static final float BLOCK_SIZE = 16.0f;
+	private static final int DEFAULT_OCTA_RISE_HEIGHT = 5;
 	private static float OCTA_RISE_VELOCITY = 50.0f;
 	private static float OCTA_FALL_VELOCITY = -30.0f;
 
 	public Octa(TextureRegion octaRisingTextureRegion, TextureRegion octaFallingTextureRegion, Texture octaDeadTexture) {
-		m_verticalRiseOffset = 0.0f;
-		m_rising = true;
+		this(octaRisingTextureRegion, octaFallingTextureRegion, octaDeadTexture, 0, DEFAULT_OCTA_RISE_HEIGHT);
+	}
+
+	public Octa(TextureRegion octaRisingTextureRegion, TextureRegion octaFallingTextureRegion, Texture octaDeadTexture, int initialRiseOffset) {
+		this(octaRisingTextureRegion, octaFallingTextureRegion, octaDeadTexture, initialRiseOffset, DEFAULT_OCTA_RISE_HEIGHT);
+	}
+
+	public Octa(TextureRegion octaRisingTextureRegion, TextureRegion octaFallingTextureRegion, Texture octaDeadTexture, int initialRiseOffset, int maxRiseHeight) {
+		m_initialRiseOffset = initialRiseOffset < 0 ? 0 : initialRiseOffset;
+		m_maxRiseHeight = maxRiseHeight < 1 ? DEFAULT_OCTA_RISE_HEIGHT : maxRiseHeight;
+		m_riseOffsetDistance = initialRiseOffset * BLOCK_SIZE;
+		m_rising = (int) (Math.random() * 3.0) != 0;
 
 		m_octaRisingTextureRegion = octaRisingTextureRegion;
 		m_octaFallingTextureRegion = octaFallingTextureRegion;
@@ -88,22 +101,25 @@ public class Octa extends Enemy {
 				m_body.setActive(true);
 			}
 
-			m_verticalRiseOffset += (m_rising ? OCTA_RISE_VELOCITY : OCTA_FALL_VELOCITY) * deltaTime;
+			m_riseOffsetDistance += (m_rising ? OCTA_RISE_VELOCITY : OCTA_FALL_VELOCITY) * deltaTime;
+
+			float initialOctaRiseOffset = m_initialRiseOffset * BLOCK_SIZE;
+			float maxOctaRiseDistance = m_maxRiseHeight * BLOCK_SIZE;
 
 			if(m_rising) {
-				if(m_verticalRiseOffset >= MAX_OCTA_RISE_DISTANCE) {
-					m_verticalRiseOffset = MAX_OCTA_RISE_DISTANCE;
+				if(m_riseOffsetDistance >= maxOctaRiseDistance) {
+					m_riseOffsetDistance = maxOctaRiseDistance;
 					m_rising = false;
 				}
 			}
 			else {
-				if(m_verticalRiseOffset <= 0.0f) {
-					m_verticalRiseOffset = 0.0f;
+				if(m_riseOffsetDistance <= 0.0f) {
+					m_riseOffsetDistance = 0.0f;
 					m_rising = true;
 				}
 			}
 
-			setPosition(new Vector2(m_startingPosition).add(new Vector2(0.0f, m_verticalRiseOffset)));
+			setPosition(new Vector2(m_startingPosition).add(new Vector2(0.0f, m_riseOffsetDistance - initialOctaRiseOffset)));
 		}
 
 		Texture currentTexture = null;

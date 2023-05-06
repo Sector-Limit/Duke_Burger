@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.objects.TextureMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Vector2;
@@ -264,7 +265,22 @@ public class Duke implements ContactListener, HUDDataProvider {
 				m_enemies.add(m_enemyFactory.createOctaBaby(Type.Blue, objectPosition));
 			}
 			else if(mapObject.getName().equalsIgnoreCase("octa")) {
-				m_enemies.add(m_enemyFactory.createOcta(objectPosition));
+				MapProperties octaProperties = mapObject.getProperties();
+
+				Object initialRiseOffsetObject = octaProperties.get("rise_offset");
+				Object maxRiseHeightObject = octaProperties.get("rise_height");
+				int initialRiseOffset = -1;
+				int maxRiseHeight = -1;
+
+				if(initialRiseOffsetObject instanceof String) {
+					initialRiseOffset = Integer.parseInt((String) initialRiseOffsetObject);
+				}
+
+				if(maxRiseHeightObject instanceof String) {
+					maxRiseHeight = Integer.parseInt((String) maxRiseHeightObject);
+				}
+
+				m_enemies.add(m_enemyFactory.createOcta(objectPosition, initialRiseOffset, maxRiseHeight));
 			}
 			else if(mapObject.getName().equalsIgnoreCase("enforcer")) {
 				m_enemies.add(m_enemyFactory.createEnforcer(objectPosition));

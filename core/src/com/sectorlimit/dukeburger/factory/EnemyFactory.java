@@ -87,6 +87,18 @@ public class EnemyFactory {
 		return octaBaby;
 	}
 
+	public Octa createOcta(Vector2 position, int initialRiseOffset) {
+		Octa octa = new Octa(m_octaRisingTextureRegion, m_octaFallingTextureRegion, m_octaDeadTexture, initialRiseOffset);
+		octa.assignPhysics(m_world, position);
+		return octa;
+	}
+
+	public Octa createOcta(Vector2 position, int initialRiseOffset, int maxRiseHeight) {
+		Octa octa = new Octa(m_octaRisingTextureRegion, m_octaFallingTextureRegion, m_octaDeadTexture, initialRiseOffset, maxRiseHeight);
+		octa.assignPhysics(m_world, position);
+		return octa;
+	}
+
 	public Octa createOcta(Vector2 position) {
 		Octa octa = new Octa(m_octaRisingTextureRegion, m_octaFallingTextureRegion, m_octaDeadTexture);
 		octa.assignPhysics(m_world, position);
