@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -72,14 +73,17 @@ public abstract class Enemy {
 		collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.ENEMY_BOUNDARY;
 		collisionFixture.setFilterData(collisionFilter);
 		FixtureDef sensorFixtureDefinition = new FixtureDef();
-		sensorFixtureDefinition.shape = polygonCollisionShape;
+		CircleShape circleCollisionShape = new CircleShape();
+		circleCollisionShape.setRadius(getSize().x * 0.5f);
+		sensorFixtureDefinition.shape = circleCollisionShape;
 		sensorFixtureDefinition.isSensor = true;
 		Fixture sensorCollisionFixture = m_body.createFixture(sensorFixtureDefinition);
 		Filter sensorCollisionFilter = new Filter();
 		sensorCollisionFilter.categoryBits = CollisionCategories.ENEMY_SENSOR;
-		sensorCollisionFilter.maskBits = CollisionCategories.DUKE;
+		sensorCollisionFilter.maskBits = CollisionCategories.OBJECT | CollisionCategories.DUKE;
 		sensorCollisionFixture.setFilterData(sensorCollisionFilter);
 		polygonCollisionShape.dispose();
+		circleCollisionShape.dispose();
 	}
 
 	public boolean isFacingLeft() {

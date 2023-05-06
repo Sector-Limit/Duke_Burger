@@ -68,7 +68,7 @@ public class OctaBaby extends BasicEnemy {
 		polygonCollisionShape.dispose();
 		Filter collisionFilter = new Filter();
 		collisionFilter.categoryBits = CollisionCategories.ENEMY;
-		collisionFilter.maskBits = CollisionCategories.DUKE | CollisionCategories.OBJECT;
+		collisionFilter.maskBits = CollisionCategories.DUKE;
 		collisionFixture.setFilterData(collisionFilter);
 	}
 
