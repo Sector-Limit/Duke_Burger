@@ -10,6 +10,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapLayer;
@@ -41,6 +42,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	private float m_physicsTimeAccumulator;
 	private Box2DDebugRenderer m_debugRenderer;
 
+	private BitmapFont m_bitmapFont;
 	private Texture m_citySkyTexture;
 	private Texture m_skyTexture;
 	private Texture m_titleScreenSheetTexture;
@@ -67,6 +69,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 	private Jukebox m_jukebox;
 
+	public static final String VERSION = new String("1.0.8");
 	public static final Vector2 VIEWPORT_SIZE = new Vector2(320.0f, 180.0f);
 	private static final float PHYSICS_TIME_STEMP = 1 / 60.f;
 	private static final int PHYSICS_VELOCITY_ITERATIONS = 6;
@@ -109,6 +112,8 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		m_gameStage.getViewport().setCamera(m_camera);
 
 		m_spriteBatch = new SpriteBatch();
+		m_bitmapFont = new BitmapFont();
+		m_bitmapFont.setColor(1.0f, 1.0f, 1.0f, 1.0f);
 		m_citySkyTexture = new Texture(Gdx.files.internal("sprites/city_bg.png"));
 
 		m_jukebox = new Jukebox();
@@ -503,6 +508,8 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 			TextureRegion titleScreenFrameTextureRegion = m_titleScreenAnimation.getKeyFrame(m_elapsedTitleScreenAnimationTime);
 			m_spriteBatch.draw(titleScreenFrameTextureRegion, 0.0f, 0.0f, 0.0f, 0.0f, titleScreenFrameTextureRegion.getRegionWidth(), titleScreenFrameTextureRegion.getRegionHeight(), 1.0f, 1.0f, 0.0f);
+
+			m_bitmapFont.draw(m_spriteBatch, VERSION, VIEWPORT_SIZE.x - VERSION.length() * 6.5f, m_bitmapFont.getCapHeight() + 1.0f);
 
 			m_spriteBatch.end();
 
