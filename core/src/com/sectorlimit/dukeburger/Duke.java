@@ -104,6 +104,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private StaticObjectFactory m_staticObjectFactory;
 	private CheatCodeHandler m_cheatCodeHandler;
 
+	private boolean m_droppingSomething;
+	private float m_droppingTimeElapsed;
 	private boolean m_tossingSomething;
 	private boolean m_pickupItemButtonPressed;
 	private boolean m_pickupCooldown;
@@ -127,6 +129,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private Texture m_idleHoldTexture;
 	private Texture m_jumpTexture;
 	private Texture m_jumpHoldTexture;
+	private Texture m_dropItemTexture;
 	private Texture m_tossItemTexture;
 	private Texture m_deadTexture;
 	private Texture m_walkSpriteSheetTexture;
@@ -164,6 +167,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private static final float DOOR_OPEN_DISTANCE = DUKE_SIZE.y + (16.0f * 1.5f);
 	private static final float DEFAULT_LEVEL_COMPLETED_DELAY = 3.0f;
 	private static final float PICKUP_COOLDOWN_DURATION = 0.35f;
+	private static final float DROP_DURATION = 0.2f;
 
 	public Duke(World world, TiledMap map) {
 		this(world, map, MAX_LIVES, 0);
@@ -208,6 +212,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_dynamicObjectFactory = new DynamicObjectFactory(m_world);
 		m_cheatCodeHandler = new CheatCodeHandler(this);
 
+		m_droppingSomething = false;
 		m_tossingSomething = false;
 		m_pickupItemButtonPressed = false;
 		m_pickupItems = new Vector<PickupItem>();
@@ -426,6 +431,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_jumpTexture = new Texture(Gdx.files.internal("sprites/duke_jump.png"));
 		m_jumpHoldTexture = new Texture(Gdx.files.internal("sprites/duke_holds_jump.png"));
 		m_tossItemTexture = new Texture(Gdx.files.internal("sprites/duke_toss.png"));
+		m_dropItemTexture = new Texture(Gdx.files.internal("sprites/duke_put.png"));
 		m_deadTexture = new Texture(Gdx.files.internal("sprites/duke_dead.png"));
 		m_walkSpriteSheetTexture = new Texture(Gdx.files.internal("sprites/duke_walk.png"));
 		m_walkHoldSpriteSheetTexture = new Texture(Gdx.files.internal("sprites/duke_holds_walk.png"));
@@ -610,6 +616,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 			return;
 		}
 
+		m_droppingSomething = true;
+		m_droppingTimeElapsed = 0.0f;
 		m_pickupItem.drop(m_body.getLinearVelocity());
 		m_pickupItem = null;
 	}
@@ -758,6 +766,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	public void teleportToDoor() {
 		m_jumping = false;
 		m_tossingSomething = false;
+		m_droppingSomething = false;
 		m_acceleration.x = 0.0f;
 		m_acceleration.y = 0.0f;
 
@@ -891,6 +900,15 @@ public class Duke implements ContactListener, HUDDataProvider {
 			}
 			else {
 				m_acceleration.x = 0.0f;
+			}
+
+			if(m_droppingSomething) {
+				m_droppingTimeElapsed += deltaTime;
+
+				if(m_droppingTimeElapsed > DROP_DURATION) {
+					m_droppingSomething = false;
+					m_droppingTimeElapsed = 0.0f;
+				}
 			}
 
 			boolean wasJumpKeyPressed = m_jumpKeyPressed;
@@ -1165,8 +1183,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 		if(!m_alive) {
 			currentTexture = m_deadTexture;
 		}
-		else if(m_tossingSomething) {
-			currentTexture = m_tossItemTexture;
+		else if(m_droppingSomething) {
+			currentTexture = m_dropItemTexture;
 		}
 		else if(m_jumping) {
 			if(isHoldingSomething()) {
@@ -1178,6 +1196,9 @@ public class Duke implements ContactListener, HUDDataProvider {
 		}
 		else if(!m_jumping && !m_tossingSomething && m_feetGroundContactFixtures.isEmpty()) {
 			currentTexture = m_jumpTexture;
+		}
+		else if(m_tossingSomething) {
+			currentTexture = m_tossItemTexture;
 		}
 		else if(m_walking) {
 			if(isHoldingSomething()) {
@@ -1212,6 +1233,12 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 		Vector2 renderOrigin = new Vector2(getOriginPosition()).sub(new Vector2(getSize()).scl(0.5f));
 		float scale = m_steroids ? 4.0f : 1.0f;
+
+		if(m_droppingSomething) {
+			float dropDurationPercentage = m_droppingTimeElapsed / DROP_DURATION;
+
+			renderOrigin.y += (1.0f - dropDurationPercentage) * 4.0f;
+		}
 
 		if(m_underAttack && m_alive) {
 			spriteBatch.setColor(1.0f, 1.0f, 1.0f, m_attackCooldownTimeElapsed % DAMAGED_FLICKER_SPEED > DAMAGED_FLICKER_SPEED * 0.5f ? 1.0f : DAMAGED_OPACITY);
