@@ -415,7 +415,9 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	}
 
 	@Override
-	public void onKilled() { }
+	public void onKilled() {
+		stopMusic();
+	}
 
 	@Override
 	public void onDead() {
