@@ -61,7 +61,7 @@ public class Enforcer extends Enemy {
 		Fixture sensorCollisionFixture = m_body.createFixture(sensorFixtureDefinition);
 		Filter sensorCollisionFilter = new Filter();
 		sensorCollisionFilter.categoryBits = CollisionCategories.ENEMY_SENSOR;
-		sensorCollisionFilter.maskBits = CollisionCategories.OBJECT | CollisionCategories.DUKE_MAIN_SENSOR;
+		sensorCollisionFilter.maskBits = CollisionCategories.OBJECT | CollisionCategories.DUKE_MAIN_SENSOR | CollisionCategories.EXPLOSION;
 		sensorCollisionFixture.setFilterData(sensorCollisionFilter);
 		circleCollisionShape.dispose();
 	}

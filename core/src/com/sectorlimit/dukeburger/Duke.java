@@ -118,6 +118,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private Vector<PickupItem> m_pickupItems;
 	private Vector<Enemy> m_enemies;
 	private Vector<Explosion> m_explosions;
+	private Vector<Vector2> m_explosionsToCreate;
 	private Vector<Vector2> m_boxDebrisToCreate;
 	private Vector<DynamicObject> m_dynamicObjects;
 	private Vector<StaticObject> m_staticObjects;
@@ -202,7 +203,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_projectileSystem = new ProjectileSystem(m_world);
 		m_enemyFactory = new EnemyFactory(m_projectileSystem, m_world);
 		m_powerupsFactory = new PowerupsFactory();
-		m_explosionFactory = new ExplosionFactory();
+		m_explosionFactory = new ExplosionFactory(m_world);
 		m_staticObjectFactory = new StaticObjectFactory(m_world);
 		m_dynamicObjectFactory = new DynamicObjectFactory(m_world);
 		m_cheatCodeHandler = new CheatCodeHandler(this);
@@ -213,6 +214,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_powerups = new Vector<Powerup>();
 		m_enemies = new Vector<Enemy>();
 		m_explosions = new Vector<Explosion>();
+		m_explosionsToCreate = new Vector<Vector2>();
 		m_boxDebrisToCreate = new Vector<Vector2>();
 		m_dynamicObjects = new Vector<DynamicObject>();
 		m_staticObjects = new Vector<StaticObject>();
@@ -1135,6 +1137,12 @@ public class Duke implements ContactListener, HUDDataProvider {
 			m_enemies.remove(enemy);
 		}
 
+		for(Vector2 explosionPosition : m_explosionsToCreate) {
+			m_explosions.add(m_explosionFactory.createExplosion(explosionPosition));
+		}
+
+		m_explosionsToCreate.clear();
+
 		Vector<Explosion> explosionsToRemove = new Vector<Explosion>();
 
 		for(Explosion explosion : m_explosions) {
@@ -1147,6 +1155,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		}
 
 		for(Explosion explosion : explosionsToRemove) {
+			explosion.cleanup(m_world);
 			m_explosions.remove(explosion);
 		}
 
@@ -1364,7 +1373,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 				if(tossedPickupItem != null) {
 					if(tossedPickupItem instanceof Barrel) {
-						m_explosions.add(m_explosionFactory.createExplosion(new Vector2(tossedPickupItem.getOriginPosition())));
+						m_explosionsToCreate.add(new Vector2(tossedPickupItem.getOriginPosition()));
 					}
 					else if(tossedPickupItem instanceof Box) {
 						m_boxDebrisToCreate.add(new Vector2(tossedPickupItem.getOriginPosition()));
@@ -1392,27 +1401,35 @@ public class Duke implements ContactListener, HUDDataProvider {
 				else {
 					Enemy enemy = null;
 					Fixture enemyFixture = null;
+					Object enemyContactObject = null;
 
 					if(contactObjectA instanceof Enemy) {
 						enemy = (Enemy) contactObjectA;
 						enemyFixture = contact.getFixtureA();
+						enemyContactObject = contactObjectB;
 					}
 					else if(contactObjectB instanceof Enemy) {
 						enemy = (Enemy) contactObjectB;
 						enemyFixture = contact.getFixtureB();
+						enemyContactObject = contactObjectA;
 					}
 
 					if(enemy != null) {
-						Object enemyFixtureTypeObject = enemyFixture.getUserData();
-
-						if(enemyFixtureTypeObject instanceof String) {
-							String enemyFixtureType = (String) enemyFixtureTypeObject;
-
-							if(enemyFixtureType.equalsIgnoreCase("left")) {
-								enemy.onCollideWithWall(true);
-							}
-							else if(enemyFixtureType.equalsIgnoreCase("right")) {
-								enemy.onCollideWithWall(false);
+						if(enemyContactObject instanceof Explosion) {
+							enemy.kill();
+						}
+						else {
+							Object enemyFixtureTypeObject = enemyFixture.getUserData();
+	
+							if(enemyFixtureTypeObject instanceof String) {
+								String enemyFixtureType = (String) enemyFixtureTypeObject;
+	
+								if(enemyFixtureType.equalsIgnoreCase("left")) {
+									enemy.onCollideWithWall(true);
+								}
+								else if(enemyFixtureType.equalsIgnoreCase("right")) {
+									enemy.onCollideWithWall(false);
+								}
 							}
 						}
 					}
