@@ -1,5 +1,6 @@
 package com.sectorlimit.dukeburger;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -35,13 +36,14 @@ import com.sectorlimit.dukeburger.image.GifDecoder;
 public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 	private World m_world;
+	private float m_physicsTimeAccumulator;
 	private Box2DDebugRenderer m_debugRenderer;
 
 	private Texture m_citySkyTexture;
 	private Texture m_skyTexture;
 	private Texture m_titleScreenSheetTexture;
 	private Animation<TextureRegion> m_titleScreenAnimation;
-    private Animation<TextureRegion> m_introAnimation;
+	private Animation<TextureRegion> m_introAnimation;
 	private TiledMap m_map;
 	private OrthogonalTiledMapRenderer m_mapRenderer;
 
@@ -49,6 +51,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	private float m_elapsedTitleScreenAnimationTime;
 	private boolean m_showIntro;
 	private float m_elapsedIntroAnimationTime;
+	private Stage m_uiStage;
 	private Stage m_gameStage;
 	private boolean m_debugCameraEnabled;
 	private OrthographicCamera m_camera;
@@ -67,7 +70,9 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	private Sound m_astroLoungeMusic;
 
 	public static final Vector2 VIEWPORT_SIZE = new Vector2(320.0f, 180.0f);
-	private static final float UI_SCALE_PERCENTAGE = 4.0f;
+	private static final float PHYSICS_TIME_STEMP = 1 / 60.f;
+	private static final int PHYSICS_VELOCITY_ITERATIONS = 6;
+	private static final int PHYSICS_POSITION_ITERATIONS = 2;
 	private static final int NUMBER_OF_TITLE_SCREEN_FRAMES = 2;
 	private static final int NUMBER_OF_MISSIONS = 4;
 	private static final float CAMERA_FOLLOW_VERTICAL_OFFSET_PERCENTAGE = 0.5f;
@@ -91,6 +96,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 		m_camera = new OrthographicCamera(VIEWPORT_SIZE.x, VIEWPORT_SIZE.y);
 		m_debugCameraEnabled = DEBUG_CAMERA_ENABLED;
+		m_uiStage = new Stage(new StretchViewport(VIEWPORT_SIZE.x, VIEWPORT_SIZE.y));
 		m_gameStage = new Stage(new StretchViewport(VIEWPORT_SIZE.x, VIEWPORT_SIZE.y));
 		m_gameStage.getViewport().setCamera(m_camera);
 
@@ -107,7 +113,9 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 			m_themeMusic.loop(MUSIC_VOLUME);
 		}
 
-		m_introAnimation = GifDecoder.loadGIFAnimation(Animation.PlayMode.NORMAL, Gdx.files.internal("ui/intro.gif").read());
+		if(Gdx.app.getType() == Application.ApplicationType.Desktop) {
+			m_introAnimation = GifDecoder.loadGIFAnimation(Animation.PlayMode.NORMAL, Gdx.files.internal("ui/intro.gif").read());
+		}
 
 		m_titleScreenSheetTexture = new Texture(Gdx.files.internal("ui/duke_burger_menu_animation.png"));
 
@@ -171,6 +179,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		m_elapsedTitleScreenAnimationTime = 0.0f;
 		m_showIntro = false;
 		m_elapsedIntroAnimationTime = 0.0f;
+		m_physicsTimeAccumulator = 0.0f;
 
 		m_world = new World(new Vector2(0, -220), true);
 
@@ -209,7 +218,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 				collisionObjectPolygonShape.dispose();
 				Filter collisionFilter = new Filter();
 				collisionFilter.categoryBits = CollisionCategories.GROUND;
-				collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.DUKE | CollisionCategories.DUKE_FEET_SENSOR | CollisionCategories.DUKE_SIDE_SENSOR | CollisionCategories.OBJECT | CollisionCategories.BURGER | CollisionCategories.ENEMY;
+				collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.DUKE | CollisionCategories.DUKE_FEET_SENSOR | CollisionCategories.DUKE_SIDE_SENSOR | CollisionCategories.OBJECT | CollisionCategories.BURGER | CollisionCategories.ENEMY | CollisionCategories.ENEMY_SIDE_SENSOR;
 				collisionFixture.setFilterData(collisionFilter);
 			}
 		}
@@ -243,7 +252,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 						enemyBoundaryCollisionObjectPolygonShape.dispose();
 						Filter enemyBoundaryCollisionFixture = new Filter();
 						enemyBoundaryCollisionFixture.categoryBits = CollisionCategories.ENEMY_BOUNDARY;
-						enemyBoundaryCollisionFixture.maskBits = CollisionCategories.ENEMY;
+						enemyBoundaryCollisionFixture.maskBits = CollisionCategories.ENEMY | CollisionCategories.ENEMY_SIDE_SENSOR;
 						collisionFixture.setFilterData(enemyBoundaryCollisionFixture);
 					}
 				}
@@ -476,8 +485,11 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 			m_spriteBatch.begin();
 
+			m_uiStage.getViewport().apply();
+			m_uiStage.draw();
+
 			TextureRegion titleScreenFrameTextureRegion = m_titleScreenAnimation.getKeyFrame(m_elapsedTitleScreenAnimationTime);
-			m_spriteBatch.draw(titleScreenFrameTextureRegion, 0.0f, 0.0f, 0.0f, 0.0f, titleScreenFrameTextureRegion.getRegionWidth(), titleScreenFrameTextureRegion.getRegionHeight(), UI_SCALE_PERCENTAGE, UI_SCALE_PERCENTAGE, 0.0f);
+			m_spriteBatch.draw(titleScreenFrameTextureRegion, 0.0f, 0.0f, 0.0f, 0.0f, titleScreenFrameTextureRegion.getRegionWidth(), titleScreenFrameTextureRegion.getRegionHeight(), 1.0f, 1.0f, 0.0f);
 
 			m_spriteBatch.end();
 
@@ -493,23 +505,33 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		}
 
 		if(m_showIntro) {
-			m_elapsedIntroAnimationTime += deltaTime;
-
-			m_spriteBatch.begin();
-
-			TextureRegion introFrameTextureRegion = m_introAnimation.getKeyFrame(m_elapsedIntroAnimationTime);
-			m_spriteBatch.draw(introFrameTextureRegion, 0.0f, 0.0f, 0.0f, 0.0f, introFrameTextureRegion.getRegionWidth(), introFrameTextureRegion.getRegionHeight(), UI_SCALE_PERCENTAGE, UI_SCALE_PERCENTAGE, 0.0f);
-
-			m_spriteBatch.end();
-
-			if((Gdx.input.isKeyPressed(Keys.ESCAPE) || Gdx.input.isKeyPressed(Keys.BUTTON_START) || Gdx.input.isKeyPressed(Keys.BUTTON_SELECT) || Gdx.input.isKeyPressed(Keys.BUTTON_A)) || m_elapsedIntroAnimationTime >= m_introAnimation.getAnimationDuration()) {
+			if(m_introAnimation != null) {
+				m_elapsedIntroAnimationTime += deltaTime;
+	
+				m_spriteBatch.begin();
+	
+				m_uiStage.getViewport().apply();
+				m_uiStage.draw();
+	
+				TextureRegion introFrameTextureRegion = m_introAnimation.getKeyFrame(m_elapsedIntroAnimationTime);
+				m_spriteBatch.draw(introFrameTextureRegion, 0.0f, 0.0f, 0.0f, 0.0f, introFrameTextureRegion.getRegionWidth(), introFrameTextureRegion.getRegionHeight(), 1.0f, 1.0f, 0.0f);
+	
+				m_spriteBatch.end();
+	
+				if((Gdx.input.isKeyPressed(Keys.ESCAPE) || Gdx.input.isKeyPressed(Keys.BUTTON_START) || Gdx.input.isKeyPressed(Keys.BUTTON_SELECT) || Gdx.input.isKeyPressed(Keys.BUTTON_A)) || m_elapsedIntroAnimationTime >= m_introAnimation.getAnimationDuration()) {
+					m_showIntro = false;
+					m_elapsedIntroAnimationTime = 0.0f;
+				
+					startBrandNewGame();
+				}
+	
+				return;
+			}
+			else {
 				m_showIntro = false;
-				m_elapsedIntroAnimationTime = 0.0f;
-			
+
 				startBrandNewGame();
 			}
-
-			return;
 		}
 
 		if(m_duke == null) {
@@ -538,6 +560,13 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 			}
 		}
 
+		m_physicsTimeAccumulator += deltaTime;
+
+	    while(m_physicsTimeAccumulator >= PHYSICS_TIME_STEMP) {
+	    	m_world.step(PHYSICS_TIME_STEMP, PHYSICS_VELOCITY_ITERATIONS, PHYSICS_POSITION_ITERATIONS);
+	    	m_physicsTimeAccumulator -= PHYSICS_TIME_STEMP;
+	    }
+
 		Vector2 newCameraPosition = new Vector2(m_duke.getCenterPosition().x, VIEWPORT_SIZE.y / 2.0f).add(m_cameraOffset);
 
 		if(m_duke.getCenterPosition().y > VIEWPORT_SIZE.y * CAMERA_FOLLOW_VERTICAL_OFFSET_PERCENTAGE) {
@@ -545,15 +574,15 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		}
 
 		m_camera.position.set(newCameraPosition.x, newCameraPosition.y, 0.0f);
-
-		m_world.step(1 / 60f, 6, 2);
-
 		m_camera.update();
 
 		if(m_skyTexture != null) {
 			m_spriteBatch.begin();
 
-			m_spriteBatch.draw(m_skyTexture, 0.0f, 0.0f, 0.0f, 0.0f, m_skyTexture.getWidth(), m_skyTexture.getHeight(), UI_SCALE_PERCENTAGE, UI_SCALE_PERCENTAGE, 0.0f, 0, 0, m_skyTexture.getWidth(), m_skyTexture.getHeight(), false, false);
+			m_uiStage.getViewport().apply();
+			m_uiStage.draw();
+
+			m_spriteBatch.draw(m_skyTexture, 0.0f, 0.0f, 0.0f, 0.0f, m_skyTexture.getWidth(), m_skyTexture.getHeight(), 1.0f, 1.0f, 0.0f, 0, 0, m_skyTexture.getWidth(), m_skyTexture.getHeight(), false, false);
 	
 			m_spriteBatch.end();
 		}
@@ -575,6 +604,9 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		}
 
 		m_spriteBatch.begin();
+
+		m_uiStage.getViewport().apply();
+		m_uiStage.draw();
 
 		m_duke.renderHUD(m_spriteBatch);
 

@@ -14,7 +14,6 @@ public class HUD {
 	private Texture m_fullHeartTexture;
 	private Texture m_emptyHeartTexture;
 
-	private static final float HUD_SCALE = 4.0f;
 	private static final float HEART_SPACING = 5.0f;
 	private static final float DIGIT_SPACING = 8.0f;
 
@@ -36,19 +35,18 @@ public class HUD {
 	}
 
 	public void renderNumber(SpriteBatch spriteBatch, int number, Vector2 position, int minLength) {
-		float digitSpacing = DIGIT_SPACING * HUD_SCALE;
 		String numberString = Integer.toString(number); 
 		int numberLength = numberString.length();
 		Vector2 digitPosition = new Vector2(position);
 
 		for(int i = 0; i < minLength - numberLength; i++) {
 			renderDigit(spriteBatch, 0, digitPosition);
-			digitPosition.add(new Vector2(digitSpacing, 0.0f));
+			digitPosition.add(new Vector2(DIGIT_SPACING, 0.0f));
 		}
 
 		for(int i = 0; i < numberLength; i++) {
 			renderDigit(spriteBatch, Integer.parseInt("" + numberString.charAt(i)), digitPosition);
-			digitPosition.add(new Vector2(digitSpacing, 0.0f));
+			digitPosition.add(new Vector2(DIGIT_SPACING, 0.0f));
 		}
 	}
 
@@ -59,25 +57,25 @@ public class HUD {
 
 		Texture digitTexture = m_numberTextures[digit];
 
-		spriteBatch.draw(digitTexture, position.x, position.y, 0.0f, 0.0f, digitTexture.getWidth(), digitTexture.getHeight(), HUD_SCALE, HUD_SCALE, 0.0f, 0, 0, digitTexture.getWidth(), digitTexture.getHeight(), false, false);
+		spriteBatch.draw(digitTexture, position.x, position.y, 0.0f, 0.0f, digitTexture.getWidth(), digitTexture.getHeight(), 1.0f, 1.0f, 0.0f, 0, 0, digitTexture.getWidth(), digitTexture.getHeight(), false, false);
 	}
 
 	public void render(SpriteBatch spriteBatch) {
-		Vector2 hudPosition = new Vector2(0.0f, (DukeBurger.VIEWPORT_SIZE.y - m_hudTexture.getHeight()) * HUD_SCALE);
-		spriteBatch.draw(m_hudTexture, hudPosition.x, hudPosition.y, 0.0f, 0.0f, m_hudTexture.getWidth(), m_hudTexture.getHeight(), HUD_SCALE, HUD_SCALE, 0.0f, 0, 0, m_hudTexture.getWidth(), m_hudTexture.getHeight(), false, false);
+		Vector2 hudPosition = new Vector2(0.0f, (DukeBurger.VIEWPORT_SIZE.y - m_hudTexture.getHeight()));
+		spriteBatch.draw(m_hudTexture, hudPosition.x, hudPosition.y, 0.0f, 0.0f, m_hudTexture.getWidth(), m_hudTexture.getHeight(), 1.0f, 1.0f, 0.0f, 0, 0, m_hudTexture.getWidth(), m_hudTexture.getHeight(), false, false);
 
-		float verticalTextPosition =  (m_hudTexture.getHeight() * 0.35f) * HUD_SCALE;
-		Vector2 heartPosition = new Vector2(hudPosition).add(new Vector2(63.0f * HUD_SCALE, verticalTextPosition));
+		float verticalTextPosition =  (m_hudTexture.getHeight() * 0.35f);
+		Vector2 heartPosition = new Vector2(hudPosition).add(new Vector2(63.0f, verticalTextPosition));
 
 		for(int i = 0; i < Duke.MAX_HEALTH; i++) {
 			Texture heartTexture = m_dataProvider.getHealth() >= i + 1 ? m_fullHeartTexture : m_emptyHeartTexture;
-			spriteBatch.draw(heartTexture, heartPosition.x + ((heartTexture.getWidth() + HEART_SPACING) * i * HUD_SCALE), heartPosition.y, 0.0f, 0.0f, heartTexture.getWidth(), heartTexture.getHeight(), HUD_SCALE, HUD_SCALE, 0.0f, 0, 0, heartTexture.getWidth(), heartTexture.getHeight(), false, false);
+			spriteBatch.draw(heartTexture, heartPosition.x + ((heartTexture.getWidth() + HEART_SPACING) * i), heartPosition.y, 0.0f, 0.0f, heartTexture.getWidth(), heartTexture.getHeight(), 1.0f, 1.0f, 0.0f, 0, 0, heartTexture.getWidth(), heartTexture.getHeight(), false, false);
 		}
 
-		Vector2 livesPosition = new Vector2(hudPosition).add(new Vector2(157.0f * HUD_SCALE, verticalTextPosition));
+		Vector2 livesPosition = new Vector2(hudPosition).add(new Vector2(157.0f, verticalTextPosition));
 		renderNumber(spriteBatch, m_dataProvider.getLives(), livesPosition);
 
-		Vector2 coinsPosition = new Vector2(hudPosition).add(new Vector2(297.0f * HUD_SCALE, verticalTextPosition));
+		Vector2 coinsPosition = new Vector2(hudPosition).add(new Vector2(297.0f, verticalTextPosition));
 		renderNumber(spriteBatch, m_dataProvider.getCoins(), coinsPosition, 2);
 	}
 

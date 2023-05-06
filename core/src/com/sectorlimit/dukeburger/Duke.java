@@ -304,7 +304,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		polygonCollisionShape.dispose();
 		Filter collisionFilter = new Filter();
 		collisionFilter.categoryBits = CollisionCategories.DUKE;
-		collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.ENEMY_SENSOR | CollisionCategories.DOOR | CollisionCategories.PROJECTILE | CollisionCategories.DEATH;
+		collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.ENEMY_TOP_SENSOR | CollisionCategories.DOOR | CollisionCategories.PROJECTILE | CollisionCategories.DEATH;
 		collisionFixture.setFilterData(collisionFilter);
 		collisionFixture.setUserData("body");
 
@@ -1261,6 +1261,34 @@ public class Duke implements ContactListener, HUDDataProvider {
 						}
 						else if(randomNumber < 30) {
 							m_powerups.add(m_powerupsFactory.createCola(newItemPosition));
+						}
+					}
+				}
+				else {
+					Enemy enemy = null;
+					Fixture enemyFixture = null;
+
+					if(contactObjectA instanceof Enemy) {
+						enemy = (Enemy) contactObjectA;
+						enemyFixture = contact.getFixtureA();
+					}
+					else if(contactObjectB instanceof Enemy) {
+						enemy = (Enemy) contactObjectB;
+						enemyFixture = contact.getFixtureB();
+					}
+
+					if(enemy != null) {
+						Object enemyFixtureTypeObject = enemyFixture.getUserData();
+	
+						if(enemyFixtureTypeObject instanceof String) {
+							String enemyFixtureType = (String) enemyFixtureTypeObject;
+	
+							if(enemyFixtureType.equalsIgnoreCase("left")) {
+								enemy.onCollideWithWall(true);
+							}
+							else if(enemyFixtureType.equalsIgnoreCase("right")) {
+								enemy.onCollideWithWall(false);
+							}
 						}
 					}
 				}

@@ -93,7 +93,7 @@ public class Door extends StaticObject {
 		Fixture collisionFixture = m_body.createFixture(fixtureDefinition);
 		Filter collisionFilter = new Filter();
 		collisionFilter.categoryBits = CollisionCategories.OBJECT | CollisionCategories.DOOR;
-		collisionFilter.maskBits = CollisionCategories.OBJECT | CollisionCategories.DUKE | CollisionCategories.BURGER | CollisionCategories.ENEMY | CollisionCategories.ENEMY_SENSOR;
+		collisionFilter.maskBits = CollisionCategories.OBJECT | CollisionCategories.DUKE | CollisionCategories.BURGER | CollisionCategories.ENEMY | CollisionCategories.ENEMY_TOP_SENSOR;
 		collisionFixture.setFilterData(collisionFilter);
 		polygonCollisionShape.dispose();
 	}

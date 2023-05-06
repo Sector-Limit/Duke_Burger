@@ -6,6 +6,8 @@
 package com.sectorlimit.dukeburger.image;
 
 import java.io.InputStream;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.util.Vector;
 
 import com.badlogic.gdx.graphics.Pixmap;
@@ -79,8 +81,7 @@ public class GifDecoder {
             for(y = 0; y < h; y++) {
                 for(x = 0; x < w; x++) {
                     int pxl_ARGB8888 = data[x + y * w];
-                    int pxl_RGBA8888 =
-                            ((pxl_ARGB8888 >> 24) & 0x000000ff) | ((pxl_ARGB8888 << 8) & 0xffffff00);
+                    int pxl_RGBA8888 = ((pxl_ARGB8888 >> 24) & 0x000000ff) | ((pxl_ARGB8888 << 8) & 0xffffff00);
                     // convert ARGB8888 > RGBA8888
                     drawPixel(x, y, pxl_RGBA8888);
                 }
@@ -88,14 +89,18 @@ public class GifDecoder {
         }
 
         void getPixels(int[] pixels, int offset, int stride, int x, int y, int width, int height) {
-            java.nio.ByteBuffer bb = getPixels();
+            Buffer buffer = getPixels();
 
-            int k, l;
+            if(!(buffer instanceof ByteBuffer)) {
+            	return;
+            }
 
-            for(k = y;  k < y + height; k++) {
+            ByteBuffer byteBuffer = (ByteBuffer) buffer;
+
+            for(int k = y;  k < y + height; k++) {
                 int _offset = offset;
-                for(l = x; l < x + width; l++) {
-                    int pxl = bb.getInt(4 * (l + k * width));
+                for(int l = x; l < x + width; l++) {
+                    int pxl = byteBuffer.getInt(4 * (l + k * width));
 
                     // convert RGBA8888 > ARGB8888
                     pixels[_offset++] = ((pxl >> 8) & 0x00ffffff) | ((pxl << 24) & 0xff000000);
@@ -417,7 +422,8 @@ public class GifDecoder {
         int curByte = 0;
         try {
             curByte = in.read();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             status = STATUS_FORMAT_ERROR;
         }
         return curByte;
@@ -441,7 +447,8 @@ public class GifDecoder {
                     }
                     n += count;
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 e.printStackTrace();
             }
             if (n < blockSize) {
@@ -465,12 +472,14 @@ public class GifDecoder {
         int n = 0;
         try {
             n = in.read(c);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
         if (n < nbytes) {
             status = STATUS_FORMAT_ERROR;
-        } else {
+        }
+        else {
             tab = new int[256]; // max size to avoid bounds checks
             int i = 0;
             int j = 0;
@@ -510,7 +519,8 @@ public class GifDecoder {
                             }
                             if (app.equals("NETSCAPE2.0")) {
                                 readNetscapeExt();
-                            } else {
+                            }
+                            else {
                                 skip(); // don't care
                             }
                             break;
@@ -587,7 +597,8 @@ public class GifDecoder {
         if (lctFlag) {
             lct = readColorTable(lctSize); // read table
             act = lct; // make local table active
-        } else {
+        }
+        else {
             act = gct; // make global table active
             if (bgIndex == transIndex) {
                 bgColor = 0;
@@ -741,4 +752,5 @@ public class GifDecoder {
         gifDecoder.read(is);
         return gifDecoder.getAnimation(playMode);
     }
-} 
+
+}
