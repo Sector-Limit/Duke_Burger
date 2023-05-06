@@ -1,5 +1,8 @@
 package com.sectorlimit.dukeburger.factory;
 
+import java.util.Arrays;
+import java.util.Vector;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
@@ -19,7 +22,7 @@ public class PowerupsFactory {
 	private Animation<TextureRegion> m_chickenAnimation;
 	private Animation<TextureRegion> m_coinAnimation;
 
-	private Sound m_colaConsumeSound;
+	private Vector<Sound> m_colaConsumeSounds;
 	private Sound m_chickenConsumeSound;
 	private Sound m_coinConsumeSound;
 
@@ -59,13 +62,17 @@ public class PowerupsFactory {
 
 		m_coinAnimation = new Animation<TextureRegion>(0.125f, coinFrames);
 
-		m_colaConsumeSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Cola.wav"));
+		m_colaConsumeSounds = new Vector<Sound>(Arrays.asList(
+				Gdx.audio.newSound(Gdx.files.internal("sounds/Cola.wav")),
+				Gdx.audio.newSound(Gdx.files.internal("sounds/Cola02.wav"))
+		));
+
 		m_chickenConsumeSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Chicken.wav"));
 		m_coinConsumeSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Coin.wav"));
 	}
 
 	public Cola createCola(Vector2 position) {
-		return new Cola(position, m_colaAnimation, m_colaConsumeSound);
+		return new Cola(position, m_colaAnimation, m_colaConsumeSounds);
 	}
 
 	public Chicken createChicken(Vector2 position) {
@@ -80,7 +87,11 @@ public class PowerupsFactory {
 		m_colaSpriteSheetTexture.dispose();
 		m_chickenSpriteSheetTexture.dispose();
 		m_coinSpriteSheetTexture.dispose();
-		m_colaConsumeSound.dispose();
+
+		for(Sound sound : m_colaConsumeSounds) {
+			sound.dispose();
+		}
+
 		m_chickenConsumeSound.dispose();
 		m_coinConsumeSound.dispose();
 	}
