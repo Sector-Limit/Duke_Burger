@@ -109,7 +109,7 @@ public abstract class PickupItem {
 	}
 
 	public short getCollisionMask() {
-		return CollisionCategories.GROUND | CollisionCategories.OBJECT | CollisionCategories.ENEMY | CollisionCategories.ENEMY_SENSOR;
+		return CollisionCategories.GROUND | CollisionCategories.ENEMY | CollisionCategories.ENEMY_SENSOR;
 	}
 
 	public float getFriction() {
