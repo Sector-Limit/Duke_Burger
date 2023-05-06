@@ -58,6 +58,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private boolean m_walking;
 	private boolean m_jumping;
 	private float m_jumpTimeElapsed;
+	private boolean m_jumpKeyPressed;
 	private Vector<Fixture> m_feetGroundContactFixtures;
 	private Vector<Fixture> m_leftSideGroundContactFixtures;
 	private Vector<Fixture> m_rightSideGroundContactFixtures;
@@ -380,6 +381,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_walking = false;
 		m_jumping = false;
 		m_jumpTimeElapsed = 0.0f;
+		m_jumpKeyPressed = false;
 		m_walkDuration = 0.0f;
 
 		m_idleTexture = new Texture(Gdx.files.internal("sprites/duke_idle.png"));
@@ -832,10 +834,18 @@ public class Duke implements ContactListener, HUDDataProvider {
 				m_acceleration.x = 0.0f;
 			}
 
+			boolean wasJumpKeyPressed = m_jumpKeyPressed;
 			Vector2 newVelocity = new Vector2(m_body.getLinearVelocity());
 
-			if(!enteringCheatCode && (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.Z) || Gdx.input.isKeyPressed(Keys.DPAD_UP) || Gdx.input.isKeyPressed(Keys.BUTTON_A))) {
-				if(!m_jumping && !m_tossingSomething && !m_feetGroundContactFixtures.isEmpty()) {
+			if(Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.Z) || Gdx.input.isKeyPressed(Keys.DPAD_UP) || Gdx.input.isKeyPressed(Keys.BUTTON_A)) {
+				m_jumpKeyPressed = true;
+			}
+			else {
+				m_jumpKeyPressed = false;
+			}
+	
+			if(!enteringCheatCode && m_jumpKeyPressed) {
+				if(!m_jumping && !m_tossingSomething && !m_feetGroundContactFixtures.isEmpty() && !wasJumpKeyPressed) {
 					m_jumping = true;
 					m_jumpTimeElapsed = 0.0f;
 
