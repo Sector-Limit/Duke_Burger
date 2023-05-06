@@ -75,12 +75,24 @@ public class PowerupsFactory {
 		return new Cola(position, m_colaAnimation, m_colaConsumeSounds);
 	}
 
+	public Cola createCola(int id, Vector2 position) {
+		return new Cola(id, position, m_colaAnimation, m_colaConsumeSounds);
+	}
+
 	public Chicken createChicken(Vector2 position) {
 		return new Chicken(position, m_chickenAnimation, m_chickenConsumeSound);
 	}
 
+	public Chicken createChicken(int id, Vector2 position) {
+		return new Chicken(id, position, m_chickenAnimation, m_chickenConsumeSound);
+	}
+
 	public Coin createCoin(Vector2 position) {
 		return new Coin(position, m_coinAnimation, m_coinConsumeSound);
+	}
+
+	public Coin createCoin(int id, Vector2 position) {
+		return new Coin(id, position, m_coinAnimation, m_coinConsumeSound);
 	}
 
 	public void dispose() {

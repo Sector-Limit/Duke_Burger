@@ -118,6 +118,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private PigCop m_pigCop;
 	private Vector<FinishText> m_finishText;
 	private Vector<Powerup> m_powerups;
+	private Vector<Integer> m_consumedPowerupIdentifiers;
 	private Vector<PickupItem> m_pickupItems;
 	private Vector<Enemy> m_enemies;
 	private Vector<Explosion> m_explosions;
@@ -171,10 +172,10 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private static final float DROP_DURATION = 0.2f;
 
 	public Duke(World world, TiledMap map) {
-		this(world, map, MAX_LIVES, 0);
+		this(world, map, MAX_LIVES, 0, null);
 	}
 
-	public Duke(World world, TiledMap map, int lives, int coins) {
+	public Duke(World world, TiledMap map, int lives, int coins, Vector<Integer> consumedPowerupIdentifiers) {
 		m_world = world;
 		m_world.setContactListener(this);
 
@@ -218,6 +219,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_pickupItemButtonPressed = false;
 		m_pickupItems = new Vector<PickupItem>();
 		m_powerups = new Vector<Powerup>();
+		m_consumedPowerupIdentifiers = consumedPowerupIdentifiers != null ? consumedPowerupIdentifiers : new Vector<Integer>();
 		m_enemies = new Vector<Enemy>();
 		m_explosions = new Vector<Explosion>();
 		m_explosionsToCreate = new Vector<Vector2>();
@@ -234,6 +236,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 			TextureMapObject textureMapObject = (TextureMapObject) mapObject;
 			TextureRegion textureMapObjectTextureRegion = textureMapObject.getTextureRegion();
 			Vector2 objectPosition = new Vector2(textureMapObject.getX() + (textureMapObjectTextureRegion.getRegionWidth() / 2.0f), textureMapObject.getY() + (textureMapObjectTextureRegion.getRegionHeight() / 2.0f));
+			int objectIdentifier = (Integer) mapObject.getProperties().get("id");
 
 			if(mapObject.getName() == null) {
 				System.err.println("Map object is missing name.");
@@ -253,10 +256,12 @@ public class Duke implements ContactListener, HUDDataProvider {
 				m_pickupItems.add(m_burger);
 			}
 			else if(mapObject.getName().equalsIgnoreCase("cola")) {
-				m_powerups.add(m_powerupsFactory.createCola(objectPosition));
+				m_powerups.add(m_powerupsFactory.createCola(objectIdentifier, objectPosition));
 			}
 			else if(mapObject.getName().equalsIgnoreCase("chicken")) {
-				m_powerups.add(m_powerupsFactory.createChicken(objectPosition));
+				if(!m_consumedPowerupIdentifiers.contains(objectIdentifier)) {
+					m_powerups.add(m_powerupsFactory.createChicken(objectIdentifier, objectPosition));
+				}
 			}
 			else if(mapObject.getName().equalsIgnoreCase("octababy")) {
 				m_enemies.add(m_enemyFactory.createOctaBaby(Type.Green, objectPosition));
@@ -313,7 +318,9 @@ public class Duke implements ContactListener, HUDDataProvider {
 				m_staticObjects.add(m_staticObjectFactory.createPigCop(2, objectPosition));
 			}
 			else if(mapObject.getName().equalsIgnoreCase("coin")) {
-				m_powerups.add(m_powerupsFactory.createCoin(objectPosition));
+				if(!m_consumedPowerupIdentifiers.contains(objectIdentifier)) {
+					m_powerups.add(m_powerupsFactory.createCoin(objectIdentifier, objectPosition));
+				}
 			}
 			else if(!mapObject.getName().equalsIgnoreCase("player_start")){
 				System.err.println("Unexpected object name: " + mapObject.getName());
@@ -575,6 +582,18 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 	public void setCoins(int coins) {
 		m_coins = coins;
+	}
+
+	public Vector<Integer> getConsumedPowerupIdentifiers() {
+		return m_consumedPowerupIdentifiers;
+	}
+
+	public void setConsumedPowerUpIdentifiers(Vector<Integer> consumedPowerupIdentifiers) {
+		m_consumedPowerupIdentifiers = consumedPowerupIdentifiers;
+	}
+
+	public void clearConsumedPowerUpIdentifiers() {
+		m_consumedPowerupIdentifiers.clear();
 	}
 
 	public Vector2 getOriginPosition() {
@@ -1138,6 +1157,10 @@ public class Duke implements ContactListener, HUDDataProvider {
 				if(consume) {
 					powerup.consume();
 					powerupsToRemove.add(powerup);
+
+					if(powerup.isOneTimeUse() && powerup.hasID()) {
+						m_consumedPowerupIdentifiers.add(powerup.getID());
+					}
 
 					continue;
 				}

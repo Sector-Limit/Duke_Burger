@@ -14,9 +14,18 @@ public class Cola extends Powerup {
 	private static final Vector2 COLA_SIZE = new Vector2(16, 16);
 
 	public Cola(Vector2 position, Animation<TextureRegion> animation, Vector<Sound> consumeSounds) {
-		super(position, animation);
+		this(-1, position, animation, consumeSounds);
+	}
+
+	public Cola(int id, Vector2 position, Animation<TextureRegion> animation, Vector<Sound> consumeSounds) {
+		super(id, position, animation);
 
 		m_consumeSounds = consumeSounds;
+	}
+
+	@Override
+	public boolean isOneTimeUse() {
+		return false;
 	}
 
 	public Vector2 getSize() {

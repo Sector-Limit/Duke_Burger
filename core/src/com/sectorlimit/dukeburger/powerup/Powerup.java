@@ -9,13 +9,31 @@ import com.badlogic.gdx.math.Vector2;
 public abstract class Powerup {
 
 	protected Vector2 m_position;
+	protected int m_id;
 	protected boolean m_consumed;
 	protected float m_elapsedAnimationTime;
 	protected Animation<TextureRegion> m_animation;
 
 	public Powerup(Vector2 position, Animation<TextureRegion> animation) {
+		this(-1, position, animation);
+	}
+
+	public Powerup(int id, Vector2 position, Animation<TextureRegion> animation) {
+		m_id = id;
 		m_position = position;
 		m_animation = animation;
+	}
+
+	public boolean hasID() {
+		return m_id > 0;
+	}
+
+	public int getID() {
+		return m_id;
+	}
+
+	public boolean isOneTimeUse() {
+		return true;
 	}
 
 	public Vector2 getOriginPosition() {

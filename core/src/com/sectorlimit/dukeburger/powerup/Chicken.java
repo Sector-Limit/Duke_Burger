@@ -12,7 +12,11 @@ public class Chicken extends Powerup {
 	private static final Vector2 CHICKEN_SIZE = new Vector2(16, 18);
 
 	public Chicken(Vector2 position, Animation<TextureRegion> animation, Sound consumeSound) {
-		super(position, animation);
+		this(-1, position, animation, consumeSound);
+	}
+
+	public Chicken(int id, Vector2 position, Animation<TextureRegion> animation, Sound consumeSound) {
+		super(id, position, animation);
 
 		m_consumeSound = consumeSound;
 	}

@@ -170,10 +170,14 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	}
 
 	public void startNewGame(String levelFileName) {
-		startNewGame(levelFileName, Duke.MAX_LIVES, 0);
+		startNewGame(levelFileName, Duke.MAX_LIVES, 0, null);
 	}
 
 	public void startNewGame(String levelFileName, int lives, int coins) {
+		startNewGame(levelFileName, lives, coins, null);
+	}
+
+	public void startNewGame(String levelFileName, int lives, int coins, Vector<Integer> consumedPowerupIdentifiers) {
 		stopMusic();
 
 		m_currentLevelFileName = levelFileName;
@@ -341,7 +345,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 			}
 		}
 
-		m_duke = new Duke(m_world, m_map, lives, coins);
+		m_duke = new Duke(m_world, m_map, lives, coins, consumedPowerupIdentifiers);
 		m_duke.setListener(this);
 
 		MapProperties mapProperties = m_map.getProperties();
@@ -411,8 +415,10 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		m_lives = m_duke.getLives();
 		m_coins = m_duke.getCoins();
 
+		Vector<Integer> consumedPowerupIdentifiers = m_duke.getConsumedPowerupIdentifiers();
+
 		stopGame();
-		startNewGame(m_currentLevelFileName, m_lives, m_coins);
+		startNewGame(m_currentLevelFileName, m_lives, m_coins, consumedPowerupIdentifiers);
 	}
 
 	@Override
@@ -473,7 +479,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	}
 
 	@Override
-	public void resize (int width, int height) {
+	public void resize(int width, int height) {
 		m_gameStage.getViewport().update(width, height, true);
 	}
 
