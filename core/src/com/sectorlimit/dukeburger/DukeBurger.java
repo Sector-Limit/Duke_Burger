@@ -7,7 +7,6 @@ import java.util.Vector;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -34,6 +33,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.sectorlimit.dukeburger.Jukebox.Track;
 
 public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
@@ -65,12 +65,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	private int m_currentLevelNumber;
 	private String m_currentLevelFileName;
 
-	private Sound m_themeMusic;
-	private Sound m_cityMusic;
-	private Sound m_subwayMusic;
-	private Sound m_burgerPeopleMusic;
-	private Sound m_astroLoungeMusic;
-	private boolean m_musicPlaying;
+	private Jukebox m_jukebox;
 
 	public static final Vector2 VIEWPORT_SIZE = new Vector2(320.0f, 180.0f);
 	private static final float PHYSICS_TIME_STEMP = 1 / 60.f;
@@ -82,8 +77,6 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	private static final float CAMERA_SPEED = 4.0f;
 	private static final boolean DEBUG_CAMERA_ENABLED = false;
 	private static final boolean PHYSICS_DEBUGGING_ENABLED = false;
-	private static final boolean MUSIC_ENABLED = true;
-	private static final float MUSIC_VOLUME = 0.13f;
 
 	private class AnimationFrameData {
 
@@ -108,7 +101,6 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		m_currentLevelNumber = 1;
 		m_lives = Duke.MAX_LIVES;
 		m_coins = 0;
-		m_musicPlaying = false;
 
 		m_camera = new OrthographicCamera(VIEWPORT_SIZE.x, VIEWPORT_SIZE.y);
 		m_debugCameraEnabled = DEBUG_CAMERA_ENABLED;
@@ -119,21 +111,12 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		m_spriteBatch = new SpriteBatch();
 		m_citySkyTexture = new Texture(Gdx.files.internal("sprites/city_bg.png"));
 
-		if(MUSIC_ENABLED) {
-			m_themeMusic = Gdx.audio.newSound(Gdx.files.internal("music/pixelduke.mp3"));
-			m_cityMusic = Gdx.audio.newSound(Gdx.files.internal("music/city.mp3"));
-			m_subwayMusic = Gdx.audio.newSound(Gdx.files.internal("music/subway.mp3"));
-			m_burgerPeopleMusic = Gdx.audio.newSound(Gdx.files.internal("music/burger_people.mp3"));
-			m_astroLoungeMusic = Gdx.audio.newSound(Gdx.files.internal("music/subway.mp3"));
-		}
+		m_jukebox = new Jukebox();
 
 		m_introAnimation = createIntroAnimation();
 
 		if(Gdx.app.getType() == Application.ApplicationType.Desktop) {
-			if(MUSIC_ENABLED) {
-				m_themeMusic.loop(MUSIC_VOLUME);
-				m_musicPlaying = true;
-			}
+			m_jukebox.play(Jukebox.Track.PixelDuke);
 		}
 
 		m_titleScreenSheetTexture = new Texture(Gdx.files.internal("ui/duke_burger_menu_animation.png"));
@@ -386,27 +369,9 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 				
 				if(musicTypeObject instanceof String) {
 					String musicType = (String) musicTypeObject;
-					Sound music = null;
 
-					if(musicType.equalsIgnoreCase("city")) {
-						music = m_cityMusic;
-					}
-					else if(musicType.equalsIgnoreCase("subway")) {
-						music = m_subwayMusic;
-					}
-					else if(musicType.equalsIgnoreCase("burger_people")) {
-						music = m_burgerPeopleMusic;
-					}
-					else if(musicType.equalsIgnoreCase("astro_lounge")) {
-						music = m_astroLoungeMusic;
-					}
-					else {
+					if(!m_jukebox.play(musicType)) {
 						System.err.println("Invalid music type: '" + musicType + "'.");
-					}
-
-					if(music != null && MUSIC_ENABLED) {
-						music.loop(MUSIC_VOLUME);
-						m_musicPlaying = true;
 					}
 				}
 			}
@@ -414,15 +379,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	}
 
 	public void stopMusic() {
-		if(!MUSIC_ENABLED) {
-			return;
-		}
-
-		m_themeMusic.stop();
-		m_cityMusic.stop();
-		m_subwayMusic.stop();
-		m_burgerPeopleMusic.stop();
-		m_astroLoungeMusic.stop();
+		m_jukebox.stop();
 	}
 
 	public void stopGame() {
@@ -457,10 +414,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 		stopGame();
 
-		if(MUSIC_ENABLED) {
-			m_themeMusic.loop(MUSIC_VOLUME);
-			m_musicPlaying = true;
-		}
+		m_jukebox.play(Track.PixelDuke);
 	}
 
 	@Override
@@ -529,9 +483,8 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 				m_showIntro = true;
 				m_elapsedIntroAnimationTime = 0.0f;
 
-				if(!m_musicPlaying && MUSIC_ENABLED) {
-					m_themeMusic.loop(MUSIC_VOLUME);
-					m_musicPlaying = true;
+				if(!m_jukebox.isPlaying()) {
+					m_jukebox.play(Track.PixelDuke);
 				}
 			}
 
