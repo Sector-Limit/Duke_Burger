@@ -1,6 +1,9 @@
 package com.sectorlimit.dukeburger;
 
 import com.badlogic.gdx.Application;
+import java.util.Arrays;
+import java.util.Vector;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -31,7 +34,6 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
-import com.sectorlimit.dukeburger.image.GifDecoder;
 
 public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
@@ -43,7 +45,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	private Texture m_skyTexture;
 	private Texture m_titleScreenSheetTexture;
 	private Animation<TextureRegion> m_titleScreenAnimation;
-	private Animation<TextureRegion> m_introAnimation;
+	private Animation<Texture> m_introAnimation;
 	private TiledMap m_map;
 	private OrthogonalTiledMapRenderer m_mapRenderer;
 
@@ -83,6 +85,18 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	private static final boolean MUSIC_ENABLED = true;
 	private static final float MUSIC_VOLUME = 0.15f;
 
+	private class AnimationFrameData {
+
+		public Texture texture;
+		public float delay;
+
+		public AnimationFrameData(Texture t, float d) {
+			texture = t;
+			delay = d;
+		}
+		
+	}
+
 	@Override
 	public void create() {
 		Gdx.graphics.setWindowedMode(1280, 720);
@@ -113,9 +127,9 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 			m_astroLoungeMusic = Gdx.audio.newSound(Gdx.files.internal("music/subway.mp3"));
 		}
 
-		if(Gdx.app.getType() == Application.ApplicationType.Desktop) {
-			m_introAnimation = GifDecoder.loadGIFAnimation(Animation.PlayMode.NORMAL, Gdx.files.internal("ui/intro.gif").read());
+		m_introAnimation = createIntroAnimation();
 
+		if(Gdx.app.getType() == Application.ApplicationType.Desktop) {
 			if(MUSIC_ENABLED) {
 				m_themeMusic.loop(MUSIC_VOLUME);
 				m_musicPlaying = true;
@@ -533,9 +547,9 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 				m_uiStage.getViewport().apply();
 				m_uiStage.draw();
 	
-				TextureRegion introFrameTextureRegion = m_introAnimation.getKeyFrame(m_elapsedIntroAnimationTime);
-				m_spriteBatch.draw(introFrameTextureRegion, 0.0f, 0.0f, 0.0f, 0.0f, introFrameTextureRegion.getRegionWidth(), introFrameTextureRegion.getRegionHeight(), 1.0f, 1.0f, 0.0f);
-	
+				Texture introFrameTexture = m_introAnimation.getKeyFrame(m_elapsedIntroAnimationTime);
+				m_spriteBatch.draw(introFrameTexture, 0.0f, 0.0f, 0.0f, 0.0f, introFrameTexture.getWidth(), introFrameTexture.getHeight(), 1.0f, 1.0f, 0.0f, 0, 0, introFrameTexture.getWidth(), introFrameTexture.getHeight(), false, false);
+
 				m_spriteBatch.end();
 	
 				if((Gdx.input.isKeyPressed(Keys.ESCAPE) || Gdx.input.isKeyPressed(Keys.BUTTON_START) || Gdx.input.isKeyPressed(Keys.BUTTON_SELECT) || Gdx.input.isKeyPressed(Keys.BUTTON_A)) || m_elapsedIntroAnimationTime >= m_introAnimation.getAnimationDuration()) {
@@ -635,6 +649,64 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		if(m_debugRenderer != null) {
 			m_debugRenderer.render(m_world, m_gameStage.getCamera().combined);
 		}
+	}
+
+	private Animation<Texture> createIntroAnimation() {
+		float fadeDuration = 200.0f;
+		Texture blankFrame = new Texture(Gdx.files.internal("ui/intro/intro00.png"));
+
+		Vector<AnimationFrameData> animationFrameData = new Vector<AnimationFrameData>(Arrays.asList(
+			new AnimationFrameData(blankFrame, 1000.0f),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro01.png")), fadeDuration),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro02.png")), 3000.0f),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro03.png")), 200.0f),
+			new AnimationFrameData(blankFrame, fadeDuration),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro04.png")), fadeDuration),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro05.png")), 3000.0f),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro06.png")), 3000.0f),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro07.png")), fadeDuration),
+			new AnimationFrameData(blankFrame, fadeDuration),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro08.png")), fadeDuration),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro09.png")), 1500.0f),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro10.png")), 200.0f),
+			new AnimationFrameData(blankFrame, fadeDuration),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro11.png")), fadeDuration),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro12.png")), 3000.0f),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro14.png")), 3000.0f),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro15.png")), 800.0f),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro16.png")), 800.0f),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro17.png")), 800.0f),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro18.png")), 800.0f),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro19.png")), 2000.0f),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro20.png")), fadeDuration),
+			new AnimationFrameData(blankFrame, fadeDuration),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro21.png")), fadeDuration),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro22.png")), 4000.0f),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro23.png")), 4000.0f),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro24.png")), 4000.0f),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro25.png")), 4000.0f),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro26.png")), 2000.0f)
+		));
+
+		int totalFrameCount = 0;
+
+		for(int i = 0; i < animationFrameData.size(); i++) {
+			totalFrameCount += (int) (animationFrameData.elementAt(i).delay / 100.0f);
+		}
+
+		int currentFrameIndex = 0;
+		Texture[] animationFrames = new Texture[totalFrameCount];
+
+		for(int i = 0; i < animationFrameData.size(); i++) {
+			AnimationFrameData data = animationFrameData.elementAt(i);
+			int frameCount = (int) (data.delay / 100.0f);
+
+			for(int j = 0; j < frameCount; j++) {
+				animationFrames[currentFrameIndex++] = data.texture;
+			}
+		}
+
+		return new Animation<Texture>(0.1f, animationFrames);
 	}
 
 	@Override
