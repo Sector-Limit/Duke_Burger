@@ -1,5 +1,6 @@
 package com.sectorlimit.dukeburger.object;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -18,6 +19,7 @@ public abstract class PickupItem {
 
 	protected boolean m_destroyed;
 	protected boolean m_tossed;
+	protected float m_tossedDuration;
 
 	protected Body m_body;
 
@@ -37,6 +39,7 @@ public abstract class PickupItem {
 	public PickupItem(Texture texture, Sound destroySound, Sound impactSound) {
 		m_destroyed = false;
 		m_tossed = false;
+		m_tossedDuration = 0.0f;
 		m_texture = texture;
 		m_destroySound = destroySound;
 		m_impactSound = impactSound;
@@ -142,6 +145,10 @@ public abstract class PickupItem {
 		collisionFixture.setFilterData(collisionFilter);
 	}
 
+	public boolean shouldTossHorizontal() {
+		return true;
+	}
+
 	public void pickup() {
 		m_body.setActive(false);
 	}
@@ -175,6 +182,16 @@ public abstract class PickupItem {
 	}
 
 	public void update() {
+		float deltaTime = Gdx.graphics.getDeltaTime();
+
+		if(m_tossed && shouldTossHorizontal()) {
+			m_tossedDuration += deltaTime;
+
+			if(m_tossedDuration <= 0.25f) {
+				m_body.setLinearVelocity(new Vector2(m_body.getLinearVelocity().x, 0.0f));
+			}
+		}
+
 		if(m_body.getPosition().y + getSize().y < 0.0f) {
 			destroy(true);
 		}

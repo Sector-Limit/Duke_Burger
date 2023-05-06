@@ -13,8 +13,14 @@ public class Burger extends PickupItem {
 		super(texture, null, impactSound);
 	}
 
+	@Override
 	public Vector2 getSize() {
 		return BURGER_SIZE;
+	}
+
+	@Override
+	public boolean shouldTossHorizontal() {
+		return false;
 	}
 
 	@Override
