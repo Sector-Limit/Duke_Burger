@@ -1114,7 +1114,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 		if(m_alive) {
 			if(m_pickupItem instanceof Burger) {
-				if(getOriginPosition().dst(m_door.getOriginPosition()) <= DOOR_OPEN_DISTANCE) {
+				if(getOriginPosition().dst(m_door.getOriginPosition()) <= DOOR_OPEN_DISTANCE && !m_levelCompleted) {
 					m_door.open();
 				}
 				else {
