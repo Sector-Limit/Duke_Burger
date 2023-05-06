@@ -76,7 +76,7 @@ public abstract class Enemy {
 		sensorFixtureDefinition.isSensor = true;
 		Fixture sensorCollisionFixture = m_body.createFixture(sensorFixtureDefinition);
 		Filter sensorCollisionFilter = new Filter();
-		sensorCollisionFilter.categoryBits = CollisionCategories.ENEMY_TOP_SENSOR;
+		sensorCollisionFilter.categoryBits = CollisionCategories.ENEMY_SENSOR;
 		sensorCollisionFilter.maskBits = CollisionCategories.DUKE;
 		sensorCollisionFixture.setFilterData(sensorCollisionFilter);
 		polygonCollisionShape.dispose();

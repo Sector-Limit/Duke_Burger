@@ -320,7 +320,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		polygonCollisionShape.dispose();
 		Filter collisionFilter = new Filter();
 		collisionFilter.categoryBits = CollisionCategories.DUKE;
-		collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.ENEMY_TOP_SENSOR | CollisionCategories.DOOR | CollisionCategories.PROJECTILE | CollisionCategories.DEATH;
+		collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.ENEMY_SENSOR | CollisionCategories.DOOR | CollisionCategories.PROJECTILE | CollisionCategories.DEATH;
 		collisionFixture.setFilterData(collisionFilter);
 		collisionFixture.setUserData("body");
 

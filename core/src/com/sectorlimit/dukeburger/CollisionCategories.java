@@ -8,7 +8,7 @@ public class CollisionCategories {
 	public static final short DUKE_FEET_SENSOR  = 1 << 3;
 	public static final short DUKE_SIDE_SENSOR  = 1 << 4;
 	public static final short ENEMY             = 1 << 5;
-	public static final short ENEMY_TOP_SENSOR  = 1 << 6;
+	public static final short ENEMY_SENSOR      = 1 << 6;
 	public static final short ENEMY_SIDE_SENSOR = 1 << 7;
 	public static final short ENEMY_BOUNDARY    = 1 << 8;
 	public static final short BURGER            = 1 << 9;
