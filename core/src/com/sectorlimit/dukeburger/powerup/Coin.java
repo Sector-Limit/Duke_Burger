@@ -25,7 +25,7 @@ public class Coin extends Powerup {
 	public void consume() {
 		super.consume();
 
-		m_consumeSound.play();
+		m_consumeSound.play(0.4f);
 	}
 
 }

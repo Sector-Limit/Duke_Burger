@@ -536,7 +536,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_pickupItem = pickupItem;
 		m_pickupItem.pickup();
 
-		m_pickupSound.play();
+		m_pickupSound.play(0.5f);
 	}
 
 	public void tossItem() {
@@ -555,7 +555,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_pickupCooldown = true;
 		m_pickupCooldownTimeElapsed = 0.0f;
 
-		m_tossSound.play();
+		m_tossSound.play(0.7f);
 	}
 
 	public void dropItem() {
@@ -589,7 +589,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_pickupEnemy.toss(m_facingLeft);
 		m_pickupEnemy = null;
 
-		m_tossSound.play();
+		m_tossSound.play(0.7f);
 	}
 
 	public void giveBarrel() {
@@ -830,7 +830,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 					m_jumping = true;
 					m_jumpTimeElapsed = 0.0f;
 
-					m_jumpSounds.elementAt((int) (Math.random() * 2.0)).play();
+					m_jumpSounds.elementAt((int) (Math.random() * 2.0)).play(0.25f);
 				}
 
 				if(m_jumping) {

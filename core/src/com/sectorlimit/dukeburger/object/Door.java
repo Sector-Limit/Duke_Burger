@@ -26,6 +26,7 @@ public class Door extends StaticObject {
 	private Sound m_doorSound;
 
 	private static final Vector2 DOOR_SIZE = new Vector2(16, 32);
+	private static final float DOOR_SOUND_VOLUME = 0.5f;
 
 	public Door(Vector2 position, TextureRegion doorClosedTextureRegion, TextureRegion doorOpenTextureRegion, Sound doorSound) {
 		super(position);
@@ -58,12 +59,12 @@ public class Door extends StaticObject {
 		if(m_open) {
 			firstFixture.setSensor(true);
 
-			m_doorSound.play();
+			m_doorSound.play(DOOR_SOUND_VOLUME);
 		}
 		else {
 			firstFixture.setSensor(false);
 
-			m_doorSound.play(1.0f, 0.75f, 0.0f);
+			m_doorSound.play(DOOR_SOUND_VOLUME, 0.75f, 0.0f);
 		}
 	}
 

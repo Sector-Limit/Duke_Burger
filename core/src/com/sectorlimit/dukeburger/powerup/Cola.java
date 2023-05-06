@@ -27,7 +27,7 @@ public class Cola extends Powerup {
 	public void consume() {
 		super.consume();
 
-		m_consumeSounds.elementAt((int) (Math.random() * 2.0f)).play();
+		m_consumeSounds.elementAt((int) (Math.random() * 2.0f)).play(0.5f);
 	}
 
 }

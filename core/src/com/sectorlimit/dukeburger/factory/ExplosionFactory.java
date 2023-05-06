@@ -42,7 +42,7 @@ public class ExplosionFactory {
 	}
 
 	public Explosion createExplosion(Vector2 position) {
-		m_explosionSounds.elementAt((int) (Math.random() * 2.0)).play();
+		m_explosionSounds.elementAt((int) (Math.random() * 2.0)).play(0.6f);
 
 		return new Explosion(position, m_explosionAnimation);
 	}

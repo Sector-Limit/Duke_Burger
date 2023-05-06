@@ -25,7 +25,7 @@ public class Chicken extends Powerup {
 	public void consume() {
 		super.consume();
 
-		m_consumeSound.play();
+		m_consumeSound.play(0.8f);
 	}
 
 }
