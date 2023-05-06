@@ -406,6 +406,8 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	}
 
 	public void stopGame() {
+		stopMusic();
+
 		m_mapRenderer = null;
 		m_map = null;
 		m_debugRenderer = null;
@@ -434,6 +436,11 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		m_elapsedTitleScreenAnimationTime = 0.0f;
 
 		stopGame();
+
+		if(MUSIC_ENABLED) {
+			m_themeMusic.loop(MUSIC_VOLUME);
+			m_musicPlaying = true;
+		}
 	}
 
 	@Override
