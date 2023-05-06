@@ -1310,12 +1310,19 @@ public class Duke implements ContactListener, HUDDataProvider {
 				if(enemy instanceof OctaBaby) {
 					OctaBaby octaBaby = (OctaBaby) enemy;
 
-					if((m_feetGroundContactFixtures.isEmpty() && m_body.getLinearVelocity().y < 0.0f) && !m_recentlyAttacked && contactFixture.isSensor()) {
-						m_squishSound.play();
-						octaBaby.squish();
-					}
-					else if(!octaBaby.isSquished()) {
-						onAttackedBy(enemy);
+					String contactFixtureType = null;
+					Object contactFixtureTypeObject = contactFixture.getUserData();
+
+					if(contactFixtureTypeObject instanceof String) {
+						contactFixtureType = (String) contactFixtureTypeObject;
+
+						if((m_feetGroundContactFixtures.isEmpty() && m_body.getLinearVelocity().y < 0.0f) && !m_recentlyAttacked && contactFixtureType.equalsIgnoreCase("top")) {
+							m_squishSound.play();
+							octaBaby.squish();
+						}
+						else if(!octaBaby.isSquished() && contactFixtureType.equalsIgnoreCase("main")) {
+							onAttackedBy(enemy);
+						}
 					}
 				}
 				else {

@@ -70,6 +70,7 @@ public class OctaBaby extends BasicEnemy {
 		collisionFilter.categoryBits = CollisionCategories.ENEMY;
 		collisionFilter.maskBits = CollisionCategories.DUKE_FEET_SENSOR;
 		collisionFixture.setFilterData(collisionFilter);
+		collisionFixture.setUserData("top");
 	}
 
 	@Override

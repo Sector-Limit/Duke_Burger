@@ -82,6 +82,7 @@ public abstract class Enemy {
 		sensorCollisionFilter.categoryBits = CollisionCategories.ENEMY_SENSOR;
 		sensorCollisionFilter.maskBits = CollisionCategories.OBJECT | CollisionCategories.DUKE_MAIN_SENSOR | CollisionCategories.EXPLOSION;
 		sensorCollisionFixture.setFilterData(sensorCollisionFilter);
+		sensorCollisionFixture.setUserData("main");
 		polygonCollisionShape.dispose();
 		circleCollisionShape.dispose();
 	}
