@@ -6,6 +6,7 @@ import java.util.Vector;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -122,6 +123,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private Texture m_walkHoldSpriteSheetTexture;
 	private Animation<TextureRegion> m_walkAnimation;
 	private Animation<TextureRegion> m_walkHoldAnimation;
+	private Texture m_attackedOverlayTexture;
 
 	private Sound m_hitSound;
 	private Sound m_squishSound;
@@ -147,7 +149,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private static final float WALK_ANIMATION_SPEED = 0.07f;
 	private static final float ATTACK_COOLDOWN = 3.0f;
 	private static final float DAMAGED_FLICKER_SPEED = 0.15f;
-	private static final float DAMAGED_OPACITYT = 0.65f;
+	private static final float DAMAGED_OPACITY = 0.65f;
 	private static final float RECENTLY_ATTACKED_DURATION = 1.0f;
 	private static final float DOOR_OPEN_DISTANCE = DUKE_SIZE.y + (16.0f * 1.5f);
 	private static final float LEVEL_COMPLETED_DELAY = 3.0f;
@@ -410,6 +412,12 @@ public class Duke implements ContactListener, HUDDataProvider {
 		}
 
 		m_walkHoldAnimation = new Animation<TextureRegion>(WALK_ANIMATION_SPEED, walkHoldFrames);
+
+
+        Pixmap attackedOverlayPixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        attackedOverlayPixmap.setColor(1.0f, 0.0f, 0.0f, 1.0f);
+        attackedOverlayPixmap.fill();
+		m_attackedOverlayTexture = new Texture(attackedOverlayPixmap);
 
 		m_hitSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Squish.wav"));
 		m_squishSound = Gdx.audio.newSound(Gdx.files.internal("sounds/GetHit.wav"));
@@ -1122,7 +1130,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		float scale = m_steroids ? 4.0f : 1.0f;
 
 		if(m_underAttack && m_alive) {
-			spriteBatch.setColor(1.0f, 1.0f, 1.0f, m_attackCooldownTimeElapsed % DAMAGED_FLICKER_SPEED > DAMAGED_FLICKER_SPEED * 0.5f ? 1.0f : DAMAGED_OPACITYT);
+			spriteBatch.setColor(1.0f, 1.0f, 1.0f, m_attackCooldownTimeElapsed % DAMAGED_FLICKER_SPEED > DAMAGED_FLICKER_SPEED * 0.5f ? 1.0f : DAMAGED_OPACITY);
 		}
 
 		if(currentTexture != null) {
@@ -1147,6 +1155,14 @@ public class Duke implements ContactListener, HUDDataProvider {
 
 	public void renderHUD(SpriteBatch spriteBatch) {
 		m_hud.render(spriteBatch);
+
+		if(m_underAttack && m_alive && m_attackCooldownTimeElapsed <= 0.5f) {
+			spriteBatch.setColor(1.0f, 1.0f, 1.0f, 0.5f - ((m_attackCooldownTimeElapsed / 0.5f) * 0.5f));
+
+			spriteBatch.draw(m_attackedOverlayTexture, 0.0f, 0.0f, 0.0f, 0.0f, m_attackedOverlayTexture.getWidth(), m_attackedOverlayTexture.getHeight(), DukeBurger.VIEWPORT_SIZE.x, DukeBurger.VIEWPORT_SIZE.y, 0.0f, 0, 0, m_attackedOverlayTexture.getWidth(), m_attackedOverlayTexture.getHeight(), false, false);
+	
+			spriteBatch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+		}
 	}
 
 	@Override
