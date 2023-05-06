@@ -7,6 +7,8 @@ public class FinishText extends StaticObject {
 
 	public FinishText(Vector2 position, Texture texture) {
 		super(position, texture);
+
+		m_visible = false;
 	}
 
 	public Vector2 getSize() {

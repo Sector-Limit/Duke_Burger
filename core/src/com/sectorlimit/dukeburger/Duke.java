@@ -43,6 +43,7 @@ import com.sectorlimit.dukeburger.object.Box;
 import com.sectorlimit.dukeburger.object.Burger;
 import com.sectorlimit.dukeburger.object.Door;
 import com.sectorlimit.dukeburger.object.Explosion;
+import com.sectorlimit.dukeburger.object.FinishText;
 import com.sectorlimit.dukeburger.object.PickupItem;
 import com.sectorlimit.dukeburger.object.PigCop;
 import com.sectorlimit.dukeburger.object.StaticObject;
@@ -107,6 +108,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private Burger m_burger;
 	private Door m_door;
 	private PigCop m_pigCop;
+	private Vector<FinishText> m_finishText;
 	private Vector<Powerup> m_powerups;
 	private Vector<PickupItem> m_pickupItems;
 	private Vector<Enemy> m_enemies;
@@ -203,6 +205,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_enemies = new Vector<Enemy>();
 		m_explosions = new Vector<Explosion>();
 		m_staticObjects = new Vector<StaticObject>();
+		m_finishText = new Vector<FinishText>();
 
 		MapLayers mapLayers = map.getLayers();
 		MapObjects mapObjects = mapLayers.get("objects").getObjects();
@@ -259,10 +262,14 @@ public class Duke implements ContactListener, HUDDataProvider {
 				m_staticObjects.add(m_staticObjectFactory.createLava(objectPosition));
 			}
 			else if(mapObject.getName().equalsIgnoreCase("finish_text_1")) {
-				m_staticObjects.add(m_staticObjectFactory.createFinishText(1, objectPosition));
+				FinishText finishText1 = m_staticObjectFactory.createFinishText(1, objectPosition);
+				m_finishText.add(finishText1);
+				m_staticObjects.add(finishText1);
 			}
 			else if(mapObject.getName().equalsIgnoreCase("finish_text_2")) {
-				m_staticObjects.add(m_staticObjectFactory.createFinishText(2, objectPosition));
+				FinishText finishText2 = m_staticObjectFactory.createFinishText(2, objectPosition);
+				m_finishText.add(finishText2);
+				m_staticObjects.add(finishText2);
 			}
 			else if(mapObject.getName().equalsIgnoreCase("pigcop_1") || mapObject.getName().equalsIgnoreCase("pigcop_finish")) {
 				m_pigCop = m_staticObjectFactory.createPigCop(1, objectPosition);
@@ -634,7 +641,11 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_levelCompletedTimeElapsed = 0.0f;
 
 		if(m_pigCop != null) {
-			m_pigCop.setVisible(true);
+			m_pigCop.show();
+		}
+
+		for(FinishText finishText : m_finishText) {
+			finishText.show();
 		}
 
 		m_winSound.play(0.1f);

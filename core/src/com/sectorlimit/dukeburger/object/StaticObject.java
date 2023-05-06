@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 public abstract class StaticObject {
 
 	protected Vector2 m_position;
+	protected boolean m_visible;
 
 	protected float m_elapsedAnimationTime;
 	protected Texture m_texture;
@@ -17,15 +18,18 @@ public abstract class StaticObject {
 
 	public StaticObject(Vector2 position) {
 		m_position = position;
+		m_visible = true;
 	}
 
 	public StaticObject(Vector2 position, Texture texture) {
 		m_position = position;
+		m_visible = true;
 		m_texture = texture;
 	}
 
 	public StaticObject(Vector2 position, Animation<TextureRegion> animation) {
 		m_position = position;
+		m_visible = true;
 		m_animation = animation;
 	}
 
@@ -43,7 +47,27 @@ public abstract class StaticObject {
 		m_position = position;
 	}
 
+	public boolean isVisible() {
+		return m_visible;
+	}
+
+	public void setVisible(boolean visible) {
+		m_visible = visible;
+	}
+
+	public void show() {
+		setVisible(true);
+	}
+
+	public void hide() {
+		setVisible(false);
+	}
+
 	public void render(SpriteBatch spriteBatch) {
+		if(!m_visible) {
+			return;
+		}
+
 		Vector2 renderOrigin = new Vector2(getOriginPosition()).sub(new Vector2(getSize()).scl(0.5f));
 
 		if(m_texture != null) {
