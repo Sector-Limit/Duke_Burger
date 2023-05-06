@@ -85,6 +85,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private boolean m_levelCompleted;
 	private boolean m_levelEnded;
 	private float m_levelCompletedTimeElapsed;
+	private float m_levelCompletedDelay;
 	private boolean m_gameOver;
 
 	private World m_world;
@@ -154,7 +155,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private static final float DAMAGED_OPACITY = 0.65f;
 	private static final float RECENTLY_ATTACKED_DURATION = 1.0f;
 	private static final float DOOR_OPEN_DISTANCE = DUKE_SIZE.y + (16.0f * 1.5f);
-	private static final float LEVEL_COMPLETED_DELAY = 3.0f;
+	private static final float DEFAULT_LEVEL_COMPLETED_DELAY = 3.0f;
 	private static final float PICKUP_COOLDOWN_DURATION = 0.35f;
 
 	public Duke(World world, TiledMap map) {
@@ -189,6 +190,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_levelEnded = false;
 		m_gameOver = false;
 		m_levelCompletedTimeElapsed = 0.0f;
+		m_levelCompletedDelay = DEFAULT_LEVEL_COMPLETED_DELAY;
 		m_hud = new HUD(this);
 		m_pickupItemFactory = new PickupItemFactory(m_world);
 		m_projectileSystem = new ProjectileSystem(m_world);
@@ -653,6 +655,18 @@ public class Duke implements ContactListener, HUDDataProvider {
 		return true;
 	}
 
+	public float getLevelCompletedDelay() {
+		return m_levelCompletedDelay;
+	}
+
+	public void setLevelCompletedDelay(float levelCompletedDelay) {
+		if(levelCompletedDelay < 0.0f) {
+			return;
+		}
+
+		m_levelCompletedDelay = levelCompletedDelay;
+	}
+
 	public boolean onAttackedBy(Enemy enemy) {
 		if(m_underAttack) {
 			return false;
@@ -800,7 +814,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 				if(!m_levelEnded) {
 					m_levelCompletedTimeElapsed += deltaTime;
 
-					if(m_levelCompletedTimeElapsed >= LEVEL_COMPLETED_DELAY) {
+					if(m_levelCompletedTimeElapsed >= m_levelCompletedDelay) {
 						m_levelEnded = true;
 
 						m_listener.onLevelEnded();

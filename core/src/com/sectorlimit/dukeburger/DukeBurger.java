@@ -375,6 +375,14 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 					}
 				}
 			}
+
+			if(mapProperties.containsKey("completed_delay")) {
+				Object completedDelayObject = mapProperties.get("completed_delay");
+
+				if(completedDelayObject instanceof String) {
+					m_duke.setLevelCompletedDelay(Float.parseFloat((String) completedDelayObject));
+				}
+			}
 		}
 	}
 
