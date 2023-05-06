@@ -103,9 +103,21 @@ public class OctaBaby extends BasicEnemy {
 
 		m_squished = false;
 		m_squishedTimeElapsed = 0.0f;
-		m_body.setActive(true);
+		setPlayerCollisionEnabled(true);
 
 		return true;
+	}
+
+	private void setPlayerCollisionEnabled(boolean enabled) {
+		Fixture enemySensorFixture = m_body.getFixtureList().get(1);
+		Filter enemySensorFilter = enemySensorFixture.getFilterData();
+
+		if(enabled) {
+			enemySensorFilter.maskBits = CollisionCategories.OBJECT | CollisionCategories.DUKE_MAIN_SENSOR;
+		}
+		else {
+			enemySensorFilter.maskBits = (short) (enemySensorFilter.maskBits & (~CollisionCategories.DUKE_MAIN_SENSOR));
+		}
 	}
 
 	@Override
@@ -127,7 +139,7 @@ public class OctaBaby extends BasicEnemy {
 			if(!isTossed()) {
 				if(isSquished()) {
 					if(m_body.isActive()) {
-						m_body.setActive(false);
+						setPlayerCollisionEnabled(false);
 					}
 
 					m_squishedTimeElapsed += deltaTime;
@@ -138,7 +150,7 @@ public class OctaBaby extends BasicEnemy {
 				}
 				else {
 					if(!m_body.isActive()) {
-						m_body.setActive(true);
+						setPlayerCollisionEnabled(true);
 					}
 				}
 			}
