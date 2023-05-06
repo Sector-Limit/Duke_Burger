@@ -1,5 +1,6 @@
 package com.sectorlimit.dukeburger;
 
+import java.util.Arrays;
 import java.util.Vector;
 
 import com.badlogic.gdx.Gdx;
@@ -127,6 +128,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private Sound m_extraLifeSound;
 	private Sound m_deathSound;
 	private Sound m_winSound;
+	private Vector<Sound> m_jumpSounds;
 
 	private DukeListener m_listener;
 
@@ -412,6 +414,11 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_extraLifeSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Chicken.wav"));
 		m_deathSound = Gdx.audio.newSound(Gdx.files.internal("sounds/DeathSound.wav"));
 		m_winSound = Gdx.audio.newSound(Gdx.files.internal("sounds/WinSound.wav"));
+
+		m_jumpSounds = new Vector<Sound>(Arrays.asList(
+			Gdx.audio.newSound(Gdx.files.internal("sounds/Jump.wav")),
+			Gdx.audio.newSound(Gdx.files.internal("sounds/Jump02.wav"))
+		));
 	}
 
 	public int getHealth() {
@@ -822,6 +829,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 				if(!m_jumping && !m_tossingSomething && !m_feetGroundContactFixtures.isEmpty()) {
 					m_jumping = true;
 					m_jumpTimeElapsed = 0.0f;
+
+					m_jumpSounds.elementAt((int) (Math.random() * 2.0)).play();
 				}
 
 				if(m_jumping) {
