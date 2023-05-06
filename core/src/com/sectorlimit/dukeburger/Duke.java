@@ -320,9 +320,24 @@ public class Duke implements ContactListener, HUDDataProvider {
 		polygonCollisionShape.dispose();
 		Filter collisionFilter = new Filter();
 		collisionFilter.categoryBits = CollisionCategories.DUKE;
-		collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.ENEMY_SENSOR | CollisionCategories.DOOR | CollisionCategories.PROJECTILE | CollisionCategories.DEATH;
+		collisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.DOOR | CollisionCategories.DEATH;
 		collisionFixture.setFilterData(collisionFilter);
 		collisionFixture.setUserData("body");
+
+		BodyDef mainSensorBodyDefinition = new BodyDef();
+		mainSensorBodyDefinition.fixedRotation = true;
+		PolygonShape mainPolygonCollisionShape = new PolygonShape();
+		mainPolygonCollisionShape.setAsBox(getSize().x * 0.35f, getSize().y * 0.475f);
+		FixtureDef mainFixtureDefinition = new FixtureDef();
+		mainFixtureDefinition.shape = mainPolygonCollisionShape;
+		mainFixtureDefinition.isSensor = true;
+		Fixture mainCollisionFixture = m_body.createFixture(mainFixtureDefinition);
+		mainPolygonCollisionShape.dispose();
+		Filter mainCollisionFilter = new Filter();
+		mainCollisionFilter.categoryBits = CollisionCategories.DUKE_MAIN_SENSOR;
+		mainCollisionFilter.maskBits = CollisionCategories.ENEMY_SENSOR | CollisionCategories.PROJECTILE;
+		mainCollisionFixture.setFilterData(mainCollisionFilter);
+		mainCollisionFixture.setUserData("main");
 
 		Vector2 halfSize = new Vector2(getSize()).scl(0.5f);
 		float halfSensorWidth = halfSize.x * 0.99f;
@@ -343,7 +358,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		bottomPolygonCollisionShape.dispose();
 		Filter bottomCollisionFilter = new Filter();
 		bottomCollisionFilter.categoryBits = CollisionCategories.DUKE_FEET_SENSOR;
-		bottomCollisionFilter.maskBits = CollisionCategories.GROUND;
+		bottomCollisionFilter.maskBits = CollisionCategories.GROUND | CollisionCategories.ENEMY;
 		bottomCollisionFixture.setFilterData(bottomCollisionFilter);
 		bottomCollisionFixture.setUserData("feet");
 
@@ -423,9 +438,9 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_walkHoldAnimation = new Animation<TextureRegion>(WALK_ANIMATION_SPEED, walkHoldFrames);
 
 
-        Pixmap attackedOverlayPixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        attackedOverlayPixmap.setColor(1.0f, 0.0f, 0.0f, 1.0f);
-        attackedOverlayPixmap.fill();
+		Pixmap attackedOverlayPixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+		attackedOverlayPixmap.setColor(1.0f, 0.0f, 0.0f, 1.0f);
+		attackedOverlayPixmap.fill();
 		m_attackedOverlayTexture = new Texture(attackedOverlayPixmap);
 
 		m_hitSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Squish.wav"));

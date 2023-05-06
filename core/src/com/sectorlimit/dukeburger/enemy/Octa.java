@@ -63,7 +63,7 @@ public class Octa extends Enemy {
 		Fixture sensorCollisionFixture = m_body.createFixture(sensorFixtureDefinition);
 		Filter sensorCollisionFilter = new Filter();
 		sensorCollisionFilter.categoryBits = CollisionCategories.ENEMY_SENSOR;
-		sensorCollisionFilter.maskBits = CollisionCategories.OBJECT | CollisionCategories.DUKE;
+		sensorCollisionFilter.maskBits = CollisionCategories.OBJECT | CollisionCategories.DUKE_MAIN_SENSOR;
 		sensorCollisionFixture.setFilterData(sensorCollisionFilter);
 		circleCollisionShape.dispose();
 
