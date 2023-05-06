@@ -685,7 +685,8 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro23.png")), 4000.0f),
 			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro24.png")), 4000.0f),
 			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro25.png")), 4000.0f),
-			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro26.png")), 2000.0f)
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro26.png")), 4000.0f),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/intro/intro27.png")), 2000.0f)
 		));
 
 		int totalFrameCount = 0;
