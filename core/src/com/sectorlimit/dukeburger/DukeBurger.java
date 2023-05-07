@@ -127,7 +127,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		TextureRegion[][] titleScreenTextureRegion = TextureRegion.split(m_titleScreenSheetTexture, m_titleScreenSheetTexture.getWidth() / NUMBER_OF_TITLE_SCREEN_FRAMES, m_titleScreenSheetTexture.getHeight());
 		TextureRegion[] titleScreenFrames = new TextureRegion[NUMBER_OF_TITLE_SCREEN_FRAMES];
 
-		for (int i = 0; i < NUMBER_OF_TITLE_SCREEN_FRAMES; i++) {
+		for(int i = 0; i < NUMBER_OF_TITLE_SCREEN_FRAMES; i++) {
 			titleScreenFrames[i] = titleScreenTextureRegion[0][i];
 		}
 
@@ -507,7 +507,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 			TextureRegion titleScreenFrameTextureRegion = m_titleScreenAnimation.getKeyFrame(m_elapsedTitleScreenAnimationTime);
 			m_spriteBatch.draw(titleScreenFrameTextureRegion, 0.0f, 0.0f, 0.0f, 0.0f, titleScreenFrameTextureRegion.getRegionWidth(), titleScreenFrameTextureRegion.getRegionHeight(), 1.0f, 1.0f, 0.0f);
 
-			m_textRenderer.renderText(m_spriteBatch, VERSION, new Vector2(VIEWPORT_SIZE.x - m_textRenderer.getRenderedTextWidth(VERSION), 1.0f));
+			m_textRenderer.renderText(m_spriteBatch, VERSION, new Vector2(VIEWPORT_SIZE.x - m_textRenderer.getRenderedTextWidth(VERSION), VIEWPORT_SIZE.y - m_textRenderer.getRenderedTextHeight() - 1.0f));
 
 			m_spriteBatch.end();
 

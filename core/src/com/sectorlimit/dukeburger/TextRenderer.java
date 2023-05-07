@@ -44,6 +44,10 @@ public class TextRenderer {
 		return textWidth - 1.0f;
 	}
 
+	public float getRenderedTextHeight() {
+		return m_numberTextures[0].getHeight();
+	}
+
 	public void renderText(SpriteBatch spriteBatch, String text, Vector2 position) {
 		Vector2 digitPosition = new Vector2(position);
 
