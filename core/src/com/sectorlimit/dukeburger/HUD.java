@@ -7,57 +7,22 @@ import com.badlogic.gdx.math.Vector2;
 
 public class HUD {
 
+	private TextRenderer m_textRenderer;
 	private HUDDataProvider m_dataProvider;
 
-	private Texture[] m_numberTextures;
 	private Texture m_hudTexture;
 	private Texture m_fullHeartTexture;
 	private Texture m_emptyHeartTexture;
 
 	private static final float HEART_SPACING = 5.0f;
-	private static final float DIGIT_SPACING = 8.0f;
 
-	public HUD(HUDDataProvider dataProvider) {
+	public HUD(HUDDataProvider dataProvider, TextRenderer textRenderer) {
 		m_dataProvider = dataProvider;
+		m_textRenderer = textRenderer;
 
 		m_hudTexture = new Texture(Gdx.files.internal("sprites/ui_bar.png"));
 		m_fullHeartTexture = new Texture(Gdx.files.internal("sprites/heart.png"));
 		m_emptyHeartTexture = new Texture(Gdx.files.internal("sprites/heart_grey.png"));
-		m_numberTextures = new Texture[10];
-
-		for(int i = 0; i < 10; i++) {
-			m_numberTextures[i] = new Texture(Gdx.files.internal("sprites/" + i + ".png"));
-		}
-	}
-
-	public void renderNumber(SpriteBatch spriteBatch, int number, Vector2 position) {
-		renderNumber(spriteBatch, number, position, 0);
-	}
-
-	public void renderNumber(SpriteBatch spriteBatch, int number, Vector2 position, int minLength) {
-		String numberString = Integer.toString(number); 
-		int numberLength = numberString.length();
-		Vector2 digitPosition = new Vector2(position);
-
-		for(int i = 0; i < minLength - numberLength; i++) {
-			renderDigit(spriteBatch, 0, digitPosition);
-			digitPosition.add(new Vector2(DIGIT_SPACING, 0.0f));
-		}
-
-		for(int i = 0; i < numberLength; i++) {
-			renderDigit(spriteBatch, Integer.parseInt("" + numberString.charAt(i)), digitPosition);
-			digitPosition.add(new Vector2(DIGIT_SPACING, 0.0f));
-		}
-	}
-
-	public void renderDigit(SpriteBatch spriteBatch, int digit, Vector2 position) {
-		if(digit >= m_numberTextures.length) {
-			return;
-		}
-
-		Texture digitTexture = m_numberTextures[digit];
-
-		spriteBatch.draw(digitTexture, position.x, position.y, 0.0f, 0.0f, digitTexture.getWidth(), digitTexture.getHeight(), 1.0f, 1.0f, 0.0f, 0, 0, digitTexture.getWidth(), digitTexture.getHeight(), false, false);
 	}
 
 	public void render(SpriteBatch spriteBatch) {
@@ -73,10 +38,10 @@ public class HUD {
 		}
 
 		Vector2 livesPosition = new Vector2(hudPosition).add(new Vector2(157.0f, verticalTextPosition));
-		renderNumber(spriteBatch, m_dataProvider.getLives(), livesPosition);
+		m_textRenderer.renderNumber(spriteBatch, m_dataProvider.getLives(), livesPosition);
 
 		Vector2 coinsPosition = new Vector2(hudPosition).add(new Vector2(297.0f, verticalTextPosition));
-		renderNumber(spriteBatch, m_dataProvider.getCoins(), coinsPosition, 2);
+		m_textRenderer.renderNumber(spriteBatch, m_dataProvider.getCoins(), coinsPosition, 2);
 	}
 
 }

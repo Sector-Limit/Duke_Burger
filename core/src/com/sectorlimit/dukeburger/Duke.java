@@ -95,6 +95,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private World m_world;
 	private Body m_body;
 
+	private TextRenderer m_textRenderer;
 	private HUD m_hud;
 	private ExplosionFactory m_explosionFactory;
 	private EnemyFactory m_enemyFactory;
@@ -171,11 +172,11 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private static final float PICKUP_COOLDOWN_DURATION = 0.35f;
 	private static final float DROP_DURATION = 0.2f;
 
-	public Duke(World world, TiledMap map) {
-		this(world, map, MAX_LIVES, 0, null);
+	public Duke(World world, TiledMap map, TextRenderer textRenderer) {
+		this(world, map, textRenderer, MAX_LIVES, 0, null);
 	}
 
-	public Duke(World world, TiledMap map, int lives, int coins, Vector<Integer> consumedPowerupIdentifiers) {
+	public Duke(World world, TiledMap map, TextRenderer textRenderer, int lives, int coins, Vector<Integer> consumedPowerupIdentifiers) {
 		m_world = world;
 		m_world.setContactListener(this);
 
@@ -204,7 +205,8 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_gameOver = false;
 		m_levelCompletedTimeElapsed = 0.0f;
 		m_levelCompletedDelay = DEFAULT_LEVEL_COMPLETED_DELAY;
-		m_hud = new HUD(this);
+		m_textRenderer = textRenderer;
+		m_hud = new HUD(this, m_textRenderer);
 		m_pickupItemFactory = new PickupItemFactory(m_world);
 		m_projectileSystem = new ProjectileSystem(m_world);
 		m_enemyFactory = new EnemyFactory(m_projectileSystem, m_world);
@@ -476,7 +478,6 @@ public class Duke implements ContactListener, HUDDataProvider {
 		}
 
 		m_walkHoldAnimation = new Animation<TextureRegion>(WALK_ANIMATION_SPEED, walkHoldFrames);
-
 
 		Pixmap attackedOverlayPixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
 		attackedOverlayPixmap.setColor(1.0f, 0.0f, 0.0f, 1.0f);
