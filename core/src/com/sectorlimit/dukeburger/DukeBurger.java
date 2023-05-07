@@ -46,13 +46,20 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	private Texture m_titleScreenSheetTexture;
 	private Animation<TextureRegion> m_titleScreenAnimation;
 	private Animation<Texture> m_introAnimation;
+	private Animation<Texture> m_gameOverAnimation;
+	private Texture m_creditsTexture;
 	private TiledMap m_map;
 	private OrthogonalTiledMapRenderer m_mapRenderer;
 
 	private boolean m_showTitleScreen;
 	private float m_elapsedTitleScreenAnimationTime;
+	private float m_newGameDelay;
 	private boolean m_showIntro;
 	private float m_elapsedIntroAnimationTime;
+	private boolean m_showGameOver;
+	private float m_elapsedGameOverAnimationTime;
+	private boolean m_showCredits;
+	private float m_elapsedCreditsTime;
 	private Stage m_uiStage;
 	private Stage m_gameStage;
 	private boolean m_debugCameraEnabled;
@@ -98,8 +105,13 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 		m_showTitleScreen = true;
 		m_elapsedTitleScreenAnimationTime = 0.0f;
+		m_newGameDelay = 0.0f;
 		m_showIntro = false;
 		m_elapsedIntroAnimationTime = 0.0f;
+		m_showGameOver = false;
+		m_elapsedGameOverAnimationTime = 0.0f;
+		m_showCredits = false;
+		m_elapsedCreditsTime = 0.0f;
 		m_currentLevelNumber = 1;
 		m_lives = Duke.MAX_LIVES;
 		m_coins = 0;
@@ -113,10 +125,12 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		m_spriteBatch = new SpriteBatch();
 		m_textRenderer = new TextRenderer();
 		m_citySkyTexture = new Texture(Gdx.files.internal("sprites/city_bg.png"));
+		m_creditsTexture = new Texture(Gdx.files.internal("ui/credits.png"));
 
 		m_jukebox = new Jukebox();
 
 		m_introAnimation = createIntroAnimation();
+		m_gameOverAnimation = createGameOverAnimation();
 
 		if(Gdx.app.getType() == Application.ApplicationType.Desktop) {
 			m_jukebox.play(Jukebox.Track.PixelDuke);
@@ -145,7 +159,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		stopGame();
 
 		if(m_currentLevelNumber <= 0 || m_currentLevelNumber >= NUMBER_OF_MISSIONS) {
-			m_showTitleScreen = true;
+			m_showCredits = true;
 			return;
 		}
 
@@ -431,7 +445,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 		stopGame();
 
-		m_jukebox.play(Track.PixelDuke);
+		m_showGameOver = true;
 	}
 
 	@Override
@@ -486,11 +500,74 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		m_gameStage.getViewport().update(width, height, true);
 	}
 
+	private boolean isSkipKeyPressed() {
+		return Gdx.input.isKeyPressed(Keys.ESCAPE) || Gdx.input.isKeyPressed(Keys.BUTTON_START) || Gdx.input.isKeyPressed(Keys.BUTTON_SELECT) || Gdx.input.isKeyPressed(Keys.BUTTON_A);
+	}
+
 	@Override
 	public void render() {
 		ScreenUtils.clear(0, 0, 0, 1);
 
 		float deltaTime = Gdx.graphics.getDeltaTime();
+
+		if(m_showGameOver) {
+			m_elapsedGameOverAnimationTime += deltaTime;
+
+			m_spriteBatch.begin();
+
+			m_uiStage.getViewport().apply();
+			m_uiStage.draw();
+
+			Texture gameOverFrameTexture = m_gameOverAnimation.getKeyFrame(m_elapsedGameOverAnimationTime % m_gameOverAnimation.getAnimationDuration());
+			m_spriteBatch.draw(gameOverFrameTexture, 0.0f, 0.0f, 0.0f, 0.0f, gameOverFrameTexture.getWidth(), gameOverFrameTexture.getHeight(), 1.0f, 1.0f, 0.0f, 0, 0, gameOverFrameTexture.getWidth(), gameOverFrameTexture.getHeight(), false, false);
+
+			m_spriteBatch.end();
+
+			if(((isSkipKeyPressed() || Gdx.input.isKeyPressed(Keys.SPACE)) && m_elapsedGameOverAnimationTime >= 1.0f) || m_elapsedGameOverAnimationTime >= 5.0f) {
+				m_showGameOver = false;
+				m_elapsedGameOverAnimationTime = 0.0f;
+
+				m_showTitleScreen = true;
+				m_elapsedTitleScreenAnimationTime = 0.0f;
+
+				m_newGameDelay = 1.0f;
+
+				if(!m_jukebox.isPlaying()) {
+					m_jukebox.play(Track.PixelDuke);
+				}
+			}
+
+			return;
+		}
+
+		if(m_showCredits) {
+			m_elapsedCreditsTime += deltaTime;
+
+			m_spriteBatch.begin();
+
+			m_uiStage.getViewport().apply();
+			m_uiStage.draw();
+
+			m_spriteBatch.draw(m_creditsTexture, 0.0f, 0.0f, 0.0f, 0.0f, m_creditsTexture.getWidth(), m_creditsTexture.getHeight(), 1.0f, 1.0f, 0.0f, 0, 0, m_creditsTexture.getWidth(), m_creditsTexture.getHeight(), false, false);
+
+			m_spriteBatch.end();
+
+			if(((isSkipKeyPressed() || Gdx.input.isKeyPressed(Keys.SPACE)) && m_elapsedCreditsTime >= 2.0f) || m_elapsedCreditsTime >= 15.0f) {
+				m_showCredits = false;
+				m_elapsedCreditsTime = 0.0f;
+
+				m_showTitleScreen = true;
+				m_elapsedTitleScreenAnimationTime = 0.0f;
+
+				m_newGameDelay = 1.0f;
+
+				if(!m_jukebox.isPlaying()) {
+					m_jukebox.play(Track.PixelDuke);
+				}
+			}
+
+			return;
+		}
 
 		if(m_showTitleScreen) {
 			m_elapsedTitleScreenAnimationTime += deltaTime;
@@ -511,7 +588,14 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 			m_spriteBatch.end();
 
-			if(Gdx.input.isKeyPressed(Keys.ANY_KEY)) {
+			if(m_newGameDelay > 0.0f) {
+				m_newGameDelay -= deltaTime;
+			}
+			else if(m_newGameDelay < 0.0f) {
+				m_newGameDelay = 0.0f;
+			}
+
+			if(Gdx.input.isKeyPressed(Keys.ANY_KEY) && m_newGameDelay == 0.0f) {
 				m_showTitleScreen = false;
 				m_elapsedTitleScreenAnimationTime = 0.0f;
 
@@ -540,7 +624,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 				m_spriteBatch.end();
 
-				if((Gdx.input.isKeyPressed(Keys.ESCAPE) || Gdx.input.isKeyPressed(Keys.BUTTON_START) || Gdx.input.isKeyPressed(Keys.BUTTON_SELECT) || Gdx.input.isKeyPressed(Keys.BUTTON_A)) || m_elapsedIntroAnimationTime >= m_introAnimation.getAnimationDuration()) {
+				if(isSkipKeyPressed() || m_elapsedIntroAnimationTime >= m_introAnimation.getAnimationDuration()) {
 					m_showIntro = false;
 					m_elapsedIntroAnimationTime = 0.0f;
 
@@ -637,6 +721,33 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		if(m_debugRenderer != null) {
 			m_debugRenderer.render(m_world, m_gameStage.getCamera().combined);
 		}
+	}
+
+	private Animation<Texture> createGameOverAnimation() {
+		Vector<AnimationFrameData> animationFrameData = new Vector<AnimationFrameData>(Arrays.asList(
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/gameover_01.png")), 700.0f),
+			new AnimationFrameData(new Texture(Gdx.files.internal("ui/gameover_02.png")), 700.0f)
+		));
+
+		int totalFrameCount = 0;
+
+		for(int i = 0; i < animationFrameData.size(); i++) {
+			totalFrameCount += (int) (animationFrameData.elementAt(i).delay / 100.0f);
+		}
+
+		int currentFrameIndex = 0;
+		Texture[] animationFrames = new Texture[totalFrameCount];
+
+		for(int i = 0; i < animationFrameData.size(); i++) {
+			AnimationFrameData data = animationFrameData.elementAt(i);
+			int frameCount = (int) (data.delay / 100.0f);
+
+			for(int j = 0; j < frameCount; j++) {
+				animationFrames[currentFrameIndex++] = data.texture;
+			}
+		}
+
+		return new Animation<Texture>(0.1f, animationFrames);
 	}
 
 	private Animation<Texture> createIntroAnimation() {
