@@ -76,7 +76,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 	private Jukebox m_jukebox;
 
-	public static final String VERSION = new String("1.0.8");
+	public static final String VERSION = new String("1.0.9");
 	public static final Vector2 VIEWPORT_SIZE = new Vector2(320.0f, 180.0f);
 	private static final float PHYSICS_TIME_STEMP = 1 / 60.f;
 	private static final int PHYSICS_VELOCITY_ITERATIONS = 6;
