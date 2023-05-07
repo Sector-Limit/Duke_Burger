@@ -115,12 +115,38 @@ public class Jukebox {
 		return null;
 	}
 
+	public static Track getTrack(int trackNumber) {
+		int trackIndex = trackNumber - 1;
+
+		if(trackIndex < 0 || trackIndex >= Track.values().length) {
+			return null;
+		}
+
+		return Track.values()[trackIndex];
+	}
+
 	public boolean play(String trackName) {
 		return play(trackName, true);
 	}
 
 	public boolean play(String trackName, boolean looping) {
 		Track track = getTrack(trackName);
+
+		if(track == null) {
+			return false;
+		}
+
+		play(track, looping);
+
+		return true;
+	}
+
+	public boolean play(int trackNumber) {
+		return play(trackNumber, true);
+	}
+
+	public boolean play(int trackNumber, boolean looping) {
+		Track track = getTrack(trackNumber);
 
 		if(track == null) {
 			return false;
