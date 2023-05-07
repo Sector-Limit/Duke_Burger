@@ -71,6 +71,10 @@ public class Jukebox {
 		}
 
 		m_enabled = enabled;
+
+		if(!m_enabled) {
+			stop();
+		}
 	}
 
 	public void enable() {
@@ -86,6 +90,10 @@ public class Jukebox {
 	}
 
 	public void play(Track track, boolean loop) {
+		if(!m_enabled) {
+			return;
+		}
+
 		stop();
 
 		m_currentTrack = track;
