@@ -42,6 +42,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 	private Box2DDebugRenderer m_debugRenderer;
 
 	private Texture m_citySkyTexture;
+	private Texture m_castleSkyTexture;
 	private Texture m_skyTexture;
 	private Texture m_titleScreenSheetTexture;
 	private Animation<TextureRegion> m_titleScreenAnimation;
@@ -125,6 +126,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 		m_spriteBatch = new SpriteBatch();
 		m_textRenderer = new TextRenderer();
 		m_citySkyTexture = new Texture(Gdx.files.internal("sprites/city_bg.png"));
+		m_castleSkyTexture = new Texture(Gdx.files.internal("sprites/castle.png"));
 		m_creditsTexture = new Texture(Gdx.files.internal("ui/credits.png"));
 
 		m_jukebox = new Jukebox();
@@ -378,6 +380,9 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 					if(backgroundType.equalsIgnoreCase("city")) {
 						m_skyTexture = m_citySkyTexture;
+					}
+					else if(backgroundType.equalsIgnoreCase("castle")) {
+						m_skyTexture = m_castleSkyTexture;
 					}
 					else {
 						System.err.println("Invalid background type: '" + backgroundType + "'.");
@@ -825,6 +830,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 
 		m_skyTexture = null;
 		m_citySkyTexture.dispose();
+		m_castleSkyTexture.dispose();
 		m_spriteBatch.dispose();
 		m_gameStage.dispose();
 	}
