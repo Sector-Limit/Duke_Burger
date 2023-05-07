@@ -348,7 +348,7 @@ public class DukeBurger extends ApplicationAdapter implements DukeListener {
 			}
 		}
 
-		m_duke = new Duke(m_world, m_map, m_textRenderer, lives, coins, consumedPowerupIdentifiers);
+		m_duke = new Duke(m_world, m_map, m_textRenderer, m_jukebox, lives, coins, consumedPowerupIdentifiers);
 		m_duke.setListener(this);
 
 		MapProperties mapProperties = m_map.getProperties();

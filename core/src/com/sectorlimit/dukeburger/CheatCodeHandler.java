@@ -25,7 +25,9 @@ public class CheatCodeHandler implements InputProcessor {
 		"GRAV",    // toggle low gravity
 		"KILL",    // suicide
 		"THANOS",  // kill all enemies
-		"TEST"     // warp to test level
+		"TEST",    // warp to test level
+		"MUSIC",   // toggle music
+		"SONG"     // play a specific music track
 	};
 
 	public CheatCodeHandler(Duke duke) {
@@ -130,6 +132,16 @@ public class CheatCodeHandler implements InputProcessor {
 
 			m_duke.warpTestLevel(special);
 		}
+		else if(cheatCode == 13) {
+			System.out.println("Toggling music.");
+
+			m_duke.toggleMusic();
+		}
+		else if(cheatCode == 14) {
+			System.out.println("Playing music track #" + special + ".");
+
+			m_duke.playMusicTrack(special);
+		}
 	}
 
 	@Override
@@ -158,10 +170,11 @@ public class CheatCodeHandler implements InputProcessor {
 
 		boolean isMissionWarp = m_currentCheatCode.equals(CHEAT_CODES[2]);
 		boolean isTestLevelWarp = m_currentCheatCode.equals(CHEAT_CODES[12]);
+		boolean isMusicTrackRequest = m_currentCheatCode.equals(CHEAT_CODES[14]);
 
-		if(isMissionWarp || isTestLevelWarp) {
+		if(isMissionWarp || isTestLevelWarp || isMusicTrackRequest) {
 			if(character >= '0' && character <= '9') {
-				handleCheatCode(isMissionWarp ? 2 : 12, (int) (character - '0'));
+				handleCheatCode(isMissionWarp ? 2 : (isMusicTrackRequest ? 14 : 12), (int) (character - '0'));
 			}
 			else {
 				m_currentCheatCode = "";
@@ -194,7 +207,7 @@ public class CheatCodeHandler implements InputProcessor {
 		}
 
 		for(int i = 0; i < CHEAT_CODES.length; i++) {
-			if(i == 2 || i == 12) {
+			if(i == 2 || i == 12 || i == 14) {
 				continue;
 			}
 

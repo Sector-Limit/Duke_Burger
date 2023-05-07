@@ -95,6 +95,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private World m_world;
 	private Body m_body;
 
+	private Jukebox m_jukebox;
 	private TextRenderer m_textRenderer;
 	private HUD m_hud;
 	private ExplosionFactory m_explosionFactory;
@@ -172,11 +173,11 @@ public class Duke implements ContactListener, HUDDataProvider {
 	private static final float PICKUP_COOLDOWN_DURATION = 0.35f;
 	private static final float DROP_DURATION = 0.2f;
 
-	public Duke(World world, TiledMap map, TextRenderer textRenderer) {
-		this(world, map, textRenderer, MAX_LIVES, 0, null);
+	public Duke(World world, TiledMap map, TextRenderer textRenderer, Jukebox jukebox) {
+		this(world, map, textRenderer, jukebox, MAX_LIVES, 0, null);
 	}
 
-	public Duke(World world, TiledMap map, TextRenderer textRenderer, int lives, int coins, Vector<Integer> consumedPowerupIdentifiers) {
+	public Duke(World world, TiledMap map, TextRenderer textRenderer, Jukebox jukebox, int lives, int coins, Vector<Integer> consumedPowerupIdentifiers) {
 		m_world = world;
 		m_world.setContactListener(this);
 
@@ -205,6 +206,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_gameOver = false;
 		m_levelCompletedTimeElapsed = 0.0f;
 		m_levelCompletedDelay = DEFAULT_LEVEL_COMPLETED_DELAY;
+		m_jukebox = jukebox;
 		m_textRenderer = textRenderer;
 		m_hud = new HUD(this, m_textRenderer);
 		m_pickupItemFactory = new PickupItemFactory(m_world);
@@ -827,6 +829,18 @@ public class Duke implements ContactListener, HUDDataProvider {
 		else {
 			m_world.setGravity(m_normalGravity);
 		}
+	}
+
+	public void toggleMusic() {
+		m_jukebox.setEnabled(!m_jukebox.isEnabled());
+
+		if(m_jukebox.isEnabled()) {
+			m_jukebox.play(m_jukebox.getCurrentTrack());
+		}
+	}
+
+	public boolean playMusicTrack(int trackNumber) {
+		return m_jukebox.play(trackNumber);
 	}
 
 	public void render(SpriteBatch spriteBatch) {
