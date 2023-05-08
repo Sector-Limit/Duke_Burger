@@ -27,6 +27,7 @@ public class Enforcer extends Enemy {
 
 	private static final float FIREBALL_COOLDOWN = 2.0f;
 	private static final Vector2 ENFORCER_SIZE = new Vector2(22, 22);
+	private static final Vector2 COLLISION_OFFSET = new Vector2(0.0f, 0.5f);
 
 	public Enforcer(ProjectileSystem projectileSystem, Animation<TextureRegion> enforcerAnimation, Texture enforcerDeadTexture) {
 		m_fireballCooldownTimeElapsed = 0.0f;
@@ -37,8 +38,19 @@ public class Enforcer extends Enemy {
 		m_enforcerDeadTexture = enforcerDeadTexture;
 	}
 
+	@Override
 	public Vector2 getSize() {
 		return ENFORCER_SIZE;
+	}
+
+	@Override
+	public Vector2 getCollisionOffset() {
+		return COLLISION_OFFSET;
+	}
+
+	@Override
+	public float getCollisionRadius() {
+		return getSize().y * 0.5f;
 	}
 
 	@Override
@@ -53,15 +65,15 @@ public class Enforcer extends Enemy {
 		m_body = world.createBody(bodyDefinition);
 		m_body.setUserData(this);
 		CircleShape circleCollisionShape = new CircleShape();
-		circleCollisionShape.setRadius(getSize().y * 0.5f);
-		circleCollisionShape.setPosition(new Vector2(0.0f, 0.5f));
+		circleCollisionShape.setPosition(getCollisionOffset());
+		circleCollisionShape.setRadius(getCollisionRadius());
 		FixtureDef sensorFixtureDefinition = new FixtureDef();
 		sensorFixtureDefinition.shape = circleCollisionShape;
 		sensorFixtureDefinition.isSensor = true;
 		Fixture sensorCollisionFixture = m_body.createFixture(sensorFixtureDefinition);
 		Filter sensorCollisionFilter = new Filter();
 		sensorCollisionFilter.categoryBits = CollisionCategories.ENEMY_SENSOR;
-		sensorCollisionFilter.maskBits = CollisionCategories.OBJECT | CollisionCategories.DUKE_MAIN_SENSOR | CollisionCategories.EXPLOSION;
+		sensorCollisionFilter.maskBits = CollisionCategories.OBJECT | CollisionCategories.DUKE_MAIN_SENSOR;
 		sensorCollisionFixture.setFilterData(sensorCollisionFilter);
 		circleCollisionShape.dispose();
 	}

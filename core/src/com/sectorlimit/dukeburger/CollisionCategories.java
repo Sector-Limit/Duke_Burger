@@ -16,6 +16,5 @@ public class CollisionCategories {
 	public static final short DOOR              = 1 << 11;
 	public static final short PROJECTILE        = 1 << 12;
 	public static final short DEATH             = 1 << 13;
-	public static final short EXPLOSION         = 1 << 14;
 
 }

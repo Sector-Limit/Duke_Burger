@@ -24,6 +24,8 @@ public abstract class Enemy {
 
 	protected Body m_body;
 
+	private static final Vector2 DEFAULT_COLLISION_OFFSET = new Vector2(0.0f, 0.0f);
+
 	public Enemy() {
 		if(shouldRandomizeInitialDirection()) {
 			m_facingLeft = (byte) (Math.random() * 2.0) == 0;
@@ -51,7 +53,15 @@ public abstract class Enemy {
 		m_body.setTransform(position, 0);
 	}
 
-	public abstract Vector2 getSize();
+    public abstract Vector2 getSize();
+
+	public Vector2 getCollisionOffset() {
+		return DEFAULT_COLLISION_OFFSET;
+	}
+
+	public float getCollisionRadius() {
+		return getSize().x * 0.5f;
+	}
 
 	public void assignPhysics(World world, Vector2 position) {
 		BodyDef bodyDefinition = new BodyDef();
@@ -74,13 +84,14 @@ public abstract class Enemy {
 		collisionFixture.setFilterData(collisionFilter);
 		FixtureDef sensorFixtureDefinition = new FixtureDef();
 		CircleShape circleCollisionShape = new CircleShape();
-		circleCollisionShape.setRadius(getSize().x * 0.5f);
+		circleCollisionShape.setPosition(getCollisionOffset());
+		circleCollisionShape.setRadius(getCollisionRadius());
 		sensorFixtureDefinition.shape = circleCollisionShape;
 		sensorFixtureDefinition.isSensor = true;
 		Fixture sensorCollisionFixture = m_body.createFixture(sensorFixtureDefinition);
 		Filter sensorCollisionFilter = new Filter();
 		sensorCollisionFilter.categoryBits = CollisionCategories.ENEMY_SENSOR;
-		sensorCollisionFilter.maskBits = CollisionCategories.OBJECT | CollisionCategories.DUKE_MAIN_SENSOR | CollisionCategories.EXPLOSION;
+		sensorCollisionFilter.maskBits = CollisionCategories.OBJECT | CollisionCategories.DUKE_MAIN_SENSOR;
 		sensorCollisionFixture.setFilterData(sensorCollisionFilter);
 		sensorCollisionFixture.setUserData("main");
 		polygonCollisionShape.dispose();

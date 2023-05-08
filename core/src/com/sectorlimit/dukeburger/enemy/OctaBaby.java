@@ -44,9 +44,10 @@ public class OctaBaby extends BasicEnemy {
 		return m_type;
 	}
 
-	public Vector2 getSize() {
-		return OCTA_BABY_SIZE;
-	}
+	@Override
+    public Vector2 getSize() {
+        return OCTA_BABY_SIZE;
+    }
 
 	@Override
 	public void assignPhysics(World world, Vector2 position) {

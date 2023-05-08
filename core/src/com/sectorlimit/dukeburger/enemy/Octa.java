@@ -27,6 +27,7 @@ public class Octa extends Enemy {
 	private Texture m_octaDeadTexture;
 
 	private static final Vector2 OCTA_SIZE = new Vector2(27, 22);
+	private static final Vector2 COLLISION_OFFSET = new Vector2(0.0f, 2.0f);
 	private static final float BLOCK_SIZE = 16.0f;
 	private static final int DEFAULT_OCTA_RISE_HEIGHT = 5;
 	private static float OCTA_RISE_VELOCITY = 50.0f;
@@ -57,6 +58,16 @@ public class Octa extends Enemy {
 	}
 
 	@Override
+	public Vector2 getCollisionOffset() {
+		return COLLISION_OFFSET;
+	}
+
+	@Override
+	public float getCollisionRadius() {
+		return getSize().y * 0.5f;
+	}
+
+	@Override
 	public boolean shouldRandomizeInitialDirection() {
 		return false;
 	}
@@ -68,15 +79,15 @@ public class Octa extends Enemy {
 		m_body = world.createBody(bodyDefinition);
 		m_body.setUserData(this);
 		CircleShape circleCollisionShape = new CircleShape();
-		circleCollisionShape.setRadius(getSize().y * 0.5f);
-		circleCollisionShape.setPosition(new Vector2(0.0f, 2.0f));
+		circleCollisionShape.setRadius(getCollisionRadius());
+		circleCollisionShape.setPosition(getCollisionOffset());
 		FixtureDef sensorFixtureDefinition = new FixtureDef();
 		sensorFixtureDefinition.shape = circleCollisionShape;
 		sensorFixtureDefinition.isSensor = true;
 		Fixture sensorCollisionFixture = m_body.createFixture(sensorFixtureDefinition);
 		Filter sensorCollisionFilter = new Filter();
 		sensorCollisionFilter.categoryBits = CollisionCategories.ENEMY_SENSOR;
-		sensorCollisionFilter.maskBits = CollisionCategories.OBJECT | CollisionCategories.DUKE_MAIN_SENSOR | CollisionCategories.EXPLOSION;
+		sensorCollisionFilter.maskBits = CollisionCategories.OBJECT | CollisionCategories.DUKE_MAIN_SENSOR;
 		sensorCollisionFixture.setFilterData(sensorCollisionFilter);
 		circleCollisionShape.dispose();
 

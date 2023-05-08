@@ -213,7 +213,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_projectileSystem = new ProjectileSystem(m_world);
 		m_enemyFactory = new EnemyFactory(m_projectileSystem, m_world);
 		m_powerupsFactory = new PowerupsFactory();
-		m_explosionFactory = new ExplosionFactory(m_world);
+		m_explosionFactory = new ExplosionFactory();
 		m_staticObjectFactory = new StaticObjectFactory(m_world);
 		m_dynamicObjectFactory = new DynamicObjectFactory(m_world);
 		m_cheatCodeHandler = new CheatCodeHandler(this);
@@ -1223,11 +1223,16 @@ public class Duke implements ContactListener, HUDDataProvider {
 			}
 			else {
 				explosion.render(spriteBatch);
+
+				for(Enemy enemy : m_enemies) {
+					if(enemy.isAlive() && !enemy.isTossed() && explosion.getOriginPosition().dst(new Vector2(enemy.getOriginPosition()).add(enemy.getCollisionOffset())) <= explosion.getCollisionRadius() + enemy.getCollisionRadius()) {
+						enemy.kill();
+					}
+				}
 			}
 		}
 
 		for(Explosion explosion : explosionsToRemove) {
-			explosion.cleanup(m_world);
 			m_explosions.remove(explosion);
 		}
 
@@ -1494,35 +1499,27 @@ public class Duke implements ContactListener, HUDDataProvider {
 				else {
 					Enemy enemy = null;
 					Fixture enemyFixture = null;
-					Object enemyContactObject = null;
 
 					if(contactObjectA instanceof Enemy) {
 						enemy = (Enemy) contactObjectA;
 						enemyFixture = contact.getFixtureA();
-						enemyContactObject = contactObjectB;
 					}
 					else if(contactObjectB instanceof Enemy) {
 						enemy = (Enemy) contactObjectB;
 						enemyFixture = contact.getFixtureB();
-						enemyContactObject = contactObjectA;
 					}
 
 					if(enemy != null) {
-						if(enemyContactObject instanceof Explosion) {
-							enemy.kill();
-						}
-						else {
-							Object enemyFixtureTypeObject = enemyFixture.getUserData();
-	
-							if(enemyFixtureTypeObject instanceof String) {
-								String enemyFixtureType = (String) enemyFixtureTypeObject;
-	
-								if(enemyFixtureType.equalsIgnoreCase("left")) {
-									enemy.onCollideWithWall(true);
-								}
-								else if(enemyFixtureType.equalsIgnoreCase("right")) {
-									enemy.onCollideWithWall(false);
-								}
+						Object enemyFixtureTypeObject = enemyFixture.getUserData();
+
+						if(enemyFixtureTypeObject instanceof String) {
+							String enemyFixtureType = (String) enemyFixtureTypeObject;
+
+							if(enemyFixtureType.equalsIgnoreCase("left")) {
+								enemy.onCollideWithWall(true);
+							}
+							else if(enemyFixtureType.equalsIgnoreCase("right")) {
+								enemy.onCollideWithWall(false);
 							}
 						}
 					}
