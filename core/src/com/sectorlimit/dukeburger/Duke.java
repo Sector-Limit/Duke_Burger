@@ -1249,7 +1249,12 @@ public class Duke implements ContactListener, HUDDataProvider {
 			}
 		}
 		else if(!m_jumping && !m_tossingSomething && m_feetGroundContactFixtures.isEmpty()) {
-			currentTexture = m_jumpTexture;
+			if(isHoldingSomething()) {
+				currentTexture = m_jumpHoldTexture;
+			}
+			else {
+				currentTexture = m_jumpTexture;
+			}
 		}
 		else if(m_tossingSomething) {
 			currentTexture = m_tossItemTexture;
