@@ -346,6 +346,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 			System.err.println("Missing player spawn position objece with name: 'player_start'.");
 		}
 
+		Vector2 halfSize = new Vector2(getSize().x * 0.48f, getSize().y * 0.48f);
 		BodyDef bodyDefinition = new BodyDef();
 		bodyDefinition.type = BodyType.DynamicBody;
 		bodyDefinition.position.set(spawnPosition);
@@ -353,7 +354,7 @@ public class Duke implements ContactListener, HUDDataProvider {
 		m_body = world.createBody(bodyDefinition);
 		m_body.setUserData(this);
 		PolygonShape polygonCollisionShape = new PolygonShape();
-		polygonCollisionShape.setAsBox(getSize().x / 2.0f, getSize().y / 2.0f);
+		polygonCollisionShape.setAsBox(halfSize.x, halfSize.y);
 		FixtureDef fixtureDefinition = new FixtureDef();
 		fixtureDefinition.shape = polygonCollisionShape;
 		fixtureDefinition.density = 0.5f;
@@ -382,7 +383,6 @@ public class Duke implements ContactListener, HUDDataProvider {
 		mainCollisionFixture.setFilterData(mainCollisionFilter);
 		mainCollisionFixture.setUserData("main");
 
-		Vector2 halfSize = new Vector2(getSize()).scl(0.5f);
 		float halfSensorWidth = halfSize.x * 0.99f;
 		float halfSensorHeight = halfSize.y * 0.99f;
 		BodyDef bottomSensorBodyDefinition = new BodyDef();
